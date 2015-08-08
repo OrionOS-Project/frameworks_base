@@ -977,6 +977,11 @@ interface IActivityManager {
     int checkPermissionForDevice(in String permission, int pid, int uid, int deviceId);
 
     /**
+     *  Should disable touch if three fingers to screen shot is active?
+     */
+    boolean isSwipeToScreenshotGestureActive();
+
+    /**
      * Notify AMS about binder transactions to frozen apps.
      *
      * @param debugPid The binder transaction sender
