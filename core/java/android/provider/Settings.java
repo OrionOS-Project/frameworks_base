@@ -6347,10 +6347,15 @@ public final class Settings {
         public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
 
         /**
+         * Enable/disable Bluetooth Battery bar
+         * @hide
+         */
+        public static final String BLUETOOTH_SHOW_BATTERY = "bluetooth_show_battery";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
-         * All settings in {@link LEGACY_RESTORE_SETTINGS} array *must* have a non-null validator,
          * otherwise they won't be restored.
          *
          * @hide
