@@ -32,6 +32,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.android.app.animation.Interpolators
+import com.android.systemui.derpfest.logo.LogoImage
 import com.android.systemui.display.dagger.SystemUIDisplaySubcomponent.PerDisplaySingleton
 import com.android.systemui.lifecycle.repeatWhenAttached
 import com.android.systemui.res.R
@@ -125,6 +126,7 @@ constructor(
         val centerClock: Clock = view.findViewById(R.id.clock_center)
         val rightClock: Clock = view.findViewById(R.id.clock_right)
         val notificationIconsArea = view.requireViewById<View>(R.id.notificationIcons)
+        val leftLogo: LogoImage = view.requireViewById(R.id.statusbar_logo)
 
         // CollapsedStatusBarFragment doesn't need this
         if (StatusBarRootModernization.isEnabled) {
@@ -134,6 +136,7 @@ constructor(
             leftClock.hideInitially(state = View.GONE)
             centerClock.hideInitially(state = View.GONE)
             rightClock.hideInitially(state = View.GONE)
+            leftLogo.hideInitially()
             notificationIconsArea.hideInitially()
         }
 
@@ -472,6 +475,7 @@ constructor(
                     launch {
                         viewModel.isNotificationIconContainerVisible.collect {
                             notificationIconsArea.adjustVisibility(it)
+                            leftLogo.adjustVisibility(it)
                         }
                     }
 
