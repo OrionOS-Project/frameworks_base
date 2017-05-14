@@ -369,12 +369,12 @@ public class CPUInfoService extends Service {
                         int cpu = Integer.parseInt(cpuList[i]);
                         mCpu[i] = cpuList[i];
                     } catch (NumberFormatException ex) {
-                        // derped overlay
+                        // Orion overlay
                         return getCpus(null);
                     }
                 }
             } else {
-                // derped overlay
+                // orioned overlay
                 return getCpus(null);
             }
         } else {

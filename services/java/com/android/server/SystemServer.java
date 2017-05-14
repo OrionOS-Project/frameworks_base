@@ -169,7 +169,7 @@ import com.android.server.cpu.CpuMonitorService;
 import com.android.server.crashrecovery.CrashRecoveryAdaptor;
 import com.android.server.credentials.CredentialManagerService;
 import com.android.server.criticalevents.CriticalEventLog;
-import com.android.server.derpfest.CustomDeviceConfigService;
+import com.android.server.orion.CustomDeviceConfigService;
 import com.android.server.devicepolicy.DevicePolicyManagerService;
 import com.android.server.devicestate.DeviceStateManagerService;
 import com.android.server.display.DisplayManagerService;

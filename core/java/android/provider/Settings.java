@@ -124,7 +124,7 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
-import com.android.internal.util.derpfest.DeviceConfigUtils;
+import com.android.internal.util.orion.DeviceConfigUtils;
 
 /**
  * The Settings provider contains global system-level device preferences.
@@ -6752,6 +6752,26 @@ public final class Settings {
          * @hide
          */
         public static final String AUTH_RIPPLE_ENABLED = "auth_ripple_enabled";
+
+        /**
+         * Statusbar logo
+         * @hide
+         */
+        public static final String STATUS_BAR_LOGO = "status_bar_logo";
+
+        /**
+         * Position of Status bar logo
+         * 0 - Left (default)
+         * 1 - Right
+         * @hide
+         */
+        public static final String STATUS_BAR_LOGO_POSITION = "status_bar_logo_position";
+
+        /**
+         * Statusbar logo custom style
+         * @hide
+         */
+        public static final String STATUS_BAR_LOGO_STYLE = "status_bar_logo_style";
 
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to
