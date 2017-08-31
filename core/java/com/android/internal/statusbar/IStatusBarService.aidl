@@ -256,4 +256,9 @@ interface IStatusBarService
     void toggleRecentApps();
 
     void screenPinningStateChanged(boolean enabled);
+
+    /**
+     * DerpFest extensions
+     */
+    void toggleCameraFlash();
 }

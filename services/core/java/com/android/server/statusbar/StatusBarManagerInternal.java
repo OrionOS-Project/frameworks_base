@@ -290,4 +290,9 @@ public interface StatusBarManagerInternal {
 
     /** Passes through the given shell commands to SystemUI */
     void passThroughShellCommand(String[] args, FileDescriptor fd);
+
+    /**
+     * DerpFest extensions
+     */
+    void toggleCameraFlash();
 }
