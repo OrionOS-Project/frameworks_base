@@ -50,6 +50,7 @@ import com.android.systemui.statusbar.notification.stack.AmbientState;
 import com.android.systemui.statusbar.notification.stack.NotificationSectionsManager;
 import com.android.systemui.statusbar.phone.LightBarController;
 import com.android.systemui.statusbar.phone.ScreenOffAnimationController;
+import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.phone.SystemUIDialogManager;
 import com.android.systemui.statusbar.policy.BluetoothController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController;
@@ -134,6 +135,7 @@ public class Dependency {
     @Inject Lazy<NavigationModeController> mNavBarModeController;
     @Inject Lazy<NavigationBarController> mNavigationBarController;
     @Inject Lazy<StatusBarStateController> mStatusBarStateController;
+    @Inject Lazy<FlashlightController> mFlashlightController;
     @Inject Lazy<NotificationMediaManager> mNotificationMediaManager;
     @Inject Lazy<NotificationListener> mNotificationListener;
     @Inject @Background Lazy<Looper> mBgLooper;
@@ -181,6 +183,7 @@ public class Dependency {
         mProviders.put(NavigationModeController.class, mNavBarModeController::get);
         mProviders.put(NavigationBarController.class, mNavigationBarController::get);
         mProviders.put(StatusBarStateController.class, mStatusBarStateController::get);
+        mProviders.put(FlashlightController.class, mFlashlightController::get);
         mProviders.put(NotificationMediaManager.class, mNotificationMediaManager::get);
         mProviders.put(NotificationListener.class, mNotificationListener::get);
         mProviders.put(SysUiState.class, mSysUiStateFlagsContainer::get);

@@ -256,4 +256,9 @@ interface IStatusBarService
     void toggleRecentApps();
 
     void screenPinningStateChanged(boolean enabled);
+
+    /**
+     * Orion extensions
+     */
+    void toggleCameraFlash();
 }
