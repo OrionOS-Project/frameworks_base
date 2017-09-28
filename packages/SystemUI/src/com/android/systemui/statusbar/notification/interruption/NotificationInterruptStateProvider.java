@@ -195,6 +195,9 @@ public interface NotificationInterruptStateProvider {
      */
     void removeSuppressor(NotificationInterruptSuppressor suppressor);
 
+    void setHeadsUpStoplist();
+    void setHeadsUpBlacklist();
+
     /**
      * Whether the notification should show pulse light or not.
      */
