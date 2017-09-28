@@ -85,4 +85,9 @@
     <!-- Preferred network tile -->
     <string name="quick_settings_preferred_network_label">Preferred network</string>
     <string name="quick_settings_preferred_network_unsupported">Unsupported</string>
+
+    <!-- Music tile -->
+    <string name="quick_settings_music_label">Music</string>
+    <string name="quick_settings_music_play">Play</string>
+    <string name="quick_settings_music_pause">Pause</string>
 </resources>
