@@ -28,6 +28,7 @@ import com.android.systemui.qs.tiles.CompassTile
 import com.android.systemui.qs.tiles.DataSwitchTile
 import com.android.systemui.qs.tiles.HeadsUpTile
 import com.android.systemui.qs.tiles.LocaleTile
+import com.android.systemui.qs.tiles.MusicTile
 import com.android.systemui.qs.tiles.PowerShareTile
 import com.android.systemui.qs.tiles.PreferredNetworkTile
 import com.android.systemui.qs.tiles.ProfilesTile
@@ -96,6 +97,12 @@ interface LineageModule {
     @IntoMap
     @StringKey(LocaleTile.TILE_SPEC)
     fun bindLocaleTile(localeTile: LocaleTile): QSTileImpl<*>
+
+    /** Inject MusicTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(MusicTile.TILE_SPEC)
+    fun bindMusicTile(musicTile: MusicTile): QSTileImpl<*>
 
     /** Inject PowerShareTile into tileMap in QSModule */
     @Binds
@@ -281,6 +288,21 @@ interface LineageModule {
                     ),
                 instanceId = uiEventLogger.getNewInstanceId(),
                 category = TileCategory.ACCESSIBILITY,
+            )
+
+        @Provides
+        @IntoMap
+        @StringKey(MusicTile.TILE_SPEC)
+        fun provideMusicTile(uiEventLogger: QsEventLogger): QSTileConfig =
+            QSTileConfig(
+                tileSpec = TileSpec.create(MusicTile.TILE_SPEC),
+                uiConfig =
+                    QSTileUIConfig.Resource(
+                        iconRes = R.drawable.ic_qs_media_play,
+                        labelRes = R.string.quick_settings_music_label
+                    ),
+                instanceId = uiEventLogger.getNewInstanceId(),
+                category = TileCategory.UTILITIES,
             )
 
         @Provides
