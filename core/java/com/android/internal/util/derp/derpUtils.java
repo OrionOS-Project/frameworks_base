@@ -22,8 +22,10 @@ import android.content.res.Resources;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemClock;
 import android.os.UserHandle;
 
 import com.android.internal.statusbar.IStatusBarService;
@@ -35,6 +37,15 @@ import java.util.Locale;
  * @hide
  */
 public class derpUtils {
+
+    // Method to turn off the screen
+    public static void switchScreenOff(Context ctx) {
+        PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+        if (pm!= null) {
+            pm.goToSleep(SystemClock.uptimeMillis());
+        }
+    }
+
     public static boolean isPackageInstalled(Context context, String pkg, boolean ignoreState) {
         if (pkg != null) {
             try {
