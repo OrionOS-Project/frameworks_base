@@ -595,6 +595,7 @@ android_library {
         "smartspace-proto-lite-java",
         "vendor.lineage.powershare-V1-java",
         "VendorSupport-preference",
+        "FadingEdgeLayoutLib",
     ],
     javacflags: [
         "-Aroom.schemaLocation=frameworks/base/packages/SystemUI/schemas",
