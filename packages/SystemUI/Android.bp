@@ -543,6 +543,7 @@ android_library {
         "bcsmartspace-google",
         "vendor.lineage.powershare-V1-java",
         "VendorSupport-preference",
+        "FadingEdgeLayoutLib",
     ],
     libs: [
         "keepanno-annotations",
