@@ -11,4 +11,7 @@
     <string name="reboot_suggestion_title">Reboot Reminder</string>
     <string name="reboot_suggestion_description">Your device has been on for over a week. Rebooting is recommended.</string>
     <string name="reboot_suggestion_now">Reboot</string>
+
+    <!-- Name of the nfc status bar icon. -->
+    <string name="status_bar_nfc">NFC</string>
 </resources>

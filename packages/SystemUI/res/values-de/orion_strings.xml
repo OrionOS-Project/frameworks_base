@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: OrionOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+
+    <!-- Auto reboot Suggestion/Reminder -->
+    <string name="notification_channel_reboot_suggestion">Neustart-Empfehlung</string>
+    <string name="notification_channel_reboot_suggestion_description">Benachrichtigungen für Neustart-Empfehlung</string>
+    <string name="reboot_suggestion_title">Neustart-Erinnerung</string>
+    <string name="reboot_suggestion_description">Ihr Gerät war über eine Woche lang ununterbrochen eingeschaltet. Ein Neustart wird empfohlen.</string>
+    <string name="reboot_suggestion_now">Neustart</string>
+
+    <!-- Name of the nfc status bar icon. -->
+    <string name="status_bar_nfc">NFC</string>
+</resources>
