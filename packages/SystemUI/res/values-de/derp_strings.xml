@@ -23,4 +23,7 @@
         <item quantity="one">%d Gerät verbunden</item>
         <item quantity="other">%d Geräte verbunden</item>
     </plurals>
+
+    <!-- Name of the nfc status bar icon. -->
+    <string name="status_bar_nfc">NFC</string>
 </resources>
