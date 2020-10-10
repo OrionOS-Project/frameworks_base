@@ -31,10 +31,8 @@ import android.util.ArrayMap;
 import android.util.ArraySet;
 import android.util.Log;
 import android.util.Pools;
-import android.view.Gravity;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.internal.annotations.VisibleForTesting;
@@ -48,6 +46,7 @@ import com.android.systemui.dagger.SysUISingleton;
 import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
 import com.android.systemui.res.R;
+import com.android.systemui.SysUIToast;
 import com.android.systemui.scene.shared.flag.SceneContainerFlag;
 import com.android.systemui.shade.ShadeDisplayAware;
 import com.android.systemui.shade.domain.interactor.ShadeInteractor;
@@ -822,17 +821,13 @@ public class HeadsUpManagerImpl
                 }
                 Toast toast;
                 if (mSnoozeLengthMs == 60000) {
-                    toast = Toast.makeText(mContext, mContext.getString(
+                    toast = SysUIToast.makeText(mContext, mContext.getString(
                             R.string.heads_up_snooze_message_one_minute, appName),
                             Toast.LENGTH_LONG);
                 } else {
-                    toast = Toast.makeText(mContext, mContext.getString(
+                    toast = SysUIToast.makeText(mContext, mContext.getString(
                             R.string.heads_up_snooze_message, appName,
                             mSnoozeLengthMs / 60 / 1000), Toast.LENGTH_LONG);
-                }
-                TextView tv = (TextView) toast.getView().findViewById(android.R.id.message);
-                if (tv != null) {
-                    tv.setGravity(Gravity.CENTER);
                 }
                 toast.show();
             }
