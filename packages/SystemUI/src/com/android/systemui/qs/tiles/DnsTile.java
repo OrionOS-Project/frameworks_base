@@ -144,7 +144,7 @@ public class DnsTile extends QSTileImpl<BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.DERPFEST;
+        return MetricsEvent.ORION;
     }
 
     private String getSecondaryLabel(int mode) {

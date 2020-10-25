@@ -171,7 +171,7 @@ public class PreferredNetworkTile extends QSTileImpl<State> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.DERPFEST;
+        return MetricsEvent.ORION;
     }
 
     @Override

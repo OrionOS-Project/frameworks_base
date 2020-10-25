@@ -102,4 +102,8 @@
     <string name="usb_use_tethering">USB tethering</string>
     <string name="usb_use_MIDI">MIDI</string>
     <string name="usb_use">Use USB for</string>
+
+    <!-- Molecular Tile -->
+    <string name="quick_orion_label">Molecular</string>
+    <string name="quick_orion_toast">LOL, you really thought that long click will take you somewhere!!!</string>
 </resources>
