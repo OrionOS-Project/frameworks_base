@@ -26,6 +26,7 @@ import com.android.systemui.qs.tiles.CPUInfoTile
 import com.android.systemui.qs.tiles.CaffeineTile
 import com.android.systemui.qs.tiles.CompassTile
 import com.android.systemui.qs.tiles.DataSwitchTile
+import com.android.systemui.qs.tiles.DerpFestTile
 import com.android.systemui.qs.tiles.DnsTile
 import com.android.systemui.qs.tiles.HeadsUpTile
 import com.android.systemui.qs.tiles.LocaleTile
@@ -86,6 +87,12 @@ interface LineageModule {
     @IntoMap
     @StringKey(DataSwitchTile.TILE_SPEC)
     fun bindDataSwitchTile(dataSwitchTile: DataSwitchTile): QSTileImpl<*>
+
+    /** Inject DerpFestTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(DerpFestTile.TILE_SPEC)
+    fun bindDerpFestTile(derpFestTile: DerpFestTile): QSTileImpl<*>
 
     /** Inject DnsTile into tileMap in QSModule */
     @Binds
@@ -265,6 +272,21 @@ interface LineageModule {
                     ),
                 instanceId = uiEventLogger.getNewInstanceId(),
                 category = TileCategory.CONNECTIVITY,
+            )
+
+        @Provides
+        @IntoMap
+        @StringKey(DerpFestTile.TILE_SPEC)
+        fun provideDerpFestTile(uiEventLogger: QsEventLogger): QSTileConfig =
+            QSTileConfig(
+                tileSpec = TileSpec.create(DerpFestTile.TILE_SPEC),
+                uiConfig =
+                    QSTileUIConfig.Resource(
+                        iconRes = R.drawable.ic_qs_derpfest,
+                        labelRes = R.string.quick_derpfest_label
+                    ),
+                instanceId = uiEventLogger.getNewInstanceId(),
+                category = TileCategory.UTILITIES,
             )
 
         @Provides

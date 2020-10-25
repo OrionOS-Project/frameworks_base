@@ -113,4 +113,8 @@
     <string name="usb_use_tethering">USB tethering</string>
     <string name="usb_use_MIDI">MIDI</string>
     <string name="usb_use">Use USB for</string>
+
+    <!-- DerpFest Tile -->
+    <string name="quick_derpfest_label">DerpFest Customizations</string>
+    <string name="quick_derpfest_toast">LOL, you really thought that long click will take you somewhere!!!</string>
 </resources>
