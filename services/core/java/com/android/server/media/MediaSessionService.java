@@ -45,6 +45,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManagerInternal;
+import android.database.ContentObserver;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.AudioPlaybackConfiguration;
@@ -65,6 +66,7 @@ import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -563,8 +565,9 @@ public class MediaSessionService extends SystemService implements Monitor {
         int userId = targetUser.getUserIdentifier();
 
         if (DEBUG) Log.d(TAG, "onCleanupUser: " + userId);
+        FullUserRecord user;
         synchronized (mLock) {
-            FullUserRecord user = getFullUserRecordLocked(userId);
+            user = getFullUserRecordLocked(userId);
             if (user != null) {
                 if (user.mFullUserId == userId) {
                     user.destroySessionsForUserLocked(ALL.getIdentifier());
@@ -574,6 +577,9 @@ public class MediaSessionService extends SystemService implements Monitor {
                 }
             }
             updateUser();
+        }
+        if (user != null) {
+            user.destroy();
         }
     }
 
@@ -1281,10 +1287,16 @@ public class MediaSessionService extends SystemService implements Monitor {
         private IOnMediaKeyListener mOnMediaKeyListener;
         private int mOnMediaKeyListenerUid;
 
+        private final SettingsObserver mSettingsObserver;
+        private volatile boolean mAdaptivePlaybackEnabled;
+
         FullUserRecord(int fullUserId) {
             mFullUserId = fullUserId;
             mContentResolver = mContext.createContextAsUser(UserHandle.of(mFullUserId), 0)
                     .getContentResolver();
+            mSettingsObserver = new SettingsObserver(mHandler);
+            mSettingsObserver.observe();
+            mAdaptivePlaybackEnabled = readAdaptivePlaybackEnabled();
             mPriorityStack = new MediaSessionStack(mAudioPlayerStateMonitor, this);
             // Restore the remembered media button receiver before the boot.
             String mediaButtonReceiverInfo = Settings.Secure.getString(mContentResolver,
@@ -1292,6 +1304,15 @@ public class MediaSessionService extends SystemService implements Monitor {
             mLastMediaButtonReceiverHolder =
                     MediaButtonReceiverHolder.unflattenFromString(
                             mContext, mediaButtonReceiverInfo);
+        }
+
+        void destroy() {
+            mContentResolver.unregisterContentObserver(mSettingsObserver);
+        }
+
+        private boolean readAdaptivePlaybackEnabled() {
+            return Settings.System.getIntForUser(mContentResolver,
+                    Settings.System.ADAPTIVE_PLAYBACK_ENABLED, 0, mFullUserId) == 1;
         }
 
         public void destroySessionsForUserLocked(int userId) {
@@ -1480,6 +1501,27 @@ public class MediaSessionService extends SystemService implements Monitor {
             public void binderDied() {
                 synchronized (mLock) {
                     mOnMediaKeyEventSessionChangedListeners.remove(callback.asBinder());
+                }
+            }
+        }
+
+        final class SettingsObserver extends ContentObserver {
+            private final Uri ADAPTIVE_PLAYBACK_ENABLED_URI =
+                    Settings.System.getUriFor(Settings.System.ADAPTIVE_PLAYBACK_ENABLED);
+
+            SettingsObserver(Handler handler) {
+                super(handler);
+            }
+
+            void observe() {
+                mContentResolver.registerContentObserver(
+                        ADAPTIVE_PLAYBACK_ENABLED_URI, false, this, mFullUserId);
+            }
+
+            @Override
+            public void onChange(boolean selfChange, @Nullable Uri uri) {
+                if (ADAPTIVE_PLAYBACK_ENABLED_URI.equals(uri)) {
+                    mAdaptivePlaybackEnabled = readAdaptivePlaybackEnabled();
                 }
             }
         }
@@ -2590,7 +2632,9 @@ public class MediaSessionService extends SystemService implements Monitor {
                             + ". flags=" + flags + ", preferSuggestedStream="
                             + preferSuggestedStream + ", session=" + session);
                 }
-                if (musicOnly && !AudioSystem.isStreamActive(AudioManager.STREAM_MUSIC, 0)) {
+                if (musicOnly && !mCurrentFullUserRecord.mAdaptivePlaybackEnabled
+                        && direction != AudioManager.ADJUST_RAISE
+                        && !AudioSystem.isStreamActive(AudioManager.STREAM_MUSIC, 0)) {
                     if (DEBUG_KEY_EVENT) {
                         Log.d(TAG, "Nothing is playing on the music stream. Skipping volume event,"
                                 + " flags=" + flags);
