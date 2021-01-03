@@ -39,6 +39,7 @@ import android.metrics.LogMaker;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.VibrationEffect;
 import android.text.format.DateUtils;
 import android.util.ArraySet;
 import android.util.Log;
@@ -70,6 +71,8 @@ import com.android.systemui.qs.QSHost;
 import com.android.systemui.qs.QsEventLogger;
 import com.android.systemui.qs.SideLabelTileLayout;
 import com.android.systemui.qs.logging.QSLogger;
+
+import org.derpfest.support.util.VibrationUtils;
 
 import java.io.PrintWriter;
 import java.util.Objects;
@@ -304,6 +307,7 @@ public abstract class QSTileImpl<TState extends State> implements QSTile, Lifecy
         if (!mFalsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
             mHandler.obtainMessage(H.CLICK, eventId, 0, expandable).sendToTarget();
         }
+        VibrationUtils.doHapticFeedback(mContext, VibrationEffect.EFFECT_CLICK);
     }
 
     @Override
@@ -319,6 +323,7 @@ public abstract class QSTileImpl<TState extends State> implements QSTile, Lifecy
         if (!mFalsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
             mHandler.obtainMessage(H.SECONDARY_CLICK, eventId, 0, expandable).sendToTarget();
         }
+        VibrationUtils.doHapticFeedback(mContext, VibrationEffect.EFFECT_TICK);
     }
 
     @Override
