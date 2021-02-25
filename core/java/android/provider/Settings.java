@@ -19981,6 +19981,12 @@ public final class Settings {
                 "redact_otp_notifications_from_untrusted_listeners";
 
         /**
+         * The amount of time in milliseconds before wifi is turned off
+         * @hide
+         */
+        public static final String WIFI_OFF_TIMEOUT = "wifi_off_timeout";
+
+        /**
          * Settings migrated from Wear OS settings provider.
          * @hide
          */
