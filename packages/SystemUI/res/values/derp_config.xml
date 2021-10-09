@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   SPDX-FileCopyrightText: 2025 DerpFest
+   SPDX-License-Identifier: Apache-2.0
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- Whether to enable burn-in protection for statusbar and navbar -->
+    <bool name="config_statusBarBurnInProtection">@*android:bool/config_enableBurnInProtection</bool>
+    <!-- Interval between subsequent shifting of statusbar and navbar contents, in seconds -->
+    <integer name="config_statusBarBurnInProtectionShiftInterval">60</integer>
+</resources>
