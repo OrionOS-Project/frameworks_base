@@ -3,7 +3,7 @@
      SPDX-FileCopyrightText: DerpFest AOSP
      SPDX-License-Identifier: Apache-2.0
 -->
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <!-- Auto reboot Suggestion/Reminder -->
     <string name="notification_channel_reboot_suggestion">Neustart-Empfehlung</string>
@@ -64,4 +64,10 @@
     <!-- Language toggle tile -->
     <string name="quick_settings_locale_label">Sprache</string>
     <string name="quick_settings_locale_more_locales_toast">Bitte zunächst mehr als eine Sprache hinzufügen</string>
+
+    <!-- Sound QS Tile -->
+    <string name="quick_settings_sound_label">Ton</string>
+    <string name="quick_settings_sound_ring">Klingeln</string>
+    <string name="quick_settings_sound_vibrate">Vibrieren</string>
+    <string name="quick_settings_sound_mute">Stummschalten</string>
 </resources>
