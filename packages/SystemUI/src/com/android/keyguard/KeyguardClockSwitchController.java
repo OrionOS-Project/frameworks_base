@@ -260,6 +260,7 @@ public class KeyguardClockSwitchController extends ViewController<KeyguardClockS
             mLargeClockFrame = mView.findViewById(R.id.lockscreen_clock_view_large);
             mCurrentWeatherView = mView.findViewById(R.id.weather_container);
         }
+        mCurrentWeatherView = mView.findViewById(R.id.weather_container);
 
         if (!mOnlyClock) {
             mDumpManager.unregisterDumpable(getClass().getSimpleName()); // unregister previous
@@ -345,24 +346,22 @@ public class KeyguardClockSwitchController extends ViewController<KeyguardClockS
     }
 
     private void updateViews() {
-        mUiExecutor.execute(() -> {
-            if (mSmartspaceController.isEnabled()) {
-                removeViewsFromStatusArea();
+        if (mSmartspaceController.isEnabled()) {
+            removeViewsFromStatusArea();
 
-                View ksv = mView.findViewById(R.id.keyguard_slice_view);
-                int viewIndex = mStatusArea.indexOfChild(ksv);
-                ksv.setVisibility(mShowWeather ? View.VISIBLE : View.GONE);
+            View ksv = mView.findViewById(R.id.keyguard_slice_view);
+            int viewIndex = mStatusArea.indexOfChild(ksv);
+            ksv.setVisibility(mShowWeather ? View.VISIBLE : View.GONE);
 
-                if (!mShowWeather) {
-                    addSmartspaceView();
-                    if (mSmartspaceController.isDateWeatherDecoupled() && !MigrateClocksToBlueprint.isEnabled()) {
-                        addDateWeatherView();
-                        setDateWeatherVisibility();
-                        setWeatherVisibility();
-                    }
+            if (!mShowWeather) {
+                addSmartspaceView();
+                if (mSmartspaceController.isDateWeatherDecoupled() && !MigrateClocksToBlueprint.isEnabled()) {
+                    addDateWeatherView();
+                    setDateWeatherVisibility();
+                    setWeatherVisibility();
                 }
             }
-        });
+        }
     }
 
     int getNotificationIconAreaHeight() {
