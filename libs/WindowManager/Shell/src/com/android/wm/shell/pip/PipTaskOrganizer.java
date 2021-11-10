@@ -69,6 +69,7 @@ import android.os.SystemProperties;
 import android.view.Choreographer;
 import android.view.Display;
 import android.view.Surface;
+import android.util.Log;
 import android.view.SurfaceControl;
 import android.window.DesktopModeFlags;
 import android.window.DisplayAreaInfo;
@@ -1287,12 +1288,16 @@ public class PipTaskOrganizer implements ShellTaskOrganizer.TaskListener,
         }
         final float alphaStart = show ? 0 : 1;
         final float alphaEnd = show ? 1 : 0;
-        mPipAnimationController
+        if (mLeash != null) {
+            mPipAnimationController
                 .getAnimator(mTaskInfo, mLeash, mPipBoundsState.getBounds(), alphaStart, alphaEnd)
                 .setTransitionDirection(TRANSITION_DIRECTION_SAME)
                 .setPipTransactionHandler(mPipTransactionHandler)
                 .setDuration(show ? mEnterAnimationDuration : mExitAnimationDuration)
                 .start();
+        } else {
+            Log.w(TAG, "mLeash is null, skipping animation");
+        }
         mHasFadeOut = !show;
     }
 
