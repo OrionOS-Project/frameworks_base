@@ -66,7 +66,7 @@ public class UdfpsAnimation extends ImageView {
 
     private String[] mStyleNames;
 
-    private static final String UDFPS_ANIMATIONS_PACKAGE = "org.evolution.udfps.animations";
+    private static final String UDFPS_ANIMATIONS_PACKAGE = "com.orion.udfps.animations";
 
     private Resources mApkResources;
     
