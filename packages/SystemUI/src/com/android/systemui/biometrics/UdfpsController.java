@@ -872,8 +872,8 @@ public class UdfpsController implements DozeReceiver, Dumpable {
             );
         }
 
-        if (com.android.internal.util.evolution.Utils.isPackageInstalled(mContext,
-                "org.evolution.udfps.animations")) {
+        if (com.android.internal.util.orion.Utils.isPackageInstalled(mContext,
+                "com.orion.udfps.animations")) {
             mUdfpsAnimation = new UdfpsAnimation(mContext, mWindowManager, mSensorProps);
         }
     }
