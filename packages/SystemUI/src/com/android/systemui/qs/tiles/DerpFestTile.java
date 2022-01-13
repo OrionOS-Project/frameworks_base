@@ -21,6 +21,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.service.quicksettings.Tile;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -152,6 +153,7 @@ public class DerpFestTile extends QSTileImpl<State> {
     protected void handleUpdateState(State state, Object arg) {
         state.icon = ResourceIcon.get(R.drawable.ic_qs_derpfest);
         state.label = mContext.getString(R.string.quick_derpfest_label);
+        state.state = Tile.STATE_ACTIVE;
     }
 
     @Override
