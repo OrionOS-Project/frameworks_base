@@ -19565,4 +19565,8 @@ public class ActivityManagerService extends IActivityManager.Stub
         }
         return token;
     }
+
+    public boolean shouldForceCutoutFullscreen(String packageName) {
+        return mActivityTaskManager.shouldForceCutoutFullscreen(packageName);
+    }
 }
