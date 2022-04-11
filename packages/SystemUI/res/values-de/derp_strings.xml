@@ -75,4 +75,10 @@
     <string name="mic_camera_privacy_indicator_title">Mikrofon- und Kamera-Datenschutzindikator</string>
     <string name="location_privacy_indicator_title">Standort-Datenschutzindikator</string>
     <string name="projection_privacy_indicator_title">Medienprojektion-Datenschutzindikator</string>
+
+    <!-- Preferred network tile -->
+    <string name="quick_settings_preferred_network_label">Bevorzugtes Netzwerk</string>
+    <string name="quick_settings_preferred_network_lte">4G/LTE</string>
+    <string name="quick_settings_preferred_network_nr">5G/NR</string>
+    <string name="quick_settings_preferred_network_unsupported">Nicht unterstützt</string>
 </resources>
