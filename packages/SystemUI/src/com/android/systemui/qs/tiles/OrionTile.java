@@ -84,7 +84,9 @@ public class OrionTile extends QSTileImpl<State> {
 
     @Override
     public State newTileState() {
-        return new State();
+        State state = new State();
+        state.handlesLongClick = isOTABundled() ? true : false;
+        return state;
     }
 
     @Override
