@@ -332,6 +332,7 @@ public class EdgeBackGestureHandler {
     private final TopUiController mTopUiController;
 
     private boolean mIsBackGestureArrowEnabled;
+    private boolean mIsEdgeHapticEnabled;
 
     private final NavigationEdgeBackPlugin.BackCallback mBackCallback =
             new NavigationEdgeBackPlugin.BackCallback() {
@@ -594,6 +595,7 @@ public class EdgeBackGestureHandler {
         mIsButtonForcedVisible =
                 mGestureNavigationSettingsObserver.areNavigationButtonForcedVisible();
         mIsBackGestureArrowEnabled = mGestureNavigationSettingsObserver.getBackArrowGesture();
+        mIsEdgeHapticEnabled = mGestureNavigationSettingsObserver.getEdgeHapticEnabled();
         // Update this before calling mButtonForcedVisibleCallback since NavigationBar will relayout
         // and query isHandlingGestures() as a part of the callback
         mIsBackGestureAllowed = !mIsButtonForcedVisible;
@@ -1269,6 +1271,7 @@ public class EdgeBackGestureHandler {
                 } else {
                     mEdgeBackPlugin.setIsLeftPanel(mIsOnLeftEdge);
                     mEdgeBackPlugin.setBackArrowVisibility(mIsBackGestureArrowEnabled);
+                    mEdgeBackPlugin.setEdgeHapticEnabled(mIsEdgeHapticEnabled);
                     mEdgeBackPlugin.onMotionEvent(ev);
                 }
                 dispatchToBackAnimation(ev);
