@@ -7082,6 +7082,12 @@ public final class Settings {
         public static final String VOLUME_DIALOG_TIMEOUT = "volume_dialog_timeout";
 
         /**
+         * Whether to enable small size landcape notifications or not
+         * @hide
+         */
+        public static final String SMALL_LANDSCAPE_NOTIFICATION = "small_landscape_notification";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
