@@ -8096,6 +8096,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         try {
             final String rearFlashCameraId = getRearFlashCameraId();
             if (rearFlashCameraId != null) {
+                performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, "Flashlight toggle");
                 mCameraManager.setTorchMode(rearFlashCameraId, !mTorchEnabled);
                 mTorchEnabled = !mTorchEnabled;
             }
