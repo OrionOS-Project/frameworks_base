@@ -540,6 +540,7 @@ android_library {
         "kairos",
         "displaylib",
         "aconfig_settings_flags_lib",
+        "bcsmartspace-google",
         "vendor.lineage.powershare-V1-java",
         "VendorSupport-preference",
     ],
