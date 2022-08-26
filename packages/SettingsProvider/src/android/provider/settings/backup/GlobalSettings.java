@@ -134,5 +134,6 @@ public class GlobalSettings {
         Settings.Global.MINMODE_ACTIVE,
         Settings.Global.WATCH_RANGING_AVAILABLE,
         Settings.Global.WIFI_OFF_TIMEOUT,
+        Settings.Global.BLUETOOTH_OFF_TIMEOUT,
     };
 }
