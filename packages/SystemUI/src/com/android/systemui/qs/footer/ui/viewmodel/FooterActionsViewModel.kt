@@ -17,6 +17,8 @@
 package com.android.systemui.qs.footer.ui.viewmodel
 
 import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Log
 import android.view.ContextThemeWrapper
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -24,6 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import com.android.app.tracing.coroutines.launchTraced as launch
+import com.android.systemui.Dependency
 import com.android.systemui.Flags.hsuQsChanges
 import com.android.systemui.animation.Expandable
 import com.android.systemui.common.shared.model.ContentDescription
@@ -204,6 +207,10 @@ fun createFooterActionsViewModel(
     selectedUserInteractor: SelectedUserInteractor,
     hsum: HeadlessSystemUserMode,
 ): FooterActionsViewModel {
+
+    val vibrator = appContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    val EFFECT_CLICK = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+
     suspend fun observeDeviceMonitoringDialogRequests(quickSettingsContext: Context) {
         footerActionsInteractor.deviceMonitoringDialogRequests.collect {
             footerActionsInteractor.showDeviceMonitoringDialog(
@@ -218,6 +225,7 @@ fun createFooterActionsViewModel(
             return
         }
 
+        vibrator.vibrate(EFFECT_CLICK)
         footerActionsInteractor.showDeviceMonitoringDialog(quickSettingsContext, expandable)
     }
 
@@ -226,6 +234,7 @@ fun createFooterActionsViewModel(
             return
         }
 
+        vibrator.vibrate(EFFECT_CLICK)
         activityStarter.dismissKeyguardThenExecute(
             {
                 footerActionsInteractor.showForegroundServicesDialog(expandable)
@@ -241,6 +250,7 @@ fun createFooterActionsViewModel(
             return
         }
 
+        vibrator.vibrate(EFFECT_CLICK)
         footerActionsInteractor.showUserSwitcher(expandable)
     }
 
@@ -249,6 +259,7 @@ fun createFooterActionsViewModel(
             return
         }
 
+        vibrator.vibrate(EFFECT_CLICK)
         footerActionsInteractor.showSettings(expandable)
     }
 
@@ -257,6 +268,7 @@ fun createFooterActionsViewModel(
             return
         }
 
+        vibrator.vibrate(EFFECT_CLICK)
         footerActionsInteractor.showPowerMenuDialog(globalActionsDialogLite, expandable)
     }
 
