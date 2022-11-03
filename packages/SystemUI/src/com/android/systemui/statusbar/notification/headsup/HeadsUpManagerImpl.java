@@ -31,13 +31,17 @@ import android.util.ArrayMap;
 import android.util.ArraySet;
 import android.util.Log;
 import android.util.Pools;
+import android.view.Gravity;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.UiEvent;
 import com.android.internal.logging.UiEventLogger;
+import com.android.internal.util.derpfest.DerpFestUtils;
 import com.android.internal.policy.SystemBarUtils;
 import com.android.systemui.EventLogTags;
 import com.android.systemui.dagger.SysUISingleton;
@@ -96,7 +100,6 @@ import javax.inject.Inject;
 public class HeadsUpManagerImpl
         implements HeadsUpManager, HeadsUpRepository, OnHeadsUpChangedListener {
     private static final String TAG = "BaseHeadsUpManager";
-    private static final String SETTING_HEADS_UP_SNOOZE_LENGTH_MS = "heads_up_snooze_length_ms";
     private static final String REASON_REORDER_ALLOWED = "mOnReorderingAllowedListener";
     private final ListenerSet<OnHeadsUpChangedListener> mListeners = new ListenerSet<>();
 
@@ -235,11 +238,10 @@ public class HeadsUpManagerImpl
         mExtensionTime = resources.getInteger(R.integer.ambient_notification_extension_time);
         mTouchAcceptanceDelay = resources.getInteger(R.integer.touch_acceptance_delay);
         mSnoozedPackages = new ArrayMap<>();
-        int defaultSnoozeLengthMs =
-                resources.getInteger(R.integer.heads_up_default_snooze_length_ms);
-
-        mSnoozeLengthMs = globalSettings.getInt(SETTING_HEADS_UP_SNOOZE_LENGTH_MS,
-                defaultSnoozeLengthMs);
+        mSnoozeLengthMs = Settings.System.getInt(
+                context.getContentResolver(),
+                Settings.System.HEADS_UP_NOTIFICATION_SNOOZE,
+                resources.getInteger(R.integer.heads_up_default_snooze_length_ms));
         ContentObserver settingsObserver = new ContentObserver(handler) {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
@@ -250,22 +252,20 @@ public class HeadsUpManagerImpl
                             Settings.System.HEADS_UP_TIMEOUT,
                             context.getResources().getInteger(R.integer.heads_up_notification_decay));
                 } else {
-                    final int packageSnoozeLengthMs = globalSettings.getInt(
-                            SETTING_HEADS_UP_SNOOZE_LENGTH_MS, -1);
-                    if (packageSnoozeLengthMs > -1 && packageSnoozeLengthMs != mSnoozeLengthMs) {
-                        mSnoozeLengthMs = packageSnoozeLengthMs;
-                        mLogger.logSnoozeLengthChange(packageSnoozeLengthMs);
-                    }
+                    mSnoozedPackages.clear();
+                    mSnoozeLengthMs = Settings.System.getInt(
+                            context.getContentResolver(),
+                            Settings.System.HEADS_UP_NOTIFICATION_SNOOZE,
+                            context.getResources().getInteger(R.integer.heads_up_default_snooze_length_ms));
                 }
             }
         };
         context.getContentResolver().registerContentObserver(
                 Settings.System.getUriFor(Settings.System.HEADS_UP_TIMEOUT), false,
                 settingsObserver, UserHandle.USER_ALL);
-        globalSettings.registerContentObserverSync(
-                globalSettings.getUriFor(SETTING_HEADS_UP_SNOOZE_LENGTH_MS),
-                /* notifyForDescendants = */ false,
-                settingsObserver);
+        context.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.HEADS_UP_NOTIFICATION_SNOOZE), false,
+                settingsObserver, UserHandle.USER_ALL);
 
         statusBarStateController.addCallback(mStatusBarStateListener);
         updateResources();
@@ -815,6 +815,27 @@ public class HeadsUpManagerImpl
             String snoozeKey = snoozeKey(packageName, mUser);
             mLogger.logPackageSnoozed(snoozeKey);
             mSnoozedPackages.put(snoozeKey, mSystemClock.elapsedRealtime() + mSnoozeLengthMs);
+            if (mSnoozeLengthMs != 0) {
+                String appName = DerpFestUtils.getAppName(mContext, packageName);
+                if (appName == null) {
+                    appName = packageName;
+                }
+                Toast toast;
+                if (mSnoozeLengthMs == 60000) {
+                    toast = Toast.makeText(mContext, mContext.getString(
+                            R.string.heads_up_snooze_message_one_minute, appName),
+                            Toast.LENGTH_LONG);
+                } else {
+                    toast = Toast.makeText(mContext, mContext.getString(
+                            R.string.heads_up_snooze_message, appName,
+                            mSnoozeLengthMs / 60 / 1000), Toast.LENGTH_LONG);
+                }
+                TextView tv = (TextView) toast.getView().findViewById(android.R.id.message);
+                if (tv != null) {
+                    tv.setGravity(Gravity.CENTER);
+                }
+                toast.show();
+            }
         }
         mReleaseOnExpandFinish = true;
     }
