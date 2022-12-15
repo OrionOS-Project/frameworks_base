@@ -32,20 +32,17 @@ import android.util.ArraySet;
 import android.util.Log;
 import android.util.Pools;
 import android.view.accessibility.AccessibilityManager;
-import android.widget.Toast;
 
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.UiEvent;
 import com.android.internal.logging.UiEventLogger;
-import com.android.internal.util.derpfest.DerpFestUtils;
 import com.android.internal.policy.SystemBarUtils;
 import com.android.systemui.EventLogTags;
 import com.android.systemui.dagger.SysUISingleton;
 import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
 import com.android.systemui.res.R;
-import com.android.systemui.SysUIToast;
 import com.android.systemui.scene.shared.flag.SceneContainerFlag;
 import com.android.systemui.shade.ShadeDisplayAware;
 import com.android.systemui.shade.domain.interactor.ShadeInteractor;
@@ -805,23 +802,6 @@ public class HeadsUpManagerImpl
             String snoozeKey = snoozeKey(packageName, mUser);
             mLogger.logPackageSnoozed(snoozeKey);
             mSnoozedPackages.put(snoozeKey, mSystemClock.elapsedRealtime() + mSnoozeLengthMs);
-            if (mSnoozeLengthMs != 0) {
-                String appName = DerpFestUtils.getAppName(mContext, packageName);
-                if (appName == null) {
-                    appName = packageName;
-                }
-                Toast toast;
-                if (mSnoozeLengthMs == 60000) {
-                    toast = SysUIToast.makeText(mContext, mContext.getString(
-                            R.string.heads_up_snooze_message_one_minute, appName),
-                            Toast.LENGTH_LONG);
-                } else {
-                    toast = SysUIToast.makeText(mContext, mContext.getString(
-                            R.string.heads_up_snooze_message, appName,
-                            mSnoozeLengthMs / 60 / 1000), Toast.LENGTH_LONG);
-                }
-                toast.show();
-            }
         }
         mReleaseOnExpandFinish = true;
     }
