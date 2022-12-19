@@ -55,4 +55,7 @@
 
     <!-- DataSwitch Tile -->
     <string name="qs_data_switch_label">Datenkarte wechseln</string>
+
+    <!-- Screenshot Tile -->
+    <string name="screenshot_long_press">Gedrückt halten - ausgewählter Bereich</string>
 </resources>
