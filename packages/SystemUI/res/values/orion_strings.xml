@@ -151,4 +151,7 @@
 
     <!-- 4G icon -->
     <string name="show_fourg_icon_title">4G icon</string>
+
+    <!-- Label for current user in power menu options dialog -->
+    <string name="global_action_restart_systemui">SystemUI</string>
 </resources>
