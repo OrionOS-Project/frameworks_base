@@ -5,4 +5,14 @@
 -->
 <resources>
 
+    <!-- Whitelist of package names to bypass foreground service type validation -->
+    <string-array name="config_fgsTypeValidationBypassPackages" translatable="false"/>
+
+    <!-- Whitelist of package names to bypass alarm manager validation -->
+    <string-array name="config_alarmManagerValidationBypassPackages" translatable="false"/>
+
+    <!-- Whitelist of package names to bypass broadcast reciever validation -->
+    <string-array name="config_broadcaseReceiverValidationBypassPackages" translatable="false"/>
+   <!-- Whether to use Richtap vibration -->
+   <bool name="config_usesRichtapVibration">false</bool>
 </resources>
