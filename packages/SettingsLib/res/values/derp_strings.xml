@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: DerpFest AOSP
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- ZenMode -->
+    <string name="interruption_level_none_with_warning">Total silence.  This will also silence screen readers.</string>
+    <string name="interruption_level_priority">Priority only</string>
+    <string name="interruption_level_alarms">Alarms only</string>
+    <string name="interruption_level_none_twoline">Total
+silence</string>
+    <string name="interruption_level_priority_twoline">Priority
+only</string>
+    <string name="interruption_level_alarms_twoline">Alarms
+only</string>
+</resources>
