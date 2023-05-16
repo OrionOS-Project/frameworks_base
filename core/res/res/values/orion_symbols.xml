@@ -75,4 +75,7 @@
 
     <!-- Package name of the edge cutout overlay -->
     <java-symbol type="string" name="config_edge_cutout_overlay_package" />
+
+    <!-- Default line spacing multiplier between hours and minutes of the keyguard clock-->
+    <java-symbol type="dimen" format="float" name="keyguard_clock_line_spacing_scale" />
 </resources>
