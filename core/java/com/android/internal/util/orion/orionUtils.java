@@ -20,6 +20,7 @@ package com.android.internal.util.orion;
 import android.app.ActivityManager;
 import android.app.role.RoleManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -30,6 +31,9 @@ import android.os.UserHandle;
 import com.android.internal.util.CollectionUtils;
 
 import com.android.internal.statusbar.IStatusBarService;
+
+import java.util.Locale;
+
 /**
  * Some custom utilities
  * @hide
@@ -79,6 +83,11 @@ public class orionUtils {
 
     public static boolean deviceHasFlashlight(Context ctx) {
         return ctx.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+    }
+
+    public static boolean isChineseLanguage() {
+       return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
+               Locale.CHINESE.getLanguage());
     }
 
     public static void toggleCameraFlash() {
