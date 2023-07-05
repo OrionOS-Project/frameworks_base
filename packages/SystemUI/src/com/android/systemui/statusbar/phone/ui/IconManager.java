@@ -274,7 +274,8 @@ public class IconManager implements DemoModeCommandReceiver {
 
     private NetworkTrafficSB onCreateNetworkTraffic(String slot) {
          NetworkTrafficSB view = new NetworkTrafficSB(mContext);
-         view.setPadding(2, 0, 2, 0);
+         int padding = mContext.getResources().getDimensionPixelSize(R.dimen.network_traffic_padding);
+         view.setPadding(padding, 0, padding, 0);
          return view;
     }
 
