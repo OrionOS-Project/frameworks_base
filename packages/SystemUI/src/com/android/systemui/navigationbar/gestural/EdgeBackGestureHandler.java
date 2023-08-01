@@ -368,6 +368,7 @@ public class EdgeBackGestureHandler {
                 public void cancelBack() {
                     if (mBackAnimation != null) {
                         mBackAnimation.setTriggerBack(false);
+                        mBackAnimation.setTriggerLongSwipe(false);
                     }
                     logGesture(SysUiStatsLog.BACK_GESTURE__TYPE__INCOMPLETE);
                 }
