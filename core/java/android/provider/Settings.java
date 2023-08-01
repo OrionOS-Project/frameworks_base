@@ -14546,6 +14546,24 @@ public final class Settings {
         public static final String QS_DATA_USAGE_CYCLE_TYPE = "qs_data_usage_cycle_type";
 
         /**
+         * Whether to vibrate for the dt2w gesture
+         * @hide
+         */
+        public static final String DOZE_DOUBLE_TAP_GESTURE_VIBRATE = "doze_double_tap_gesture_vibrate";
+
+        /**
+         * Whether to vibrate for the tap gesture
+         * @hide
+         */
+        public static final String DOZE_TAP_GESTURE_VIBRATE = "doze_tap_gesture_vibrate";
+
+        /**
+         * Whether to vibrate for the pickup gesture
+         * @hide
+         */
+        public static final String DOZE_PICK_UP_GESTURE_VIBRATE = "doze_pick_up_gesture_vibrate";
+
+        /**
          * These entries are considered common between the personal and the managed profile,
          * since the managed profile doesn't get to change them.
          */
