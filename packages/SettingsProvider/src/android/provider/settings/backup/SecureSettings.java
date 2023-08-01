@@ -307,5 +307,8 @@ public class SecureSettings {
         Settings.Secure.SELECTED_SPELL_CHECKER_SUBTYPE,
         Settings.Secure.QS_SHOW_DATA_USAGE,
         Settings.Secure.QS_DATA_USAGE_CYCLE_TYPE,
+        Settings.Secure.DOZE_DOUBLE_TAP_GESTURE_VIBRATE,
+        Settings.Secure.DOZE_TAP_GESTURE_VIBRATE,
+        Settings.Secure.DOZE_PICK_UP_GESTURE_VIBRATE,
     };
 }
