@@ -77,4 +77,8 @@
     <string name="config_pocketJudgeVendorSensorName"></string>
     <item name="config_pocketJudgeVendorSensorValue" format="float" type="dimen">1.0</item>
     <string name="config_pocketJudgeVendorProximitySensorName"></string>
+
+    <!-- Delay in ms before invoking single tap gesture
+         Should be set to dt2w max time / 2 when needed -->
+    <integer name="config_singleTapDelay">0</integer>
 </resources>

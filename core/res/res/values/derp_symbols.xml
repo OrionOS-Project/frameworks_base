@@ -60,4 +60,8 @@
     <java-symbol type="string" name="config_pocketJudgeVendorSensorName" />
     <java-symbol type="dimen" name="config_pocketJudgeVendorSensorValue" />
     <java-symbol type="string" name="config_pocketJudgeVendorProximitySensorName" />
+
+    <!-- Delay in ms before invoking single tap gesture
+         Should be set to dt2w max time / 2 when needed -->
+    <java-symbol type="integer" name="config_singleTapDelay" />
 </resources>
