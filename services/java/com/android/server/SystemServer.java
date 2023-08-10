@@ -169,6 +169,7 @@ import com.android.server.cpu.CpuMonitorService;
 import com.android.server.crashrecovery.CrashRecoveryAdaptor;
 import com.android.server.credentials.CredentialManagerService;
 import com.android.server.criticalevents.CriticalEventLog;
+import com.android.server.derpfest.CustomDeviceConfigService;
 import com.android.server.devicepolicy.DevicePolicyManagerService;
 import com.android.server.devicestate.DeviceStateManagerService;
 import com.android.server.display.DisplayManagerService;
@@ -861,8 +862,8 @@ public final class SystemServer implements Dumpable {
                         uptimeMillis);
             }
 
-            Slog.i("DerpFest",
-                "Welcome to DerpFest! We believe that you'll love it. " +
+            Slog.i("OrionOS",
+                "Welcome to OrionOS! We believe that you'll love it. " +
                 "Ready to... uh... Vanilla Ice Cream!");
 
             // In case the runtime switched since last boot (such as when
@@ -2822,6 +2823,11 @@ public final class SystemServer implements Dumpable {
                 mSystemServiceManager.startService(BackgroundInstallControlService.class);
                 t.traceEnd();
             }
+
+            // CustomDeviceConfigService
+            t.traceBegin("StartCustomDeviceConfigService");
+            mSystemServiceManager.startService(CustomDeviceConfigService.class);
+            t.traceEnd();
 
             // AttestationService
             t.traceBegin("AttestationService");
