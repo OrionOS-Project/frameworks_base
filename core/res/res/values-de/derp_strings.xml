@@ -15,4 +15,9 @@
 
     <!-- Lock gesture -->
     <string name="gesture_locked_warning">Erneut wischen, um Gesten zu entsperren</string>
+
+    <!-- Pocket Lock -->
+    <string name="pocket_lock_message_long_press">Zum Entsperren Ein-/Aus-Taste gedrückt halten</string>
+    <string name="pocket_view_title">Taschenmodus aktiviert</string>
+    <string name="pocket_view_title_cancel">Befreie den markierten oberen Bereich des Geräts oder halte Ein-/Aus-Taste gedrückt, um den Taschenmodus zu beenden</string>
 </resources>
