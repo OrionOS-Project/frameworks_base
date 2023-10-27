@@ -76,4 +76,7 @@
     <string name="config_pocketJudgeVendorSensorName"></string>
     <item name="config_pocketJudgeVendorSensorValue" format="float" type="dimen">1.0</item>
     <string name="config_pocketJudgeVendorProximitySensorName"></string>
+
+    <!-- Package that contains udfps animation customization or empty to disable -->
+    <string name="config_udfps_animation_customization_package">com.orion.overlay.customization.udfps.animations</string>
 </resources>
