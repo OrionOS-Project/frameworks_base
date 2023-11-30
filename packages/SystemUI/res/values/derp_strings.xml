@@ -11,4 +11,7 @@
     <string name="reboot_suggestion_title">Reboot Reminder</string>
     <string name="reboot_suggestion_description">Your device has been on for over a week. Rebooting is recommended.</string>
     <string name="reboot_suggestion_now">Reboot</string>
+
+    <!-- Face unlock -->
+    <string name="face_unlock_recognizing">Recognizing face...</string>
 </resources>

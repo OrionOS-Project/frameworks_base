@@ -11,4 +11,7 @@
     <string name="reboot_suggestion_title">Neustart-Erinnerung</string>
     <string name="reboot_suggestion_description">Ihr Gerät war über eine Woche lang ununterbrochen eingeschaltet. Ein Neustart wird empfohlen.</string>
     <string name="reboot_suggestion_now">Neustart</string>
+
+    <!-- Face unlock -->
+    <string name="face_unlock_recognizing">Gesichtserkennung …</string>
 </resources>
