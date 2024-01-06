@@ -161,4 +161,8 @@
     <!-- Notification counter -->
     <string name="status_bar_notification_info_overflow" translatable="false">\u221E</string>
     <string name="status_bar_combined_notification_count">Show combined notification count</string>
+
+    <!-- Refresh rate QS tile -->
+    <string name="refresh_rate_tile_label">Refresh rate</string>
+    <string name="refresh_rate_unknown">Unknown</string>
 </resources>
