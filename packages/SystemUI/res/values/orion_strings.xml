@@ -106,4 +106,8 @@
     <!-- Molecular Tile -->
     <string name="quick_orion_label">Molecular</string>
     <string name="quick_orion_toast">LOL, you really thought that long click will take you somewhere!!!</string>
+
+    <!-- Refresh rate QS tile -->
+    <string name="refresh_rate_tile_label">Refresh rate</string>
+    <string name="refresh_rate_unknown">Unknown</string>
 </resources>
