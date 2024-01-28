@@ -9,4 +9,7 @@
     <bool name="config_statusBarBurnInProtection">@*android:bool/config_enableBurnInProtection</bool>
     <!-- Interval between subsequent shifting of statusbar and navbar contents, in seconds -->
     <integer name="config_statusBarBurnInProtectionShiftInterval">60</integer>
+
+    <!-- Whether to enable edge light only when the device face down -->
+    <bool name="config_showEdgeLightOnlyWhenFaceDown">false</bool>
 </resources>

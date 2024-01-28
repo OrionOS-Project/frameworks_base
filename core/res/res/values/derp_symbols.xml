@@ -40,4 +40,7 @@
 
     <!-- Package name of the edge cutout overlay -->
     <java-symbol type="string" name="config_edge_cutout_overlay_package" />
+
+    <!-- Whether to show edge light only when the device is face down by default -->
+    <java-symbol type="bool" name="config_edgeLightFaceDownEnabledByDefault" />
 </resources>

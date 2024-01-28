@@ -58,4 +58,7 @@
 
     <!-- Package name of the edge cutout overlay -->
     <string name="config_edge_cutout_overlay_package">com.libremobileos.overlay.customization.edgecutout</string>
+
+    <!-- Whether to show edge light only when the device is face down by default -->
+    <bool name="config_edgeLightFaceDownEnabledByDefault">false</bool>
 </resources>
