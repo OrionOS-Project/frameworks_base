@@ -72,6 +72,7 @@ constructor(
     statsLoggerCoordinator: NotificationStatsLoggerCoordinator,
     bundleCoordinator: BundleCoordinator,
     automaticPromotionCoordinator: AutomaticPromotionCoordinator,
+    pulseLightCoordinator: PulseLightCoordinator,
 ) : NotifCoordinators {
 
     private val mCoreCoordinators: MutableList<CoreCoordinator> = ArrayList()
@@ -117,6 +118,8 @@ constructor(
         if (NotificationBundleUi.isEnabled) {
             mCoordinators.add(bundleCoordinator)
         }
+        mCoordinators.add(pulseLightCoordinator)
+
         if (NotificationsLiveDataStoreRefactor.isEnabled) {
             mCoordinators.add(statsLoggerCoordinator)
         }
