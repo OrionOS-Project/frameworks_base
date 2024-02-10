@@ -38,4 +38,7 @@
     <string name="smartspace_flight_qr_code">QR code</string>
     <string name="smartspace_icu_date_pattern">EEEMMMd</string>
     <string name="smartspace_role_desc">View</string>
+
+    <!-- Name of the roaming status bar icon. -->
+    <string name="status_bar_roaming">Roaming indicator</string>
 </resources>
