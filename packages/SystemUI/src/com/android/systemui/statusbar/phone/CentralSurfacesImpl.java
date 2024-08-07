@@ -229,6 +229,7 @@ import com.android.systemui.statusbar.policy.KeyguardStateController;
 import com.android.systemui.statusbar.policy.UserInfoControllerImpl;
 import com.android.systemui.statusbar.window.StatusBarWindowControllerStore;
 import com.android.systemui.statusbar.window.StatusBarWindowStateController;
+import com.android.systemui.orion.RebootSuggestion;
 import com.android.systemui.surfaceeffects.ripple.RippleShader.RippleShape;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.util.DumpUtilsKt;
@@ -438,6 +439,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
     private final NotificationsController mNotificationsController;
     private final StatusBarSignalPolicy mStatusBarSignalPolicy;
     private final StatusBarHideIconsForBouncerManager mStatusBarHideIconsForBouncerManager;
+    private final RebootSuggestion mRebootSuggestion;
 
     /** Controller for the Shade. */
     private final ShadeSurface mShadeSurface;
@@ -865,6 +867,8 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
         mWindowManager = windowManager;
         mWindowManagerProvider = windowManagerProvider;
+
+        mRebootSuggestion = new RebootSuggestion(mContext);
     }
 
     private void initBubbles(Bubbles bubbles) {
