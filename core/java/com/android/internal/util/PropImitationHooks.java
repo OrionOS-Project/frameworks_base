@@ -97,6 +97,7 @@ public class PropImitationHooks {
     private static final String PROP_HOOKS_MAINLINE = "persist.sys.pihooks_mainline_";
 
     public static final String SPOOF_PIXEL_GPHOTOS = "persist.sys.pixelprops.gphotos";
+    public static final String ENABLE_PIXEL_PROPS = "persist.sys.pixelprops.all";
     public static final String ENABLE_GAME_PROP_OPTIONS = "persist.sys.gameprops.enabled";
     public static final String SPOOF_PIXEL_GOOGLE_APPS = "persist.sys.pixelprops.google";
 
@@ -169,17 +170,6 @@ public class PropImitationHooks {
             return;
         }
 
-        setGameProps(packageName);
-
-        boolean isPixelDevice = SystemProperties.get("ro.soc.manufacturer").equalsIgnoreCase("Google");
-        String model = SystemProperties.get("ro.product.model");
-        boolean isMainlineDevice = isPixelDevice && model.matches("Pixel [8-9][a-zA-Z ]*");
-        boolean isTensorDevice = isPixelDevice && model.matches("Pixel [6-9][a-zA-Z ]*");
-
-        Map<String, Object> propsToChange = new HashMap<>();
-
-        boolean isExcludedProcess = processName != null && (processName.toLowerCase().contains("unstable"));
-
         sProcessName = processName;
         sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
@@ -199,6 +189,21 @@ public class PropImitationHooks {
                 setPropValue("FINGERPRINT", sStockFp);
             }
         }
+
+        setGameProps(packageName);
+
+        if (!SystemProperties.getBoolean(ENABLE_PIXEL_PROPS, true)) {
+            return;
+        }
+
+        boolean isPixelDevice = SystemProperties.get("ro.soc.manufacturer").equalsIgnoreCase("Google");
+        String model = SystemProperties.get("ro.product.model");
+        boolean isMainlineDevice = isPixelDevice && model.matches("Pixel [8-9][a-zA-Z ]*");
+        boolean isTensorDevice = isPixelDevice && model.matches("Pixel [6-9][a-zA-Z ]*");
+
+        Map<String, Object> propsToChange = new HashMap<>();
+
+        boolean isExcludedProcess = processName != null && (processName.toLowerCase().contains("unstable"));
 
         String[] packagesToSpoofAsMainlineDevice = {
             "com.google.android.apps.aiwallpapers",
