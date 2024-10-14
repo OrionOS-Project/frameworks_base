@@ -432,6 +432,9 @@ public class OmniJawsClient {
     }
 
     public boolean isOutlineIconPackage() {
+        if (mIconPrefix == null) {
+            return false;
+        }
         return mIconPrefix.equals(ICON_PREFIX_OUTLINE);
     }
 }
