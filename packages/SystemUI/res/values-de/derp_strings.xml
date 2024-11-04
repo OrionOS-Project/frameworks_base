@@ -89,4 +89,13 @@
     <string name="quick_settings_music_loading">Laden...</string>
     <string name="quick_settings_music_no_player">Kein Abspielprogramm verbunden</string>
     <string name="quick_settings_music_last_played">Zuletzt gespielt: %1$s</string>
+
+    <!-- USB function dialog - copied from Settings -->
+    <string name="usb_use_charging_only">Nur laden (keine Datenübertragung)</string>
+    <string name="usb_use_file_transfers">Dateiübertragung</string>
+    <string name="usb_use_photo_transfers">PTP (Fotoübertragung)</string>
+    <string name="usb_use_uvc_webcam">Webcam</string>
+    <string name="usb_use_tethering">USB-Tethering</string>
+    <string name="usb_use_MIDI">MIDI</string>
+    <string name="usb_use">USB verwenden für</string>
 </resources>
