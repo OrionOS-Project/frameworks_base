@@ -94,6 +94,15 @@ public class PropImitationHooks {
             SystemProperties.getBoolean("persist.sys.extra.use_props", true);
     private static final boolean USE_KEYS_SPOOF =
             SystemProperties.getBoolean("persist.sys.extra.use_keys", true);
+    private static final String PROP_HOOKS_MAINLINE = "persist.sys.pihooks_mainline_";
+
+    public static final String SPOOF_PIXEL_GPHOTOS = "persist.sys.pixelprops.gphotos";
+    public static final String ENABLE_GAME_PROP_OPTIONS = "persist.sys.gameprops.enabled";
+    public static final String SPOOF_PIXEL_GOOGLE_APPS = "persist.sys.pixelprops.google";
+
+    private static final Map<String, Object> propsToChangeMainline;
+    private static final Map<String, Object> propsToChangePixelXL;
+    private static final Map<String, Object> propsToChangePixel5a;        
 
     private static final String sStockFp = SystemProperties.get("ro.build.fingerprint");
 
@@ -125,6 +134,32 @@ public class PropImitationHooks {
         }
     }
 
+    static {
+        propsToChangeMainline = new HashMap<>();
+        propsToChangeMainline.put("BRAND", "google");
+        propsToChangeMainline.put("MANUFACTURER", "Google");
+        propsToChangeMainline.put("DEVICE", "caiman");
+        propsToChangeMainline.put("PRODUCT", "caiman");
+        propsToChangeMainline.put("MODEL", "Pixel 9 Pro");
+        propsToChangeMainline.put("FINGERPRINT", "google/caiman/caiman:14/AD1A.240530.047.U1/12150698:user/release-keys");
+        propsToChangePixelXL = new HashMap<>();
+        propsToChangePixelXL.put("BRAND", "google");
+        propsToChangePixelXL.put("MANUFACTURER", "Google");
+        propsToChangePixelXL.put("DEVICE", "marlin");
+        propsToChangePixelXL.put("PRODUCT", "marlin");
+        propsToChangePixelXL.put("MODEL", "Pixel XL");
+        propsToChangePixelXL.put("FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys");
+        propsToChangePixel5a = new HashMap<>();
+        propsToChangePixel5a.put("BRAND", "google");
+        propsToChangePixel5a.put("MANUFACTURER", "Google");
+        propsToChangePixel5a.put("DEVICE", "barbet");
+        propsToChangePixel5a.put("PRODUCT", "barbet");
+        propsToChangePixel5a.put("HARDWARE", "barbet");
+        propsToChangePixel5a.put("MODEL", "Pixel 5a");
+        propsToChangePixel5a.put("ID", "AP2A.240805.005");
+        propsToChangePixel5a.put("FINGERPRINT", "google/barbet/barbet:14/AP2A.240805.005/12025142:user/release-keys");
+    }
+
     public static void setProps(Context context) {
         final String packageName = context.getPackageName();
         final String processName = Application.getProcessName();
@@ -133,6 +168,17 @@ public class PropImitationHooks {
             Log.e(TAG, "Null package or process name");
             return;
         }
+
+        setGameProps(packageName);
+
+        boolean isPixelDevice = SystemProperties.get("ro.soc.manufacturer").equalsIgnoreCase("Google");
+        String model = SystemProperties.get("ro.product.model");
+        boolean isMainlineDevice = isPixelDevice && model.matches("Pixel [8-9][a-zA-Z ]*");
+        boolean isTensorDevice = isPixelDevice && model.matches("Pixel [6-9][a-zA-Z ]*");
+
+        Map<String, Object> propsToChange = new HashMap<>();
+
+        boolean isExcludedProcess = processName != null && (processName.toLowerCase().contains("unstable"));
 
         sProcessName = processName;
         sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
@@ -151,6 +197,128 @@ public class PropImitationHooks {
             } else if (!sStockFp.isEmpty() && packageName.equals(PACKAGE_ARCORE)) {
                 dlog("Setting stock fingerprint for: " + packageName);
                 setPropValue("FINGERPRINT", sStockFp);
+            }
+        }
+
+        String[] packagesToSpoofAsMainlineDevice = {
+            "com.google.android.apps.aiwallpapers",
+            "com.google.android.apps.bard",
+            "com.google.android.apps.customization.pixel",
+            "com.google.android.apps.emojiwallpaper",
+            "com.google.android.apps.nexuslauncher",
+            "com.google.android.apps.privacy.wildlife",
+            "com.google.android.apps.wallpaper",
+            "com.google.android.apps.wallpaper.pixel",
+            "com.google.android.gms",
+            "com.google.android.googlequicksearchbox",
+            "com.google.android.inputmethod.latin",
+            "com.google.android.tts",
+            "com.google.android.wallpaper.effects"
+        };
+
+        if (Arrays.asList(packagesToSpoofAsMainlineDevice).contains(packageName) && !isExcludedProcess) {
+            if (SystemProperties.getBoolean(SPOOF_PIXEL_GOOGLE_APPS, true)) {
+                if (!isMainlineDevice) {
+                    propsToChange.putAll(propsToChangeMainline);
+                }
+            }
+        }
+        if (packageName.equals("com.google.android.apps.photos")) {
+            if (SystemProperties.getBoolean(SPOOF_PIXEL_GPHOTOS, true)) {
+                propsToChange.putAll(propsToChangePixelXL);
+            } else {
+                if (!isMainlineDevice) {
+                    propsToChange.putAll(propsToChangePixel5a);
+                }
+            }
+        }
+        
+        if (packageName.equals("com.snapchat.android")) {
+            propsToChange.putAll(propsToChangePixelXL);
+        }
+        
+        if (packageName.equals("com.google.android.settings.intelligence")) {
+            setPixelPropValue("FINGERPRINT", "eng.nobody." + 
+                new java.text.SimpleDateFormat("yyyyMMdd.HHmmss").format(new java.util.Date()));
+        }
+
+        if (!propsToChange.isEmpty()) {
+            if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
+            for (Map.Entry<String, Object> prop : propsToChange.entrySet()) {
+                String key = prop.getKey();
+                Object values = prop.getValue();
+                if (DEBUG) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
+                setPixelPropValue(key, values);
+            }
+        }
+    }
+
+    private static void setPixelPropValue(String key, Object values) {
+        try {
+            Field field = getBuildClassField(key);
+            if (field != null) {
+                field.setAccessible(true);
+                if (field.getType() == int.class) {
+                    if (values instanceof String) {
+                        field.set(null, Integer.parseInt((String) values));
+                    } else if (values instanceof Integer) {
+                        field.set(null, (Integer) values);
+                    }
+                } else if (field.getType() == long.class) {
+                    if (values instanceof String) {
+                        field.set(null, Long.parseLong((String) values));
+                    } else if (values instanceof Long) {
+                        field.set(null, (Long) values);
+                    }
+                } else {
+                    field.set(null, values.toString());
+                }
+                field.setAccessible(false);
+                dlog("Set prop " + key + " to " + values);
+            } else {
+                Log.e(TAG, "Field " + key + " not found in Build or Build.VERSION classes");
+            }
+        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
+            Log.e(TAG, "Failed to set prop " + key, e);
+        }
+    }
+
+    private static Field getBuildClassField(String key) throws NoSuchFieldException {
+        try {
+            Field field = Build.class.getDeclaredField(key);
+            dlog("Field " + key + " found in Build.class");
+            return field;
+        } catch (NoSuchFieldException e) {
+            Field field = Build.VERSION.class.getDeclaredField(key);
+            dlog("Field " + key + " found in Build.VERSION.class");
+            return field;
+        }
+    }
+
+    public static void setGameProps(String packageName) {
+        if (!SystemProperties.getBoolean(ENABLE_GAME_PROP_OPTIONS, false)) {
+            return;
+        }
+        if (packageName == null || packageName.isEmpty()) {
+            return;
+        }
+        Map<String, String> gamePropsToChange = new HashMap<>();
+        String[] keys = {"BRAND", "DEVICE", "MANUFACTURER", "MODEL", "FINGERPRINT", "PRODUCT"};
+        for (String key : keys) {
+            String systemPropertyKey = "persist.sys.gameprops." + packageName + "." + key;
+            String values = SystemProperties.get(systemPropertyKey);
+            if (values != null && !values.isEmpty()) {
+                gamePropsToChange.put(key, values);
+                if (DEBUG) Log.d(TAG, "Got system property: " + systemPropertyKey + " = " + values);
+            }
+        }
+        if (!gamePropsToChange.isEmpty()) {
+            if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
+            for (Map.Entry<String, String> prop : gamePropsToChange.entrySet()) {
+                String key = prop.getKey();
+                String values = prop.getValue();
+                if (DEBUG) Log.d(TAG, "Defining " + key + " prop for: " + packageName);
+                setPixelPropValue(key, values);
             }
         }
     }
