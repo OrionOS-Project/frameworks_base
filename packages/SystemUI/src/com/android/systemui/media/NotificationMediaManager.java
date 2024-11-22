@@ -37,7 +37,6 @@ import android.util.Log;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.systemui.Dumpable;
-import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.dagger.qualifiers.Background;
 import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.dump.DumpManager;
@@ -118,8 +117,6 @@ public class NotificationMediaManager implements Dumpable, TunerService.Tunable 
     private boolean mIslandEnabled;
     private boolean mIslandNowPlayingEnabled;
 
-    private final SysuiColorExtractor mColorExtractor;
-
     @VisibleForTesting
     final MediaController.Callback mMediaListener = new MediaController.Callback() {
 
@@ -184,8 +181,7 @@ public class NotificationMediaManager implements Dumpable, TunerService.Tunable 
             @Background Executor backgroundExecutor,
             @Main Handler handler,
             StatusBarStateController statusBarStateController,
-            TunerService tunerService,
-            SysuiColorExtractor colorExtractor
+            TunerService tunerService
     ) {
         mContext = context;
         mMediaListeners = new ArrayList<>();
@@ -196,7 +192,6 @@ public class NotificationMediaManager implements Dumpable, TunerService.Tunable 
         mBackgroundExecutor = backgroundExecutor;
         mHandler = handler;
         mStatusBarStateController = statusBarStateController;
-        mColorExtractor = colorExtractor;
 
         setupNotifPipeline();
 
@@ -359,13 +354,10 @@ public class NotificationMediaManager implements Dumpable, TunerService.Tunable 
         int playbackState = getMediaControllerPlaybackState(mMediaController);
         mHandler.post(() -> {
             callback.onPrimaryMetadataOrStateChanged(mMediaMetadata, playbackState);
-            callback.setMediaNotificationColor(mColorExtractor.getMediaBackgroundColor());
         });
     }
 
     public void removeCallback(MediaListener callback) {
-        mColorExtractor.setMediaBackgroundColor(0);
-        callback.setMediaNotificationColor(0);
         mMediaListeners.remove(callback);
     }
 
@@ -479,7 +471,6 @@ public class NotificationMediaManager implements Dumpable, TunerService.Tunable 
         mHandler.post(() -> {
             for (int i = 0; i < callbacks.size(); i++) {
                 callbacks.get(i).onPrimaryMetadataOrStateChanged(mMediaMetadata, state);
-                callbacks.get(i).setMediaNotificationColor(mColorExtractor.getMediaBackgroundColor());
             }
         });
     }
@@ -548,7 +539,5 @@ public class NotificationMediaManager implements Dumpable, TunerService.Tunable 
          */
         default void onPrimaryMetadataOrStateChanged(MediaMetadata metadata,
                 @PlaybackState.State int state) {}
-
-        default void setMediaNotificationColor(int color) {};
     }
 }
