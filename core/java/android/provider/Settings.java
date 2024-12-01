@@ -13695,11 +13695,10 @@ public final class Settings {
         public static final String EXTRA_DIM_AUTO_TIME = "extra_dim_auto_time";
 
         /**
-         * Whether lockscreen weather is enabled.
-         *
+         * Whether lockscreen smartspace is enabled.
          * @hide
          */
-        public static final String LOCK_SCREEN_WEATHER_ENABLED = "lockscreen_weather_enabled";
+        public static final String LOCKSCREEN_SMARTSPACE_ENABLED = "lockscreen_smartspace_enabled";
 
         /**
          * Whether the feature that the device will fire a haptic when users scroll and hit
