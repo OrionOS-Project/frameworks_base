@@ -31,6 +31,7 @@ import static org.lineageos.internal.util.DeviceKeysConstants.Action;
 import static java.util.stream.Collectors.joining;
 
 import android.annotation.NonNull;
+import android.annotation.Nullable;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -76,9 +77,12 @@ import androidx.annotation.DimenRes;
 
 import com.android.internal.config.sysui.SystemUiDeviceConfigFlags;
 import com.android.internal.policy.GestureNavigationSettingsObserver;
+import com.android.systemui.contextualeducation.GestureType;
 import com.android.systemui.dagger.qualifiers.Background;
 import com.android.systemui.model.SysUiState;
 import com.android.systemui.navigationbar.NavigationModeController;
+import com.android.systemui.navigationbar.gestural.domain.GestureInteractor;
+import com.android.systemui.navigationbar.gestural.domain.TaskMatcher;
 import com.android.systemui.plugins.FalsingManager;
 import com.android.systemui.plugins.NavigationEdgeBackPlugin;
 import com.android.systemui.plugins.PluginListener;
@@ -94,24 +98,27 @@ import com.android.systemui.shared.system.QuickStepContract.SystemUiStateFlags;
 import com.android.systemui.shared.system.SysUiStatsLog;
 import com.android.systemui.shared.system.TaskStackChangeListener;
 import com.android.systemui.shared.system.TaskStackChangeListeners;
+import com.android.systemui.statusbar.NotificationShadeWindowController;
 import com.android.systemui.statusbar.phone.LightBarController;
 import com.android.systemui.util.concurrency.BackPanelUiThread;
 import com.android.systemui.util.concurrency.UiThreadContext;
+import com.android.systemui.util.kotlin.JavaAdapter;
 import com.android.wm.shell.back.BackAnimation;
 import com.android.wm.shell.desktopmode.DesktopMode;
 import com.android.wm.shell.pip.Pip;
 
 import lineageos.providers.LineageSettings;
 
+import kotlinx.coroutines.Job;
+
 import java.io.PrintWriter;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -161,12 +168,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
     private TaskStackChangeListener mTaskStackListener = new TaskStackChangeListener() {
         @Override
         public void onTaskStackChanged() {
-            if (edgebackGestureHandlerGetRunningTasksBackground()) {
-                mBackgroundExecutor.execute(() -> mGestureBlockingActivityRunning.set(
-                        isGestureBlockingActivityRunning()));
-            } else {
-                mGestureBlockingActivityRunning.set(isGestureBlockingActivityRunning());
-            }
+            updateTopActivity();
         }
         @Override
         public void onTaskCreated(int taskId, ComponentName componentName) {
@@ -213,8 +215,6 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
     private final Optional<DesktopMode> mDesktopModeOptional;
     private final FalsingManager mFalsingManager;
     private final Configuration mLastReportedConfig = new Configuration();
-    // Activities which should not trigger Back gesture.
-    private final List<ComponentName> mGestureBlockingActivities = new ArrayList<>();
 
     private final Point mDisplaySize = new Point();
     private final int mDisplayId;
@@ -230,6 +230,12 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
     private final Provider<BackGestureTfClassifierProvider>
             mBackGestureTfClassifierProviderProvider;
     private final Provider<LightBarController> mLightBarControllerProvider;
+
+    private final GestureInteractor mGestureInteractor;
+    private final ArraySet<ComponentName> mBlockedActivities = new ArraySet<>();
+    private Job mBlockedActivitiesJob = null;
+
+    private final JavaAdapter mJavaAdapter;
 
     // The left side edge width where touch down is allowed
     private int mEdgeWidthLeft;
@@ -304,6 +310,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
     private Date mTmpLogDate = new Date();
 
     private final GestureNavigationSettingsObserver mGestureNavigationSettingsObserver;
+    private final NotificationShadeWindowController mNotificationShadeWindowController;
 
     private final NavigationEdgeBackPlugin.BackCallback mBackCallback =
             new NavigationEdgeBackPlugin.BackCallback() {
@@ -439,7 +446,10 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
             Optional<DesktopMode> desktopModeOptional,
             FalsingManager falsingManager,
             Provider<BackGestureTfClassifierProvider> backGestureTfClassifierProviderProvider,
-            Provider<LightBarController> lightBarControllerProvider) {
+            Provider<LightBarController> lightBarControllerProvider,
+            NotificationShadeWindowController notificationShadeWindowController,
+            GestureInteractor gestureInteractor,
+            JavaAdapter javaAdapter) {
         mContext = context;
         mDisplayId = context.getDisplayId();
         mUiThreadContext = uiThreadContext;
@@ -459,7 +469,10 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         mFalsingManager = falsingManager;
         mBackGestureTfClassifierProviderProvider = backGestureTfClassifierProviderProvider;
         mLightBarControllerProvider = lightBarControllerProvider;
+        mGestureInteractor = gestureInteractor;
+        mJavaAdapter = javaAdapter;
         mLastReportedConfig.setTo(mContext.getResources().getConfiguration());
+
         ComponentName recentsComponentName = ComponentName.unflattenFromString(
                 context.getString(com.android.internal.R.string.config_recentsComponentName));
         if (recentsComponentName != null) {
@@ -479,8 +492,14 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                 } else {
                     String[] gestureBlockingActivities = resources.getStringArray(resId);
                     for (String gestureBlockingActivity : gestureBlockingActivities) {
-                        mGestureBlockingActivities.add(
-                                ComponentName.unflattenFromString(gestureBlockingActivity));
+                        final ComponentName component =
+                                ComponentName.unflattenFromString(gestureBlockingActivity);
+
+                        if (component != null) {
+                            mGestureInteractor.addGestureBlockedMatcher(
+                                    new TaskMatcher.TopActivityComponent(component),
+                                    GestureInteractor.Scope.Local);
+                        }
                     }
                 }
             } catch (NameNotFoundException e) {
@@ -495,6 +514,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                 this::onNavigationSettingsChanged);
 
         updateCurrentUserResources();
+        mNotificationShadeWindowController = notificationShadeWindowController;
     }
 
     public void setStateChangeCallback(Runnable callback) {
@@ -585,6 +605,14 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         updateCurrentUserResources();
         if (mStateChangeCallback != null && wasBackAllowed != isHandlingGestures()) {
             mStateChangeCallback.run();
+        }
+    }
+
+    private void updateTopActivity() {
+        if (edgebackGestureHandlerGetRunningTasksBackground()) {
+            mBackgroundExecutor.execute(() -> updateTopActivityPackageName());
+        } else {
+            updateTopActivityPackageName();
         }
     }
 
@@ -689,6 +717,11 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                     Log.e(TAG, "Failed to unregister window manager callbacks", e);
                 }
 
+                if (mBlockedActivitiesJob != null) {
+                    mBlockedActivitiesJob.cancel(new CancellationException());
+                    mBlockedActivitiesJob = null;
+                }
+                mBlockedActivities.clear();
             } else {
                 mBackgroundExecutor.execute(mGestureNavigationSettingsObserver::register);
                 updateDisplaySize();
@@ -722,6 +755,12 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                 updateLongSwipeWidth();
                 mPluginManager.addPluginListener(
                         this, NavigationEdgeBackPlugin.class, /*allowMultiple=*/ false);
+
+                // Begin listening to changes in blocked activities list
+                mBlockedActivitiesJob = mJavaAdapter.alwaysCollectFlow(
+                        mGestureInteractor.getTopActivityBlocked(),
+                        blocked -> mGestureBlockingActivityRunning.set(blocked));
+
             }
             // Update the ML model resources.
             updateMLModelState();
@@ -1152,6 +1191,8 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                         if (mAllowGesture) {
                             if (mBackAnimation != null) {
                                 mBackAnimation.onThresholdCrossed();
+                                mOverviewProxyService.updateContextualEduStats(
+                                        mIsTrackpadThreeFingerSwipe, GestureType.BACK);
                             } else {
                                 pilferPointers();
                             }
@@ -1319,7 +1360,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         }
     }
 
-    private boolean isGestureBlockingActivityRunning() {
+    private void updateTopActivityPackageName() {
         ActivityManager.RunningTaskInfo runningTask =
                 ActivityManagerWrapper.getInstance().getRunningTask();
         ComponentName topActivity = runningTask == null ? null : runningTask.topActivity;
@@ -1328,21 +1369,24 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         } else {
             mPackageName = "_UNKNOWN";
         }
-        return topActivity != null && mGestureBlockingActivities.contains(topActivity);
     }
 
-    public void setBackAnimation(BackAnimation backAnimation) {
+    public void setBackAnimation(@Nullable BackAnimation backAnimation) {
         mBackAnimation = backAnimation;
-        mBackAnimation.setPilferPointerCallback(() -> {
-            pilferPointers();
-        });
-        updateBackAnimationThresholds();
-        if (mLightBarControllerProvider.get() != null) {
-            mBackAnimation.setStatusBarCustomizer((appearance) -> {
-                mUiThreadContext.getExecutor().execute(() ->
-                        mLightBarControllerProvider.get()
-                                .customizeStatusBarAppearance(appearance));
-            });
+        if (backAnimation != null) {
+            final Executor uiThreadExecutor = mUiThreadContext.getExecutor();
+            backAnimation.setPilferPointerCallback(
+                    () -> uiThreadExecutor.execute(this::pilferPointers));
+            backAnimation.setTopUiRequestCallback(
+                    (requestTopUi, tag) -> uiThreadExecutor.execute(() ->
+                            mNotificationShadeWindowController.setRequestTopUi(requestTopUi, tag)));
+            updateBackAnimationThresholds();
+            if (mLightBarControllerProvider.get() != null) {
+                mBackAnimation.setStatusBarCustomizer((appearance) ->
+                        uiThreadExecutor.execute(() ->
+                            mLightBarControllerProvider.get()
+                                    .customizeStatusBarAppearance(appearance)));
+            }
         }
     }
 
@@ -1372,6 +1416,11 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         private final Provider<BackGestureTfClassifierProvider>
                 mBackGestureTfClassifierProviderProvider;
         private final Provider<LightBarController> mLightBarControllerProvider;
+        private final NotificationShadeWindowController mNotificationShadeWindowController;
+
+        private final GestureInteractor mGestureInteractor;
+
+        private final JavaAdapter mJavaAdapter;
 
         @Inject
         public Factory(OverviewProxyService overviewProxyService,
@@ -1392,7 +1441,10 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                         FalsingManager falsingManager,
                         Provider<BackGestureTfClassifierProvider>
                                 backGestureTfClassifierProviderProvider,
-                        Provider<LightBarController> lightBarControllerProvider) {
+                        Provider<LightBarController> lightBarControllerProvider,
+                        NotificationShadeWindowController notificationShadeWindowController,
+                        GestureInteractor gestureInteractor,
+                        JavaAdapter javaAdapter) {
             mOverviewProxyService = overviewProxyService;
             mSysUiState = sysUiState;
             mPluginManager = pluginManager;
@@ -1411,6 +1463,9 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
             mFalsingManager = falsingManager;
             mBackGestureTfClassifierProviderProvider = backGestureTfClassifierProviderProvider;
             mLightBarControllerProvider = lightBarControllerProvider;
+            mNotificationShadeWindowController = notificationShadeWindowController;
+            mGestureInteractor = gestureInteractor;
+            mJavaAdapter = javaAdapter;
         }
 
         /** Construct a {@link EdgeBackGestureHandler}. */
@@ -1435,7 +1490,10 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                             mDesktopModeOptional,
                             mFalsingManager,
                             mBackGestureTfClassifierProviderProvider,
-                            mLightBarControllerProvider));
+                            mLightBarControllerProvider,
+                            mNotificationShadeWindowController,
+                            mGestureInteractor,
+                            mJavaAdapter));
         }
     }
 

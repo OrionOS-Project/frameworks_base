@@ -92,6 +92,9 @@ import com.google.ux.material.libmonet.dynamiccolor.MaterialDynamicColors;
 
 import lineageos.providers.LineageSettings;
 
+import kotlinx.coroutines.flow.Flow;
+import kotlinx.coroutines.flow.StateFlow;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -166,6 +169,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
     private final WakefulnessLifecycle mWakefulnessLifecycle;
     private final JavaAdapter mJavaAdapter;
     private final KeyguardTransitionInteractor mKeyguardTransitionInteractor;
+    private final StateFlow<Boolean> mIsKeyguardOnAsleepState;
     private final UiModeManager mUiModeManager;
     private ColorScheme mDarkColorScheme;
     private ColorScheme mLightColorScheme;
@@ -206,8 +210,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
             }
             boolean currentUser = userId == mUserTracker.getUserId();
             boolean isAsleep = themeOverlayControllerWakefulnessDeprecation()
-                    ? mKeyguardTransitionInteractor.isFinishedInStateWhereValue(
-                    KeyguardState.Companion::deviceIsAsleepInState)
+                    ? ThemeOverlayController.this.mIsKeyguardOnAsleepState.getValue()
                     : mWakefulnessLifecycle.getWakefulness() != WAKEFULNESS_ASLEEP;
 
             if (currentUser && !mAcceptColorEvents && isAsleep) {
@@ -440,6 +443,10 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
         mUiModeManager = uiModeManager;
         mActivityManager = activityManager;
         dumpManager.registerDumpable(TAG, this);
+
+        Flow<Boolean> isFinishedInAsleepStateFlow = mKeyguardTransitionInteractor
+                .isFinishedInStateWhere(KeyguardState.Companion::deviceIsAsleepInState);
+        mIsKeyguardOnAsleepState = mJavaAdapter.stateInApp(isFinishedInAsleepStateFlow, false);
     }
 
     @Override
@@ -579,7 +586,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
 
         if (themeOverlayControllerWakefulnessDeprecation()) {
             mJavaAdapter.alwaysCollectFlow(
-                    mKeyguardTransitionInteractor.isFinishedInState(KeyguardState.DOZING),
+                    mKeyguardTransitionInteractor.isFinishedIn(KeyguardState.DOZING),
                     isFinishedInDozing -> {
                         if (isFinishedInDozing) whenAsleepHandler.run();
                     });
