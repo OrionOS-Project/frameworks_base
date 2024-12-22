@@ -155,19 +155,23 @@ public class UdfpsAnimation extends ImageView {
 
     public void show() {
         if (mIsKeyguard && isAnimationEnabled()) {
-            try {
-                if (getWindowToken() == null) {
-                    mWindowManager.addView(this, mAnimParams);
-                } else {
-                    mWindowManager.updateViewLayout(this, mAnimParams);
-                }
-            } catch (RuntimeException e) {
+            showAnimation();
+        }
+    }
+
+    private void showAnimation() {
+        try {
+            if (getWindowToken() == null) {
+                mWindowManager.addView(this, mAnimParams);
+            } else {
+                mWindowManager.updateViewLayout(this, mAnimParams);
+            }
+        } catch (RuntimeException e) {
                 e.printStackTrace();
                 return;
-            }
-            if (recognizingAnim != null) {
-                recognizingAnim.start();
-            }
+        }
+        if (recognizingAnim != null) {
+            recognizingAnim.start();
         }
     }
 
