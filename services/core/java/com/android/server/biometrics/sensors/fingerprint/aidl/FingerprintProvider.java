@@ -209,11 +209,7 @@ public class FingerprintProvider implements IBinder.DeathRecipient, ServiceProvi
         mBiometricHandlerProvider = biometricHandlerProvider;
 
         mCleanup = context.getResources().getBoolean(
-<<<<<<< HEAD
-                org.lineageos.platform.internal.R.bool.config_cleanupUnusedFingerprints);
-=======
                 com.android.internal.R.bool.config_cleanupUnusedFingerprints);
->>>>>>> 53715b98671d (Biometrics: Allow disabling of fingerprint cleanups)
 
         initAuthenticationBroadcastReceiver();
         initFingerprintDanglingBroadcastReceiver();
