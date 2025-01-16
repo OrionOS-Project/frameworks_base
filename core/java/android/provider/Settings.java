@@ -7064,7 +7064,6 @@ public final class Settings {
          */
         public static final String[] LEGACY_RESTORE_SETTINGS = {
         };
-
         /**
          * @hide
          */
@@ -7079,6 +7078,15 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_WEATHER_TEXT = "lockscreen_weather_text";
+
+	/**
+         * @hide
+         */
+        public static final String LOCKSCREEN_WEATHER_WIND_INFO = "lockscreen_weather_wind_info";
+        /**
+         * @hide
+         */
+        public static final String LOCKSCREEN_WEATHER_HUMIDITY_INFO = "lockscreen_weather_humidity_info";
 
         /**
          * These are all public system settings
