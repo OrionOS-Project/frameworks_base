@@ -77,7 +77,7 @@ public class ScreenshotTile extends QSTileImpl<BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.EVOLVER;
+        return MetricsEvent.ORION;
     }
 
     @Override

@@ -18,7 +18,7 @@ package com.android.server.display;
 import static android.provider.Settings.Secure.REDUCE_BRIGHT_COLORS_ACTIVATED;
 import static android.provider.Settings.Secure.EXTRA_DIM_AUTO_MODE;
 import static android.provider.Settings.Secure.EXTRA_DIM_AUTO_TIME;
-import static com.android.internal.util.evolution.AutoSettingConsts.MODE_DISABLED;
+import static com.android.internal.util.orion.AutoSettingConsts.MODE_DISABLED;
 
 import android.content.Context;
 import android.hardware.display.ColorDisplayManager;

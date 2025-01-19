@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.orion;
 
 /**
  * Global constants for {@link com.android.server.AutoSettingService}
@@ -41,4 +41,3 @@ public class AutoSettingConsts {
      */
     public static final int MODE_MIXED_SUNRISE = 4;
 }
-

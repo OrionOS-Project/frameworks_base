@@ -15,11 +15,11 @@
  */
 package com.android.server;
 
-import static com.android.internal.util.evolution.AutoSettingConsts.MODE_DISABLED;
-import static com.android.internal.util.evolution.AutoSettingConsts.MODE_NIGHT;
-import static com.android.internal.util.evolution.AutoSettingConsts.MODE_TIME;
-import static com.android.internal.util.evolution.AutoSettingConsts.MODE_MIXED_SUNSET;
-import static com.android.internal.util.evolution.AutoSettingConsts.MODE_MIXED_SUNRISE;
+import static com.android.internal.util.orion.AutoSettingConsts.MODE_DISABLED;
+import static com.android.internal.util.orion.AutoSettingConsts.MODE_NIGHT;
+import static com.android.internal.util.orion.AutoSettingConsts.MODE_TIME;
+import static com.android.internal.util.orion.AutoSettingConsts.MODE_MIXED_SUNSET;
+import static com.android.internal.util.orion.AutoSettingConsts.MODE_MIXED_SUNRISE;
 
 import android.annotation.Nullable;
 import android.app.AlarmManager;
