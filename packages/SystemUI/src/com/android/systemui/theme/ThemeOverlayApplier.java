@@ -70,6 +70,9 @@ public class ThemeOverlayApplier implements Dumpable {
     static final String OVERLAY_BLACK_THEME =
             "org.lineageos.overlay.customization.blacktheme";
 
+    static final String OVERLAY_BLACK_THEME_SETTINGS =
+            "com.android.system.overlay.customization.blacktheme.settings";        
+
     static final String OVERLAY_CATEGORY_DYNAMIC_COLOR =
             "android.theme.customization.dynamic_color";
     static final String OVERLAY_CATEGORY_BG_COLOR =
@@ -302,6 +305,7 @@ public class ThemeOverlayApplier implements Dumpable {
         OverlayManagerTransaction.Builder transaction = getTransactionBuilder();
         try {
             transaction.setEnabled(getOverlayID(OVERLAY_BLACK_THEME), isBlackMode, currentUser);
+            transaction.setEnabled(getOverlayID(OVERLAY_BLACK_THEME_SETTINGS), isBlackMode, currentUser);
             transaction.setEnabled(getOverlayID("android:neutral"), !isBlackMode, currentUser);
             mOverlayManager.commit(transaction.build());
             if (onComplete != null) {
