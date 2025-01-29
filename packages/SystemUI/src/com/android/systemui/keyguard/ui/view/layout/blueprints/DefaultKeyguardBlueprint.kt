@@ -74,7 +74,6 @@ constructor(
     udfpsAccessibilityOverlaySection: DefaultUdfpsAccessibilityOverlaySection,
     defaultIndicationAreaTopSection: DefaultIndicationAreaTopSection,
     weatherViewSection: WeatherViewSection,
-    defaultIndicationAreaTopSection: DefaultIndicationAreaTopSection,
 ) : KeyguardBlueprint {
     override val id: String = DEFAULT
 
