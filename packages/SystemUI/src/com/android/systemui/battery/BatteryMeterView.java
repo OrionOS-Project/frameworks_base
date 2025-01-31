@@ -49,6 +49,7 @@ import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.app.animation.Interpolators;
+import com.android.settingslib.Utils;
 import com.android.settingslib.graph.CircleBatteryDrawable;
 import com.android.systemui.DualToneHandler;
 import com.android.systemui.battery.unified.BatteryColors;
@@ -334,6 +335,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         if (!newStatusBarIcons()) {
             mAccessorizedDrawable.setPowerSaveEnabled(isPowerSave);
             mCircleDrawable.setPowerSaveEnabled(isPowerSave);
+            updateShowPercent();
         } else {
             setBatteryDrawableState(
                     new BatteryDrawableState(
@@ -404,7 +406,6 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         }
         float fontHeight = mBatteryPercentView.getPaint().getFontMetricsInt(null);
         mBatteryPercentView.setLineHeight(TypedValue.COMPLEX_UNIT_PX, fontHeight);
-        if (mTextColor != 0) mBatteryPercentView.setTextColor(mTextColor);
         addView(mBatteryPercentView, new LayoutParams(
                 LayoutParams.WRAP_CONTENT,
                 (int) Math.ceil(fontHeight)));
@@ -546,6 +547,21 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         setContentDescription(contentDescription);
     }
 
+    private void updatePercentTextColor() {
+        if (mBatteryPercentView == null) {
+            return;
+        }
+        if (getBatteryStyle() == BATTERY_STYLE_TEXT && mPowerSaveEnabled) {
+            // Use the error (red) color, same as battery saver icon
+            mBatteryPercentView.setTextColor(Utils.getColorError(getContext()));
+        } else if (mTextColor != 0) {
+            mBatteryPercentView.setTextColor(mTextColor);
+        } else {
+            mBatteryPercentView.setTextColor(Utils.getColorAttr(
+                    getContext(), android.R.attr.textColorPrimary));
+        }
+    }
+
     void updateShowPercent() {
         if (!newStatusBarIcons()) {
             updateShowPercentLegacy();
@@ -608,6 +624,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
             }
             if (getBatteryStyle() == BATTERY_STYLE_TEXT) {
                 mBatteryPercentView.setPaddingRelative(0, 0, 0, 0);
+                updatePercentTextColor();
             } else {
                 Resources res = getContext().getResources();
                 mBatteryPercentView.setPaddingRelative(
@@ -805,9 +822,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         mAccessorizedDrawable.setColors(foregroundColor, backgroundColor, singleToneColor);
         mCircleDrawable.setColors(foregroundColor, backgroundColor, singleToneColor);
         mTextColor = singleToneColor;
-        if (mBatteryPercentView != null) {
-            mBatteryPercentView.setTextColor(singleToneColor);
-        }
+        updatePercentTextColor();
 
         if (mUnknownStateDrawable != null) {
             mUnknownStateDrawable.setTint(singleToneColor);
