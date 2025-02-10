@@ -29,6 +29,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.ServiceManager;
 import android.os.SystemClock;
+import android.service.quicksettings.Tile;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.ViewConfiguration;
@@ -52,12 +53,21 @@ import com.android.systemui.res.R;
 
 import javax.inject.Inject;
 
+import android.media.session.MediaController;
+import android.media.session.MediaSessionManager;
+import android.media.session.PlaybackState;
+import android.media.session.MediaSession;
+
+import java.util.List;
+
 /** Quick settings tile: Music **/
 public class MusicTile extends QSTileImpl<BooleanState> {
 
     private final String TAG = "MusicTile";
     private final boolean DBG = false;
     private final AudioManager mAudioManager;
+    private final MediaSessionManager mMediaSessionManager;
+    private MediaController mMediaController;
     public static final String TILE_SPEC = "music";
 
     private boolean mActive = false;
@@ -68,12 +78,42 @@ public class MusicTile extends QSTileImpl<BooleanState> {
 
     private Metadata mMetadata = new Metadata();
     private Handler mHandler = new Handler();
-    private RemoteController mRemoteController;
-    private IAudioService mAudioService = null;
 
     private int mTaps = 0;
 
     private static final long LAST_ACTIVE_TIMEOUT = 1000 * 60 * 60; // 1 hour
+
+    private final MediaController.Callback mMediaCallback = new MediaController.Callback() {
+        @Override
+        public void onPlaybackStateChanged(PlaybackState state) {
+            if (state == null) return;
+            mClientIdLost = false;
+            updatePlaybackState(state.getState());
+        }
+
+        @Override
+        public void onMetadataChanged(android.media.MediaMetadata metadata) {
+            if (metadata == null) return;
+            mMetadata.trackTitle = metadata.getString(android.media.MediaMetadata.METADATA_KEY_TITLE);
+            mMetadata.artist = metadata.getString(android.media.MediaMetadata.METADATA_KEY_ARTIST);
+            mClientIdLost = false;
+            refreshState();
+        }
+
+        @Override
+        public void onSessionDestroyed() {
+            updateMediaController(null);
+        }
+    };
+
+    private final MediaSessionManager.OnActiveSessionsChangedListener mSessionListener =
+            new MediaSessionManager.OnActiveSessionsChangedListener() {
+        @Override
+        public void onActiveSessionsChanged(List<MediaController> controllers) {
+            updateMediaController(controllers != null && !controllers.isEmpty() 
+                ? controllers.get(0) : null);
+        }
+    };
 
     @Inject
     public MusicTile(
@@ -89,9 +129,8 @@ public class MusicTile extends QSTileImpl<BooleanState> {
     ) {
         super(host, uiEventLogger, backgroundLooper, mainHandler, falsingManager, metricsLogger,
                 statusBarStateController, activityStarter, qsLogger);
-        mRemoteController = new RemoteController(mContext, mRCClientUpdateListener);
+        mMediaSessionManager = mContext.getSystemService(MediaSessionManager.class);
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-        mAudioManager.registerRemoteController(mRemoteController);
     }
 
     @Override
@@ -101,22 +140,88 @@ public class MusicTile extends QSTileImpl<BooleanState> {
 
     @Override
     public void handleSetListening(boolean listening) {
+        if (listening) {
+            try {
+                mMediaSessionManager.addOnActiveSessionsChangedListener(mSessionListener, null);
+                List<MediaController> controllers = mMediaSessionManager.getActiveSessions(null);
+                updateMediaController(controllers != null && !controllers.isEmpty() 
+                    ? controllers.get(0) : null);
+            } catch (SecurityException e) {
+                Log.d(TAG, "Security exception on media controller", e);
+            }
+        } else {
+            mMediaSessionManager.removeOnActiveSessionsChangedListener(mSessionListener);
+            updateMediaController(null);
+        }
+    }
+
+    private void updateMediaController(MediaController controller) {
+        if (mMediaController != null) {
+            mMediaController.unregisterCallback(mMediaCallback);
+        }
+        mMediaController = controller;
+        if (mMediaController != null) {
+            mMediaController.registerCallback(mMediaCallback);
+            updatePlaybackState(mMediaController.getPlaybackState() != null 
+                ? mMediaController.getPlaybackState().getState() 
+                : PlaybackState.STATE_NONE);
+            android.media.MediaMetadata metadata = mMediaController.getMetadata();
+            if (metadata != null) {
+                mMetadata.trackTitle = metadata.getString(android.media.MediaMetadata.METADATA_KEY_TITLE);
+                mMetadata.artist = metadata.getString(android.media.MediaMetadata.METADATA_KEY_ARTIST);
+            }
+        } else {
+            mMetadata.clear();
+            mActive = false;
+            mClientIdLost = true;
+            mIsLoading = false;
+        }
+        refreshState();
+    }
+
+    private void updatePlaybackState(int state) {
+        boolean active;
+        switch (state) {
+            case PlaybackState.STATE_PLAYING:
+                active = true;
+                mIsLoading = false;
+                break;
+            case PlaybackState.STATE_BUFFERING:
+            case PlaybackState.STATE_SKIPPING_TO_NEXT:
+            case PlaybackState.STATE_SKIPPING_TO_PREVIOUS:
+                mIsLoading = true;
+                active = false;
+                break;
+            case PlaybackState.STATE_ERROR:
+            case PlaybackState.STATE_PAUSED:
+            default:
+                active = false;
+                mIsLoading = false;
+                break;
+        }
+        if (active != mActive || mIsLoading) {
+            mActive = active;
+            refreshState();
+        }
     }
 
     @Override
     protected void handleClick(@Nullable Expandable expandable) {
+        if (mMediaController == null) return;
+        
         if (mActive) {
             checkDoubleClick();
         } else {
-            sendMediaButtonClick(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
+            mMediaController.getTransportControls().play();
         }
-
         refreshState();
     }
 
     @Override
     protected void handleLongClick(@Nullable Expandable expandable) {
-        sendMediaButtonClick(KeyEvent.KEYCODE_MEDIA_NEXT);
+        if (mMediaController != null) {
+            mMediaController.getTransportControls().skipToNext();
+        }
         refreshState();
     }
 
@@ -178,32 +283,6 @@ public class MusicTile extends QSTileImpl<BooleanState> {
         }
     }
 
-    private void playbackStateUpdate(int state) {
-        boolean active;
-        switch (state) {
-            case RemoteControlClient.PLAYSTATE_PLAYING:
-                active = true;
-                mIsLoading = false;
-                break;
-            case RemoteControlClient.PLAYSTATE_BUFFERING:
-            case RemoteControlClient.PLAYSTATE_SKIPPING_FORWARDS:
-            case RemoteControlClient.PLAYSTATE_SKIPPING_BACKWARDS:
-                mIsLoading = true;
-                active = false;
-                break;
-            case RemoteControlClient.PLAYSTATE_ERROR:
-            case RemoteControlClient.PLAYSTATE_PAUSED:
-            default:
-                active = false;
-                mIsLoading = false;
-                break;
-        }
-        if (active != mActive || mIsLoading) {
-            mActive = active;
-            refreshState();
-        }
-    }
-
     private void checkDoubleClick() {
         mHandler.removeCallbacks(checkDouble);
         if (mTaps > 0) {
@@ -211,6 +290,7 @@ public class MusicTile extends QSTileImpl<BooleanState> {
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_APP_MUSIC);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mContext.startActivity(intent);
             mTaps = 0;
         } else {
             mTaps += 1;
@@ -219,99 +299,12 @@ public class MusicTile extends QSTileImpl<BooleanState> {
         }
     }
 
-    private void sendMediaButtonClick(int keyCode) {
-        if (!mClientIdLost) {
-            mRemoteController.sendMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
-            mRemoteController.sendMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
-        } else {
-            long eventTime = SystemClock.uptimeMillis();
-            KeyEvent key = new KeyEvent(eventTime, eventTime, KeyEvent.ACTION_DOWN, keyCode, 0);
-            dispatchMediaKeyWithWakeLockToAudioService(key);
-            dispatchMediaKeyWithWakeLockToAudioService(
-                KeyEvent.changeAction(key, KeyEvent.ACTION_UP));
-        }
-    }
-
-    private void dispatchMediaKeyWithWakeLockToAudioService(KeyEvent event) {
-        MediaSessionLegacyHelper.getHelper(mContext).sendMediaButtonEvent(event, true);
-    }
-
-    private IAudioService getAudioService() {
-        if (mAudioService == null) {
-            mAudioService = IAudioService.Stub.asInterface(
-                    ServiceManager.checkService(Context.AUDIO_SERVICE));
-            if (mAudioService == null) {
-                if (DBG) Log.w(TAG, "Unable to find IAudioService interface.");
-            }
-        }
-        return mAudioService;
-    }
-
     final Runnable checkDouble = new Runnable () {
         public void run() {
             mTaps = 0;
-            sendMediaButtonClick(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
-        }
-    };
-
-    private RemoteController.OnClientUpdateListener mRCClientUpdateListener =
-            new RemoteController.OnClientUpdateListener() {
-
-        private String mCurrentTrack = null;
-
-        @Override
-        public void onClientChange(boolean clearing) {
-            if (clearing) {
-                mMetadata.clear();
-                mCurrentTrack = null;
-                mActive = false;
-                mClientIdLost = true;
-                mIsLoading = false;
-                refreshState();
+            if (mMediaController != null) {
+                mMediaController.getTransportControls().pause();
             }
-        }
-
-        @Override
-        public void onClientPlaybackStateUpdate(int state, long stateChangeTimeMs,
-                long currentPosMs, float speed) {
-            mClientIdLost = false;
-            playbackStateUpdate(state);
-        }
-
-        @Override
-        public void onClientPlaybackStateUpdate(int state) {
-            mClientIdLost = false;
-            playbackStateUpdate(state);
-        }
-
-//        @Override
-//        public void onClientFolderInfoBrowsedPlayer(String stringUri) { }
-
-//        @Override
-//        public void onClientUpdateNowPlayingEntries(long[] playList) { }
-
-//        @Override
-//        public void onClientNowPlayingContentChange() { }
-
-//        @Override
-//        public void onClientPlayItemResponse(boolean success) { }
-
-        @Override
-        public void onClientMetadataUpdate(RemoteController.MetadataEditor data) {
-            mMetadata.trackTitle = data.getString(MediaMetadataRetriever.METADATA_KEY_TITLE,
-                    mMetadata.trackTitle);
-            mMetadata.artist = data.getString(MediaMetadataRetriever.METADATA_KEY_ARTIST,
-                    mMetadata.artist);
-            mClientIdLost = false;
-            if (mMetadata.trackTitle != null
-                    && !mMetadata.trackTitle.equals(mCurrentTrack)) {
-                mCurrentTrack = mMetadata.trackTitle;
-                refreshState();
-            }
-        }
-
-        @Override
-        public void onClientTransportControlUpdate(int transportControlFlags) {
         }
     };
 
