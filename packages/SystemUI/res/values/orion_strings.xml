@@ -90,4 +90,7 @@
     <string name="quick_settings_music_label">Music</string>
     <string name="quick_settings_music_play">Play</string>
     <string name="quick_settings_music_pause">Pause</string>
+    <string name="quick_settings_music_loading">Loading...</string>
+    <string name="quick_settings_music_no_player">No player connected</string>
+    <string name="quick_settings_music_last_played">Last played: %1$s</string>
 </resources>

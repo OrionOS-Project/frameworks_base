@@ -62,6 +62,9 @@ public class MusicTile extends QSTileImpl<BooleanState> {
 
     private boolean mActive = false;
     private boolean mClientIdLost = true;
+    private boolean mIsLoading = false;
+    private String mLastPlayedTrack = null;
+    private long mLastActiveTime = 0;
 
     private Metadata mMetadata = new Metadata();
     private Handler mHandler = new Handler();
@@ -69,6 +72,8 @@ public class MusicTile extends QSTileImpl<BooleanState> {
     private IAudioService mAudioService = null;
 
     private int mTaps = 0;
+
+    private static final long LAST_ACTIVE_TIMEOUT = 1000 * 60 * 60; // 1 hour
 
     @Inject
     public MusicTile(
@@ -132,13 +137,44 @@ public class MusicTile extends QSTileImpl<BooleanState> {
 
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
+        if (mIsLoading) {
+            state.icon = ResourceIcon.get(R.drawable.ic_qs_media_play);
+            state.label = mContext.getString(R.string.quick_settings_music_loading);
+            state.state = Tile.STATE_INACTIVE;
+            return;
+        }
+
         if (mActive) {
             state.icon = ResourceIcon.get(R.drawable.ic_qs_media_pause);
             state.label = mMetadata.trackTitle != null
-                ? mMetadata.trackTitle : mContext.getString(R.string.quick_settings_music_pause);
+                ? mMetadata.trackTitle 
+                : mContext.getString(R.string.quick_settings_music_pause);
+            state.state = Tile.STATE_ACTIVE;
+            mLastPlayedTrack = mMetadata.trackTitle;
+            mLastActiveTime = System.currentTimeMillis();
         } else {
             state.icon = ResourceIcon.get(R.drawable.ic_qs_media_play);
-            state.label = mContext.getString(R.string.quick_settings_music_play);
+            
+            // Show last played track if within timeout
+            if (mLastPlayedTrack != null && 
+                (System.currentTimeMillis() - mLastActiveTime) < LAST_ACTIVE_TIMEOUT) {
+                state.label = mContext.getString(
+                    R.string.quick_settings_music_last_played, mLastPlayedTrack);
+            } else {
+                state.label = mContext.getString(R.string.quick_settings_music_play);
+            }
+            state.state = Tile.STATE_INACTIVE;
+        }
+
+        // Add secondary label based on state
+        if (mClientIdLost) {
+            state.secondaryLabel = mContext.getString(R.string.quick_settings_music_no_player);
+        } else if (mIsLoading) {
+            state.secondaryLabel = mContext.getString(R.string.quick_settings_music_loading);
+        } else if (mActive && mMetadata.artist != null) {
+            state.secondaryLabel = mMetadata.artist;
+        } else {
+            state.secondaryLabel = "";
         }
     }
 
@@ -147,16 +183,24 @@ public class MusicTile extends QSTileImpl<BooleanState> {
         switch (state) {
             case RemoteControlClient.PLAYSTATE_PLAYING:
                 active = true;
+                mIsLoading = false;
+                break;
+            case RemoteControlClient.PLAYSTATE_BUFFERING:
+            case RemoteControlClient.PLAYSTATE_SKIPPING_FORWARDS:
+            case RemoteControlClient.PLAYSTATE_SKIPPING_BACKWARDS:
+                mIsLoading = true;
+                active = false;
                 break;
             case RemoteControlClient.PLAYSTATE_ERROR:
             case RemoteControlClient.PLAYSTATE_PAUSED:
             default:
                 active = false;
+                mIsLoading = false;
                 break;
         }
-        if (active != mActive) {
+        if (active != mActive || mIsLoading) {
             mActive = active;
-            refreshState();;
+            refreshState();
         }
     }
 
@@ -222,6 +266,7 @@ public class MusicTile extends QSTileImpl<BooleanState> {
                 mCurrentTrack = null;
                 mActive = false;
                 mClientIdLost = true;
+                mIsLoading = false;
                 refreshState();
             }
         }
@@ -255,6 +300,8 @@ public class MusicTile extends QSTileImpl<BooleanState> {
         public void onClientMetadataUpdate(RemoteController.MetadataEditor data) {
             mMetadata.trackTitle = data.getString(MediaMetadataRetriever.METADATA_KEY_TITLE,
                     mMetadata.trackTitle);
+            mMetadata.artist = data.getString(MediaMetadataRetriever.METADATA_KEY_ARTIST,
+                    mMetadata.artist);
             mClientIdLost = false;
             if (mMetadata.trackTitle != null
                     && !mMetadata.trackTitle.equals(mCurrentTrack)) {
@@ -270,9 +317,11 @@ public class MusicTile extends QSTileImpl<BooleanState> {
 
     class Metadata {
         private String trackTitle;
+        private String artist;
 
         public void clear() {
             trackTitle = null;
+            artist = null;
         }
     }
 

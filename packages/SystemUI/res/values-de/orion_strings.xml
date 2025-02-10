@@ -82,4 +82,7 @@
     <string name="quick_settings_music_label">Musik</string>
     <string name="quick_settings_music_play">Abspielen</string>
     <string name="quick_settings_music_pause">Pause</string>
+    <string name="quick_settings_music_loading">Laden...</string>
+    <string name="quick_settings_music_no_player">Kein Abspielprogramm verbunden</string>
+    <string name="quick_settings_music_last_played">Zuletzt gespielt: %1$s</string>
 </resources>
