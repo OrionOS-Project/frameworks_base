@@ -128,7 +128,9 @@ constructor(
             setVisibility(getNonTargetClockFace(clock).views, GONE)
             setAlpha(getTargetClockFace(clock).views, 1F)
             setAlpha(getNonTargetClockFace(clock).views, 0F)
-            if (keyguardClockViewModel.isLargeClockVisible.value) {
+            if (!keyguardClockViewModel.isLargeClockVisible.value) {
+                connect(sharedR.id.bc_smartspace_view, TOP, sharedR.id.date_smartspace_view, BOTTOM)
+            } else {
                 setScaleX(getTargetClockFace(clock).views, aodBurnInViewModel.movement.value.scale)
                 setScaleY(getTargetClockFace(clock).views, aodBurnInViewModel.movement.value.scale)
             }
