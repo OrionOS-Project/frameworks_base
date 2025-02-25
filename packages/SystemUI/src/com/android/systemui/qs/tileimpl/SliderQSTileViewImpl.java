@@ -57,8 +57,8 @@ public class SliderQSTileViewImpl extends QSTileViewImpl {
     private float mCurrentPercent;
     private int mWarnColor;
 
-    private final int ACTIVE_STATE_PERCENTAGE_ALPHA;
-    private final int INACTIVE_STATE_PERCENTAGE_ALPHA;
+    private final static int ACTIVE_STATE_PERCENTAGE_ALPHA = 64;
+    private final static int INACTIVE_STATE_PERCENTAGE_ALPHA = 0;
 
     public SliderQSTileViewImpl(
             Context context,
@@ -67,13 +67,11 @@ public class SliderQSTileViewImpl extends QSTileViewImpl {
             String settingKey,
             float settingsDefaultValue) {
         super(context, collapsed);
-        ACTIVE_STATE_PERCENTAGE_ALPHA = context.getResources().getInteger(R.integer.tile_active_state_percentage_alpha);
-        INACTIVE_STATE_PERCENTAGE_ALPHA = context.getResources().getInteger(R.integer.tile_inactive_state_percentage_alpha);
         if (touchListener != null && !settingKey.isEmpty()) {
             mSettingsKey = settingKey;
             mWarnColor = Utils.getColorErrorDefaultColor(context);
             percentageDrawable = new PercentageDrawable(settingsDefaultValue);
-            percentageDrawable.setTint(context.getResources().getColor(R.color.tile_percentage_color));
+            percentageDrawable.setTint(Color.WHITE);
             updatePercentBackground(STATE_INACTIVE); // default
             mSettingObserver = new SettingObserver(new Handler(Looper.getMainLooper()));
             setOnTouchListener(touchListener);
