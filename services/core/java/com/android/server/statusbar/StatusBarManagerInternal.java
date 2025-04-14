@@ -291,4 +291,5 @@ public interface StatusBarManagerInternal {
      * Orion extensions
      */
     void toggleCameraFlash();
+    void restartSystemUI();
 }

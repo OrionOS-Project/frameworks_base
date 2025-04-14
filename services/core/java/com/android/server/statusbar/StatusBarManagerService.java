@@ -1020,6 +1020,17 @@ public class StatusBarManagerService extends IStatusBarService.Stub implements D
                 mBar.toggleCameraFlash();
             } catch (RemoteException ex) { }
         }
+
+        @Override
+        public void restartSystemUI() {
+            IStatusBar bar = mBar;
+            if (bar != null) {
+                try {
+                    bar.restartSystemUI();
+                } catch (RemoteException e) {
+                }
+            }
+        }
     };
 
     private final GlobalActionsProvider mGlobalActionsProvider = new GlobalActionsProvider() {
@@ -2021,6 +2032,24 @@ public class StatusBarManagerService extends IStatusBarService.Stub implements D
         try {
             mHandler.post(() -> {
                 mActivityManagerInternal.restart();
+            });
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+    }
+
+    /**
+     * Allows SystemUI restart only
+     */
+    @Override
+    public void restartSystemUI() {
+        enforceStatusBarService();
+        enforceValidCallingUser();
+
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            mHandler.post(() -> {
+                mInternalService.restartSystemUI();
             });
         } finally {
             Binder.restoreCallingIdentity(identity);

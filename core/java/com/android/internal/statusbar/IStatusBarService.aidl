@@ -262,4 +262,5 @@ interface IStatusBarService
      * Orion extensions
      */
     void toggleCameraFlash();
+    void restartSystemUI();
 }
