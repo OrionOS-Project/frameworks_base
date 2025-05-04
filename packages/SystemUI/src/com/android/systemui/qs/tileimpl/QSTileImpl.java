@@ -42,6 +42,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.UserHandle;
 import android.os.VibrationEffect;
+import android.provider.Settings;
 import android.text.format.DateUtils;
 import android.util.ArraySet;
 import android.util.Log;
@@ -307,7 +308,10 @@ public abstract class QSTileImpl<TState extends State> implements QSTile, Lifecy
         if (!mFalsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
             handleClick(ACTION_QS_CLICK, QSEvent.QS_ACTION_CLICK, H.CLICK, eventId, expandable);
         }
-        VibrationUtils.doHapticFeedback(mContext, VibrationEffect.EFFECT_CLICK);
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0) {
+            VibrationUtils.doHapticFeedback(mContext, VibrationEffect.EFFECT_CLICK);
+        }
     }
 
     @Override
@@ -317,7 +321,10 @@ public abstract class QSTileImpl<TState extends State> implements QSTile, Lifecy
                 mState.state, eventId);
         handleClick(ACTION_QS_SECONDARY_CLICK, QSEvent.QS_ACTION_SECONDARY_CLICK, H.SECONDARY_CLICK,
                 eventId, expandable);
-        VibrationUtils.doHapticFeedback(mContext, VibrationEffect.EFFECT_TICK);
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0) {
+            VibrationUtils.doHapticFeedback(mContext, VibrationEffect.EFFECT_TICK);
+        }
     }
 
     @Override
