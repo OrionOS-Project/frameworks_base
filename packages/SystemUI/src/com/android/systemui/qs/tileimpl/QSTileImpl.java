@@ -309,7 +309,9 @@ public abstract class QSTileImpl<TState extends State> implements QSTile, Lifecy
             handleClick(ACTION_QS_CLICK, QSEvent.QS_ACTION_CLICK, H.CLICK, eventId, expandable);
         }
         if (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0) {
+                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0 &&
+            Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.HAPTIC_ON_QS, 1) != 0) {
             VibrationUtils.doHapticFeedback(mContext, VibrationEffect.EFFECT_CLICK);
         }
     }
@@ -322,7 +324,9 @@ public abstract class QSTileImpl<TState extends State> implements QSTile, Lifecy
         handleClick(ACTION_QS_SECONDARY_CLICK, QSEvent.QS_ACTION_SECONDARY_CLICK, H.SECONDARY_CLICK,
                 eventId, expandable);
         if (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0) {
+                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0 &&
+            Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.HAPTIC_ON_QS, 1) != 0) {
             VibrationUtils.doHapticFeedback(mContext, VibrationEffect.EFFECT_TICK);
         }
     }
