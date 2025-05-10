@@ -6817,6 +6817,11 @@ public final class Settings {
         /**
          * @hide
          */
+        private static final String COMPACT_MODE = "compact_mode";
+
+        /**
+         * @hide
+         */
         public static final String SHOW_MEDIA_PROGRESS = "show_media_progress";
 
         /**
