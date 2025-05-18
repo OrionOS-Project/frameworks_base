@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.quicksettings.Tile;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -51,8 +52,9 @@ public class OrionTile extends QSTileImpl<State> {
 
     public static final String TILE_SPEC = "orion";
 
-    private boolean mListening;
     private final ActivityStarter mActivityStarter;
+    private final String mOrionLabel;
+    private final String mNotSupportedToast;
 
     private static final String TAG = "OrionTile";
 
@@ -81,19 +83,25 @@ public class OrionTile extends QSTileImpl<State> {
         super(host, uiEventLogger, backgroundLooper, mainHandler, falsingManager, metricsLogger,
                 statusBarStateController, activityStarter, qsLogger);
         mActivityStarter = activityStarter;
+        mOrionLabel = mContext.getString(R.string.quick_orion_label);
+        mNotSupportedToast = mContext.getString(R.string.quick_orion_toast);
     }
 
     @Override
     public State newTileState() {
         State state = new State();
-        state.handlesLongClick = isOTABundled() ? true : false;
+        state.handlesLongClick = isOTABundled();
         return state;
     }
 
     @Override
     protected void handleClick(@Nullable Expandable expandable) {
-        startOrion();
-        refreshState();
+        try {
+            startOrion();
+            refreshState();
+        } catch (Exception e) {
+            Log.e(TAG, "Error launching Molecular", e);
+        }
     }
 
     @Override
@@ -108,40 +116,45 @@ public class OrionTile extends QSTileImpl<State> {
     @Override
     protected void handleSecondaryClick(@Nullable Expandable expandable) {
         if (isOTABundled()) {
-            startOrionOTA();
+            try {
+                startOrionOTA();
+            } catch (Exception e) {
+                Log.e(TAG, "Error launching OTA updater", e);
+            }
         }
     }
 
     @Override
     public CharSequence getTileLabel() {
-        return mContext.getString(R.string.quick_orion_label);
+        return mOrionLabel;
     }
 
     protected void startOrion() {
-        mActivityStarter.postStartActivityDismissingKeyguard(ORION_INTENT, 0);
+        if (mActivityStarter != null) {
+            mActivityStarter.postStartActivityDismissingKeyguard(ORION_INTENT, 0);
+        }
     }
 
     protected void startOrionOTA() {
-        mActivityStarter.postStartActivityDismissingKeyguard(OTA_INTENT, 0);
+        if (mActivityStarter != null) {
+            mActivityStarter.postStartActivityDismissingKeyguard(OTA_INTENT, 0);
+        }
     }
 
     private void showNotSupportedToast() {
-        // Collapse the panels, so the user can see the toast.
-        SysUIToast.makeText(mContext, mContext.getString(
-                R.string.quick_orion_toast),
-                Toast.LENGTH_LONG).show();
+        if (mContext != null) {
+            SysUIToast.makeText(mContext, mNotSupportedToast, Toast.LENGTH_LONG).show();
+        }
     }
 
     private boolean isOTABundled() {
-        return orionUtils.isPackageAvailable(mContext, OTA_PKG_NAME);
+        return mContext != null && orionUtils.isPackageAvailable(mContext, OTA_PKG_NAME);
     }
 
-    private boolean isOrionFestAvailable() {
-        boolean isInstalled = false;
-        boolean isNotHidden = false;
-        isInstalled = orionUtils.isPackageInstalled(mContext, ORION_PKG_NAME);
-        isNotHidden = orionUtils.isPackageAvailable(mContext, ORION_PKG_NAME);
-        return isInstalled || isNotHidden;
+    private boolean isOrionAvailable() {
+        if (mContext == null) return false;
+        return orionUtils.isPackageInstalled(mContext, ORION_PKG_NAME) ||
+               orionUtils.isPackageAvailable(mContext, ORION_PKG_NAME);
     }
 
     @Override
@@ -152,14 +165,8 @@ public class OrionTile extends QSTileImpl<State> {
     @Override
     protected void handleUpdateState(State state, Object arg) {
         state.icon = ResourceIcon.get(R.drawable.ic_qs_orion);
-        state.label = mContext.getString(R.string.quick_orion_label);
+        state.label = mOrionLabel;
         state.state = Tile.STATE_ACTIVE;
-    }
-
-    @Override
-    public void handleSetListening(boolean listening) {
-        if (mListening == listening) return;
-        mListening = listening;
     }
 
     @Override
