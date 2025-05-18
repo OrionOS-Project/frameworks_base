@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.quicksettings.Tile;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -51,8 +52,9 @@ public class DerpFestTile extends QSTileImpl<State> {
 
     public static final String TILE_SPEC = "derpfest";
 
-    private boolean mListening;
     private final ActivityStarter mActivityStarter;
+    private final String mDerpFestLabel;
+    private final String mNotSupportedToast;
 
     private static final String TAG = "DerpFestTile";
 
@@ -81,19 +83,25 @@ public class DerpFestTile extends QSTileImpl<State> {
         super(host, uiEventLogger, backgroundLooper, mainHandler, falsingManager, metricsLogger,
                 statusBarStateController, activityStarter, qsLogger);
         mActivityStarter = activityStarter;
+        mDerpFestLabel = mContext.getString(R.string.quick_derpfest_label);
+        mNotSupportedToast = mContext.getString(R.string.quick_derpfest_toast);
     }
 
     @Override
     public State newTileState() {
         State state = new State();
-        state.handlesLongClick = isOTABundled() ? true : false;
+        state.handlesLongClick = isOTABundled();
         return state;
     }
 
     @Override
     protected void handleClick(@Nullable Expandable expandable) {
-        startDerpFest();
-        refreshState();
+        try {
+            startDerpFest();
+            refreshState();
+        } catch (Exception e) {
+            Log.e(TAG, "Error launching DerpFest customizations", e);
+        }
     }
 
     @Override
@@ -108,40 +116,45 @@ public class DerpFestTile extends QSTileImpl<State> {
     @Override
     protected void handleSecondaryClick(@Nullable Expandable expandable) {
         if (isOTABundled()) {
-            startDerpFestOTA();
+            try {
+                startDerpFestOTA();
+            } catch (Exception e) {
+                Log.e(TAG, "Error launching OTA updater", e);
+            }
         }
     }
 
     @Override
     public CharSequence getTileLabel() {
-        return mContext.getString(R.string.quick_derpfest_label);
+        return mDerpFestLabel;
     }
 
     protected void startDerpFest() {
-        mActivityStarter.postStartActivityDismissingKeyguard(DERPFEST_INTENT, 0);
+        if (mActivityStarter != null) {
+            mActivityStarter.postStartActivityDismissingKeyguard(DERPFEST_INTENT, 0);
+        }
     }
 
     protected void startDerpFestOTA() {
-        mActivityStarter.postStartActivityDismissingKeyguard(OTA_INTENT, 0);
+        if (mActivityStarter != null) {
+            mActivityStarter.postStartActivityDismissingKeyguard(OTA_INTENT, 0);
+        }
     }
 
     private void showNotSupportedToast() {
-        // Collapse the panels, so the user can see the toast.
-        SysUIToast.makeText(mContext, mContext.getString(
-                R.string.quick_derpfest_toast),
-                Toast.LENGTH_LONG).show();
+        if (mContext != null) {
+            SysUIToast.makeText(mContext, mNotSupportedToast, Toast.LENGTH_LONG).show();
+        }
     }
 
     private boolean isOTABundled() {
-        return derpUtils.isPackageAvailable(mContext, OTA_PKG_NAME);
+        return mContext != null && derpUtils.isPackageAvailable(mContext, OTA_PKG_NAME);
     }
 
     private boolean isDerpFestAvailable() {
-        boolean isInstalled = false;
-        boolean isNotHidden = false;
-        isInstalled = derpUtils.isPackageInstalled(mContext, DERPFEST_PKG_NAME);
-        isNotHidden = derpUtils.isPackageAvailable(mContext, DERPFEST_PKG_NAME);
-        return isInstalled || isNotHidden;
+        if (mContext == null) return false;
+        return derpUtils.isPackageInstalled(mContext, DERPFEST_PKG_NAME) ||
+               derpUtils.isPackageAvailable(mContext, DERPFEST_PKG_NAME);
     }
 
     @Override
@@ -152,14 +165,8 @@ public class DerpFestTile extends QSTileImpl<State> {
     @Override
     protected void handleUpdateState(State state, Object arg) {
         state.icon = ResourceIcon.get(R.drawable.ic_qs_derpfest);
-        state.label = mContext.getString(R.string.quick_derpfest_label);
+        state.label = mDerpFestLabel;
         state.state = Tile.STATE_ACTIVE;
-    }
-
-    @Override
-    public void handleSetListening(boolean listening) {
-        if (mListening == listening) return;
-        mListening = listening;
     }
 
     @Override
