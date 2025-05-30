@@ -50,11 +50,12 @@ open class SettingsPreferenceGroupAdapter(preferenceGroup: PreferenceGroup) :
     private val syncRunnable = Runnable { updatePreferencesList() }
     
     private val excludedClasses = setOf(
-        "com.android.settingslib.widget.LayoutPreference",
-        "com.android.settingslib.widget.IllustrationPreference",
-        "com.android.settings.accessibility.TextReadingPreviewPreference",
-        "com.android.settings.accessibility.TextReadingResetPreference",
-        "com.android.settings.widget.ValidatedEditTextAboutPreference",
+        "com.orion.ui.preference.OrionCardDarkModePreferenceBase",
+        "com.orion.ui.preference.OrionCardPreference",
+        "com.orion.ui.preference.OrionCardSwitchPreference",
+        "com.orion.ui.preference.OrionSystemThemePreferenceBase",
+        "com.orion.support.preference.SystemThemePreference",
+        "com.orion.support.preference.DarkModeCardPreference"
     )
 
     init {
@@ -213,16 +214,14 @@ open class SettingsPreferenceGroupAdapter(preferenceGroup: PreferenceGroup) :
             }
 
         val v = holder.itemView
-
-        // Update background
-        v.setBackgroundResource(backgroundRes)
-
         // Update padding
         if (SettingsThemeHelper.isExpressiveTheme(context) && !isExcludedFromExpressive) {
             val (paddingStart, paddingEnd) = getStartEndPadding(position, backgroundRes)
             v.setPaddingRelative(paddingStart, v.paddingTop, paddingEnd, v.paddingBottom)
             v.clipToOutline = backgroundRes != 0
         }
+        // Update background
+        v.setBackgroundResource(backgroundRes)
     }
 
     private fun getStartEndPadding(position: Int, backgroundRes: Int): Pair<Int, Int> {
