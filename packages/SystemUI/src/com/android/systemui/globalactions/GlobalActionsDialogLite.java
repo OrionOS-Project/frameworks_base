@@ -168,6 +168,7 @@ import com.android.systemui.util.EmergencyDialerConstants;
 import com.android.systemui.util.RingerModeTracker;
 import com.android.systemui.util.settings.GlobalSettings;
 import com.android.systemui.util.settings.SecureSettings;
+import com.android.systemui.keyguard.ui.transitions.BlurConfig;
 
 import dagger.Lazy;
 
@@ -3014,6 +3015,7 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
             mGestureDetector = new GestureDetector(mContext, mGestureListener);
             mSelectedUserInteractor = selectedUserInteractor;
             mBlurUtils = new BlurUtils(mContext.getResources(),
+                    new BlurConfig(0.0f, 0.0f),
                     CrossWindowBlurListeners.getInstance(), new DumpManager());
         }
 

@@ -29,6 +29,7 @@ import android.widget.ListAdapter;
 
 import com.android.systemui.statusbar.BlurUtils;
 import com.android.systemui.dump.DumpManager;
+import com.android.systemui.keyguard.ui.transitions.BlurConfig;
 
 import androidx.constraintlayout.helper.widget.Flow;
 
@@ -72,6 +73,7 @@ public class GlobalActionsPowerDialog {
         dialog.setContentView(listView);
 
         BlurUtils blurUtils = new BlurUtils(context.getResources(),
+                new BlurConfig(0.0f, 0.0f),
                 CrossWindowBlurListeners.getInstance(), new DumpManager());
 
         Window window = dialog.getWindow();
