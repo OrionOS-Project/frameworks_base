@@ -18,7 +18,6 @@ package com.android.systemui.settings.brightness;
 
 import android.annotation.StringRes;
 import android.view.MotionEvent;
-import android.widget.ImageView;
 
 import com.android.settingslib.RestrictedLockUtils;
 
@@ -41,6 +40,4 @@ public interface ToggleSlider {
     void hideView();
     void showToast(@StringRes int resId);
     boolean isVisible();
-
-    ImageView getIcon();
 }
