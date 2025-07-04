@@ -7041,6 +7041,12 @@ public final class Settings {
         public static final String QS_MEDIA_RESPECT_HALVING = "qs_media_respect_halving";
 
         /**
+         * Lockscreen Media Art
+         * @hide
+         */
+        public static final String LS_MEDIA_ART_ENABLED = "ls_media_art_enabled";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate

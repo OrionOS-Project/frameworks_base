@@ -498,4 +498,9 @@ public class SystemUIApplication extends Application implements
     public WMComponent getWMComponent() {
         return mInitializer.getWMComponent();
     }
+
+    @NonNull
+    public SysUIComponent getSysUIComponent() {
+        return mSysUIComponent;
+    }
 }
