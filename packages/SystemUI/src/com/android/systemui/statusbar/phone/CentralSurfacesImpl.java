@@ -153,6 +153,7 @@ import com.android.systemui.keyguard.KeyguardUnlockAnimationController;
 import com.android.systemui.keyguard.KeyguardViewMediator;
 import com.android.systemui.keyguard.ScreenLifecycle;
 import com.android.systemui.keyguard.WakefulnessLifecycle;
+import com.android.systemui.media.MediaViewController;
 import com.android.systemui.media.NotificationMediaManager;
 import com.android.systemui.navigation.pulse.PulseControllerImpl;
 import com.android.systemui.navigation.pulse.VisualizerView;
@@ -1203,6 +1204,13 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                 (requestTopUi, componentTag) -> mMainExecutor.execute(
                         () -> mTopUiController.setRequestTopUi(requestTopUi, componentTag)
                 )));
+        getNotifContainerParentView().addView(MediaViewController.get(mContext).getMediaArtScrim(), 0);
+    }
+
+    private ViewGroup getNotifContainerParentView() {
+        ViewGroup rootView = (ViewGroup) getNotificationShadeWindowView().findViewById(R.id.scrim_behind).getParent();
+        ViewGroup targetView = rootView.findViewById(R.id.notification_container_parent);
+        return targetView;
     }
 
     @VisibleForTesting
