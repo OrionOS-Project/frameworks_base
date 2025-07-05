@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -46,6 +47,7 @@ import com.android.systemui.qs.QsEventLogger;
 import com.android.systemui.qs.logging.QSLogger;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
 import com.android.systemui.res.R;
+import android.os.UserManager;
 
 import javax.inject.Inject;
 
@@ -95,8 +97,11 @@ public class NfcTile extends QSTileImpl<BooleanState> {
         if (mListening) {
             mBroadcastDispatcher.registerReceiver(mNfcReceiver,
                     new IntentFilter(NfcAdapter.ACTION_ADAPTER_STATE_CHANGED));
+            mBroadcastDispatcher.registerReceiver(mUserRestrictionReceiver,
+                    new IntentFilter(UserManager.ACTION_USER_RESTRICTIONS_CHANGED));
         } else {
             mBroadcastDispatcher.unregisterReceiver(mNfcReceiver);
+            mBroadcastDispatcher.unregisterReceiver(mUserRestrictionReceiver);
         }
     }
 
@@ -125,10 +130,31 @@ public class NfcTile extends QSTileImpl<BooleanState> {
         if (getAdapter() == null) {
             return;
         }
-        if (!getAdapter().isEnabled()) {
-            getAdapter().enable();
-        } else {
-            getAdapter().disable();
+        
+        // Check for user restrictions
+        UserManager userManager = mContext.getSystemService(UserManager.class);
+        if (userManager != null) {
+            Bundle restrictions = userManager.getUserRestrictions();
+            if (restrictions.getBoolean(UserManager.DISALLOW_NEAR_FIELD_COMMUNICATION_RADIO, false) ||
+                restrictions.getBoolean(UserManager.DISALLOW_CHANGE_NEAR_FIELD_COMMUNICATION_RADIO, false)) {
+                // NFC is restricted by user policy, show settings instead
+                mActivityStarter.postStartActivityDismissingKeyguard(
+                        new Intent(Settings.ACTION_NFC_SETTINGS), 0);
+                return;
+            }
+        }
+        
+        // Toggle NFC state
+        try {
+            if (!getAdapter().isEnabled()) {
+                getAdapter().enable();
+            } else {
+                getAdapter().disable();
+            }
+        } catch (SecurityException e) {
+            // If we can't toggle NFC due to security restrictions, open settings
+            mActivityStarter.postStartActivityDismissingKeyguard(
+                    new Intent(Settings.ACTION_NFC_SETTINGS), 0);
         }
     }
 
@@ -143,10 +169,26 @@ public class NfcTile extends QSTileImpl<BooleanState> {
             mIcon = maybeLoadResourceIcon(R.drawable.ic_qs_nfc);
         }
 
+        // Check for user restrictions
+        UserManager userManager = mContext.getSystemService(UserManager.class);
+        boolean isRestricted = false;
+        if (userManager != null) {
+            Bundle restrictions = userManager.getUserRestrictions();
+            isRestricted = restrictions.getBoolean(UserManager.DISALLOW_NEAR_FIELD_COMMUNICATION_RADIO, false) ||
+                          restrictions.getBoolean(UserManager.DISALLOW_CHANGE_NEAR_FIELD_COMMUNICATION_RADIO, false);
+        }
+
         state.value = getAdapter() != null && getAdapter().isEnabled();
-        state.state = getAdapter() == null
-                ? Tile.STATE_UNAVAILABLE
-                : state.value ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE;
+        
+        if (getAdapter() == null) {
+            state.state = Tile.STATE_UNAVAILABLE;
+        } else if (isRestricted) {
+            state.state = Tile.STATE_UNAVAILABLE;
+            state.disabledByPolicy = true;
+        } else {
+            state.state = state.value ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE;
+        }
+        
         state.icon = mIcon;
         state.label = mContext.getString(R.string.quick_settings_nfc_label);
         state.expandedAccessibilityClassName = Switch.class.getName();
@@ -166,6 +208,13 @@ public class NfcTile extends QSTileImpl<BooleanState> {
     }
 
     private BroadcastReceiver mNfcReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            refreshState();
+        }
+    };
+
+    private BroadcastReceiver mUserRestrictionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             refreshState();
