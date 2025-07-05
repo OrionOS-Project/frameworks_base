@@ -7190,6 +7190,21 @@ public final class Settings {
         public static final String LS_MEDIA_ART_ENABLED = "ls_media_art_enabled";
 
         /**
+         * @hide
+         */
+        public static final String LS_MEDIA_ART_FILTER = "ls_media_art_filter";
+
+        /**
+         * @hide
+         */
+        public static final String LS_MEDIA_ART_FADE_LEVEL = "ls_media_art_fade_level";
+
+        /**
+         * @hide
+         */
+        public static final String LS_MEDIA_ART_BLUR_LEVEL = "ls_media_art_blur_level";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
