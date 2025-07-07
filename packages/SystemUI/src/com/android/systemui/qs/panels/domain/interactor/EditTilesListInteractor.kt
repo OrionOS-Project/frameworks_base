@@ -39,23 +39,24 @@ constructor(
 ) {
 
     private val customTileMap: Map<String, CustomTileConfig> = mapOf(
-        "cell" to CustomTileConfig(R.drawable.ic_swap_vert, TileCategory.CONNECTIVITY),
-        "wifi" to CustomTileConfig(R.drawable.ic_qs_category_connectivty, TileCategory.CONNECTIVITY),
-        "vpn" to CustomTileConfig(R.drawable.ic_qs_vpn, TileCategory.CONNECTIVITY),
-        "usb_tether" to CustomTileConfig(R.drawable.ic_qs_usb_tether, TileCategory.CONNECTIVITY),
-        "sync" to CustomTileConfig(R.drawable.ic_qs_sync, TileCategory.CONNECTIVITY),
-        "nfc" to CustomTileConfig(R.drawable.ic_qs_nfc, TileCategory.CONNECTIVITY),
-        "aod" to CustomTileConfig(R.drawable.ic_qs_aod, TileCategory.UTILITIES),
-        "caffeine" to CustomTileConfig(R.drawable.ic_qs_caffeine, TileCategory.UTILITIES),
-        "powershare" to CustomTileConfig(R.drawable.ic_qs_powershare, TileCategory.UTILITIES),
-        "profiles" to CustomTileConfig(R.drawable.ic_qs_profiles, TileCategory.UTILITIES),
-        "ambient_display" to CustomTileConfig(R.drawable.ic_qs_ambient_display, TileCategory.DISPLAY),
-        "heads_up" to CustomTileConfig(R.drawable.ic_qs_heads_up, TileCategory.DISPLAY),
-        "reading_mode" to CustomTileConfig(R.drawable.ic_qs_reader, TileCategory.DISPLAY)
+        "cell" to CustomTileConfig(R.drawable.ic_swap_vert, R.string.mobile_data, TileCategory.CONNECTIVITY),
+        "wifi" to CustomTileConfig(R.drawable.ic_qs_category_connectivty, R.string.quick_settings_wifi_label, TileCategory.CONNECTIVITY),
+        "vpn" to CustomTileConfig(R.drawable.ic_qs_vpn, R.string.quick_settings_vpn_label, TileCategory.CONNECTIVITY),
+        "usb_tether" to CustomTileConfig(R.drawable.ic_qs_usb_tether, R.string.quick_settings_usb_tether_label, TileCategory.CONNECTIVITY),
+        "sync" to CustomTileConfig(R.drawable.ic_qs_sync, R.string.quick_settings_sync_label, TileCategory.CONNECTIVITY),
+        "nfc" to CustomTileConfig(R.drawable.ic_qs_nfc, R.string.quick_settings_nfc_label, TileCategory.CONNECTIVITY),
+        "aod" to CustomTileConfig(R.drawable.ic_qs_aod, R.string.quick_settings_aod_label, TileCategory.UTILITIES),
+        "caffeine" to CustomTileConfig(R.drawable.ic_qs_caffeine, R.string.quick_settings_caffeine_label, TileCategory.UTILITIES),
+        "powershare" to CustomTileConfig(R.drawable.ic_qs_powershare, R.string.quick_settings_powershare_label, TileCategory.UTILITIES),
+        "profiles" to CustomTileConfig(R.drawable.ic_qs_profiles, R.string.quick_settings_profiles_label, TileCategory.UTILITIES),
+        "ambient_display" to CustomTileConfig(R.drawable.ic_qs_ambient_display, R.string.quick_settings_ambient_display_label, TileCategory.DISPLAY),
+        "heads_up" to CustomTileConfig(R.drawable.ic_qs_heads_up, R.string.quick_settings_heads_up_label, TileCategory.DISPLAY),
+        "reading_mode" to CustomTileConfig(R.drawable.ic_qs_reader, R.string.quick_settings_reading_mode, TileCategory.DISPLAY)
     )
 
     private data class CustomTileConfig(
         val iconRes: Int,
+        val labelRes: Int,
         val category: TileCategory
     )
 
@@ -86,7 +87,11 @@ constructor(
                 EditTileData(
                     tile,
                     Icon.Resource(iconRes, ContentDescription.Loaded(tile.spec)),
-                    Text.Loaded(tile.spec),
+                    if (fallback != null) {
+                        Text.Resource(fallback.labelRes)
+                    } else {
+                        Text.Loaded(tile.spec)
+                    },
                     null,
                     category,
                 )
