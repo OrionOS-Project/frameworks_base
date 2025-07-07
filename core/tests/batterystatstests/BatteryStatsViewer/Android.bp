@@ -17,6 +17,7 @@ android_app {
         "androidx.recyclerview_recyclerview",
         "androidx.swiperefreshlayout_swiperefreshlayout",
         "com.google.android.material_material",
+        "SettingsLibSettingsTheme",
     ],
     platform_apis: true,
     certificate: "platform",
