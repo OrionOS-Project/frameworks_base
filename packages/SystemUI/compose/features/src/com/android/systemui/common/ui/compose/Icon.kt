@@ -16,23 +16,22 @@
 
 package com.android.systemui.common.ui.compose
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Rect
-import androidx.compose.foundation.Image
-import androidx.compose.material3.Icon
+import android.graphics.drawable.AnimatedVectorDrawable
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.VectorDrawable
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.material3.Icon as M3Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
-import com.android.systemui.common.shared.model.Icon
 import com.android.compose.ui.graphics.painter.rememberDrawablePainter
+import com.android.systemui.common.shared.model.Icon
 
 /**
  * Icon composable that draws [icon] using [tint].
@@ -41,76 +40,48 @@ import com.android.compose.ui.graphics.painter.rememberDrawablePainter
  */
 @Composable
 fun Icon(icon: Icon, modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) {
-    val context = LocalContext.current
     val contentDescription = icon.contentDescription?.load()
+    val context = LocalContext.current
+
     when (icon) {
         is Icon.Loaded -> {
-            Icon(
-                bitmap = remember(icon.drawable) {
-                    icon.drawable.toBitmap().asImageBitmap()
-                },
-                contentDescription = contentDescription,
-                modifier = modifier,
-                tint = tint,
-            )
+            val img = remember(icon.drawable) { icon.drawable.toBitmap().asImageBitmap() }
+            M3Icon(img, contentDescription, modifier, tint)
         }
         is Icon.Resource -> {
-            val drawable = remember(icon.res) {
-                ContextCompat.getDrawable(context, icon.res)
-            }
+            val drawable = remember(icon.res) { AppCompatResources.getDrawable(context, icon.res) }
 
-            if (drawable != null) {
-                val bitmap = remember(drawable) { drawable.toBitmap() }
-                val croppedBitmap = remember(bitmap) { removeExtraSpaces(bitmap) }
-                Image(
-                    bitmap = croppedBitmap.asImageBitmap(),
-                    contentDescription = contentDescription,
-                    colorFilter = ColorFilter.tint(tint),
-                    modifier = modifier,
-                )
+            when {
+                drawable == null -> {
+                    // Fallback to painterResource if drawable is null
+                    M3Icon(
+                        painterResource(icon.res),
+                        contentDescription,
+                        modifier,
+                        tint
+                    )
+                }
+                drawable is AnimatedVectorDrawable -> {
+                    M3Icon(
+                        painter = rememberDrawablePainter(drawable),
+                        contentDescription = contentDescription,
+                        modifier = modifier,
+                        tint = tint
+                    )
+                }
+                drawable is VectorDrawable || drawable is BitmapDrawable -> {
+                    M3Icon(
+                        painterResource(icon.res),
+                        contentDescription,
+                        modifier,
+                        tint
+                    )
+                }
+                else -> {
+                    val img = remember(drawable) { drawable.toBitmap().asImageBitmap() }
+                    M3Icon(img, contentDescription, modifier, tint)
+                }
             }
         }
     }
-}
-
-private fun removeExtraSpaces(bitmap: Bitmap): Bitmap {
-    val width = bitmap.width
-    val height = bitmap.height
-    var top = 0
-    var left = 0
-    var right = width - 1
-    var bottom = height - 1
-    loop@ for (y in 0 until height) {
-        for (x in 0 until width) {
-            if (bitmap.getPixel(x, y) != 0) {
-                top = y
-                break@loop
-            }
-        }
-    }
-    loop@ for (y in height - 1 downTo 0) {
-        for (x in 0 until width) {
-            if (bitmap.getPixel(x, y) != 0) {
-                bottom = y
-                break@loop
-            }
-        }
-    }
-    loop@ for (x in 0 until width) {
-        for (y in 0 until height) {
-            if (bitmap.getPixel(x, y) != 0) {
-                left = x
-                break@loop
-            }
-        }
-    }
-    loop@ for (x in width - 1 downTo 0) {
-        for (y in 0 until height) {
-            if (bitmap.getPixel(x, y) != 0) {
-                right = x
-                break@loop
-            }
-        }
-    }
-    return Bitmap.createBitmap(bitmap, left, top, right - left + 1, bottom - top + 1)
 }
