@@ -110,4 +110,7 @@
     <!-- Refresh rate QS tile -->
     <string name="refresh_rate_tile_label">Refresh rate</string>
     <string name="refresh_rate_unknown">Unknown</string>
+
+    <!-- Name of the bluetooth battery level status bar setting. -->
+    <string name="status_bar_bluetooth_battery_level">Bluetooth battery level</string>
 </resources>
