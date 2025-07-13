@@ -187,7 +187,7 @@
     <dimen name="status_bar_left_clock_starting_padding">0dp</dimen>
 
     <!-- End padding for left-aligned status bar clock -->
-    <dimen name="status_bar_left_clock_end_padding">2sp</dimen>
+    <dimen name="status_bar_left_clock_end_padding">4sp</dimen>
 
     <!-- Margins before/after the new wifi icon -->
     <dimen name="status_bar_wifi_signal_horizontal_margin">3sp</dimen>
