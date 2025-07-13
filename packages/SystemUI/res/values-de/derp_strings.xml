@@ -98,4 +98,7 @@
     <string name="usb_use_tethering">USB-Tethering</string>
     <string name="usb_use_MIDI">MIDI</string>
     <string name="usb_use">USB verwenden für</string>
+
+    <!-- Name of the bluetooth battery level status bar setting. -->
+    <string name="status_bar_bluetooth_battery_level">Bluetooth-Akkustand</string>
 </resources>

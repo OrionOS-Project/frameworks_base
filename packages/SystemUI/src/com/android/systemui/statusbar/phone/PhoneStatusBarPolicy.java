@@ -57,6 +57,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
 
 import com.android.internal.statusbar.StatusBarIcon;
+import com.android.systemui.Dependency;
 import com.android.systemui.broadcast.BroadcastDispatcher;
 import com.android.systemui.common.shared.model.Icon;
 import com.android.systemui.dagger.qualifiers.DisplayId;
@@ -89,6 +90,7 @@ import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.statusbar.policy.ZenModeController;
 import com.android.systemui.statusbar.policy.domain.interactor.ZenModeInteractor;
 import com.android.systemui.statusbar.policy.domain.model.ZenModeInfo;
+import com.android.systemui.tuner.TunerService;
 import com.android.systemui.util.RingerModeTracker;
 import com.android.systemui.util.kotlin.JavaAdapter;
 import com.android.systemui.util.time.DateFormatUtil;
@@ -545,8 +547,8 @@ public class PhoneStatusBarPolicy
         if (mBluetooth != null && mBluetooth.isBluetoothConnected()) {
             bluetoothVisible = mBluetooth.isBluetoothEnabled();
             // Check if Bluetooth battery level display is enabled
-            boolean showBatteryLevel = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.BLUETOOTH_BATTERY_LEVEL, 1) != 0;
+            boolean showBatteryLevel = Dependency.get(TunerService.class).getValue(
+                    "system:bluetooth_battery_level", 1) != 0;
             batteryLevel = showBatteryLevel ? mBluetooth.getBatteryLevel() : -1;
             contentDescription = mResources.getString(
                     R.string.accessibility_bluetooth_connected);

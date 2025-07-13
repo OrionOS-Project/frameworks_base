@@ -117,4 +117,7 @@
     <!-- DerpFest Tile -->
     <string name="quick_derpfest_label">DerpFest Customizations</string>
     <string name="quick_derpfest_toast">LOL, you really thought that long click will take you somewhere!!!</string>
+
+    <!-- Name of the bluetooth battery level status bar setting. -->
+    <string name="status_bar_bluetooth_battery_level">Bluetooth battery level</string>
 </resources>
