@@ -74,13 +74,14 @@ public class UdfpsAnimation extends ImageView {
     private final FingerprintSensorPropertiesInternal mProps;
 
     public UdfpsAnimation(Context context, WindowManager windowManager,
-           FingerprintSensorPropertiesInternal props, AuthController authController) {
+           FingerprintSensorPropertiesInternal props, AuthController authController,
+           KeyguardStateController keyguardStateController) {
         super(context);
         mContext = context;
         mAuthController = authController;
         mProps = props;
         mWindowManager = windowManager;
-        mKeyguardStateController = Dependency.get(KeyguardStateController.class);
+        mKeyguardStateController = keyguardStateController;
 
         float scaleFactor = getDisplayFactor();
 
