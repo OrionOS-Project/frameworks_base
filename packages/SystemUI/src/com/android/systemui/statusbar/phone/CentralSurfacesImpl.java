@@ -1328,7 +1328,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                                 new OnGoingActionProgressController(
                                         mContext,
                                         statusBarViewController.getOngoingActionProgressGroup(),
-                                        mNotificationListener, mKeyguardStateController);
+                                        mNotificationListener, mKeyguardStateController, mHeadsUpManager);
                     });
         }
         if (!StatusBarRootModernization.isEnabled() && !StatusBarConnectedDisplays.isEnabled()) {
