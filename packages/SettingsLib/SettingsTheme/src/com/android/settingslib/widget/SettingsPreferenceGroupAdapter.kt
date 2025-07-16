@@ -50,6 +50,10 @@ open class SettingsPreferenceGroupAdapter(preferenceGroup: PreferenceGroup) :
     private val syncRunnable = Runnable { updatePreferencesList() }
     
     private val excludedClasses = setOf(
+        "com.android.settingslib.widget.LayoutPreference",
+        "com.android.settingslib.widget.IllustrationPreference",
+        "com.android.settings.accessibility.TextReadingPreviewPreference",
+        "com.android.settings.accessibility.TextReadingResetPreference",
         "com.orion.ui.preference.OrionCardDarkModePreferenceBase",
         "com.orion.ui.preference.OrionCardPreference",
         "com.orion.ui.preference.OrionCardSwitchPreference",
