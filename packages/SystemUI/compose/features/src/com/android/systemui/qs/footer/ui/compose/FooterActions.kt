@@ -89,6 +89,7 @@ import com.android.systemui.compose.modifiers.sysuiResTag
 import com.android.systemui.qs.flags.QSComposeFragment
 import com.android.systemui.qs.flags.QsInCompose
 import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsButtonViewModel
+import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsDataUsageViewModel
 import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsForegroundServicesButtonViewModel
 import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsSecurityButtonViewModel
 import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsViewModel
@@ -150,6 +151,7 @@ fun FooterActions(
     }
     var userSwitcher by remember { mutableStateOf<FooterActionsButtonViewModel?>(null) }
     var power by remember { mutableStateOf(viewModel.initialPower()) }
+    var dataUsage by remember { mutableStateOf<FooterActionsDataUsageViewModel?>(null) }
 
     LaunchedEffect(
         context,
@@ -170,6 +172,8 @@ fun FooterActions(
             launch { viewModel.foregroundServices.collect { foregroundServices = it } }
             launch { viewModel.userSwitcher.collect { userSwitcher = it } }
             launch { viewModel.power.collect { power = it } }
+            // Set data usage view model immediately since it's not a Flow
+            dataUsage = viewModel.dataUsage
         }
     }
 
@@ -228,6 +232,21 @@ fun FooterActions(
             val useModifierBasedExpandable = remember { QSComposeFragment.isEnabled }
             val context = LocalContext.current
             
+            // Check which icons should be shown
+            val showSettingsIcon = Settings.System.getIntForUser(
+                context.contentResolver,
+                Settings.System.QS_SHOW_SETTINGS_ICON,
+                1,
+                UserHandle.USER_CURRENT
+            ) == 1
+            
+            val showPowerMenuIcon = Settings.System.getIntForUser(
+                context.contentResolver,
+                Settings.System.QS_SHOW_POWER_MENU_ICON,
+                1,
+                UserHandle.USER_CURRENT
+            ) == 1
+            
             SecurityButton({ security }, useModifierBasedExpandable, Modifier.weight(1f))
             ForegroundServicesButton({ foregroundServices }, useModifierBasedExpandable)
             IconButton(
@@ -236,12 +255,7 @@ fun FooterActions(
                 Modifier.sysuiResTag("multi_user_switch"),
             )
             
-            if (Settings.System.getIntForUser(
-                context.contentResolver,
-                Settings.System.QS_SHOW_SETTINGS_ICON,
-                1,
-                UserHandle.USER_CURRENT
-            ) == 1) {
+            if (showSettingsIcon) {
                 IconButton(
                     { viewModel.settings },
                     useModifierBasedExpandable,
@@ -249,12 +263,7 @@ fun FooterActions(
                 )
             }
             
-            if (Settings.System.getIntForUser(
-                context.contentResolver,
-                Settings.System.QS_SHOW_POWER_MENU_ICON,
-                1,
-                UserHandle.USER_CURRENT
-            ) == 1) {
+            if (showPowerMenuIcon) {
                 IconButton({ power }, useModifierBasedExpandable, Modifier.sysuiResTag("pm_lite"))
             }
         }

@@ -83,6 +83,9 @@ class FooterActionsViewModel(
     val power: Flow<FooterActionsButtonViewModel?>,
     val initialPower: () -> FooterActionsButtonViewModel?,
 
+    /** The model for the data usage display. */
+    val dataUsage: FooterActionsDataUsageViewModel?,
+
     /**
      * Observe the device monitoring dialog requests and show the dialog accordingly. This function
      * will suspend indefinitely and will need to be cancelled to stop observing.
@@ -128,7 +131,8 @@ class FooterActionsViewModel(
         private val globalActionsDialogLiteProvider: Provider<GlobalActionsDialogLite>,
         private val activityStarter: ActivityStarter,
         @Named(PM_LITE_ENABLED) private val showPowerButton: Boolean,
-        private val keyguardStateController: KeyguardStateController
+        private val keyguardStateController: KeyguardStateController,
+        private val dataUsageViewModel: FooterActionsDataUsageViewModel
     ) {
         /** Create a [FooterActionsViewModel] bound to the lifecycle of [lifecycleOwner]. */
         fun create(lifecycleOwner: LifecycleOwner): FooterActionsViewModel {
@@ -157,6 +161,7 @@ class FooterActionsViewModel(
                 activityStarter,
                 showPowerButton,
                 keyguardStateController,
+                dataUsageViewModel,
             )
         }
 
@@ -183,6 +188,7 @@ class FooterActionsViewModel(
                 activityStarter,
                 showPowerButton,
                 keyguardStateController,
+                dataUsageViewModel,
             )
         }
     }
@@ -196,7 +202,8 @@ fun createFooterActionsViewModel(
     globalActionsDialogLite: GlobalActionsDialogLite,
     activityStarter: ActivityStarter,
     showPowerButton: Boolean,
-    keyguardStateController: KeyguardStateController
+    keyguardStateController: KeyguardStateController,
+    dataUsageViewModel: FooterActionsDataUsageViewModel? = null
 ): FooterActionsViewModel {
 
     val vibrator = appContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -315,6 +322,7 @@ fun createFooterActionsViewModel(
         userSwitcher = userSwitcher,
         settings = settings,
         power = power,
+        dataUsage = dataUsageViewModel,
         observeDeviceMonitoringDialogRequests = ::observeDeviceMonitoringDialogRequests,
         initialPower =
             if (showPowerButton) {

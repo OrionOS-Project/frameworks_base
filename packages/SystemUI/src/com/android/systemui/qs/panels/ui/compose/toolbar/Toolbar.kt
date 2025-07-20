@@ -31,12 +31,32 @@ import android.provider.Settings
 import com.android.systemui.compose.modifiers.sysuiResTag
 import com.android.systemui.development.ui.compose.BuildNumber
 import com.android.systemui.qs.footer.ui.compose.IconButton
+import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsDataUsageViewModel
 import com.android.systemui.qs.panels.ui.viewmodel.toolbar.ToolbarViewModel
 import com.android.systemui.qs.ui.compose.borderOnFocus
 
 @Composable
-fun Toolbar(viewModel: ToolbarViewModel, modifier: Modifier = Modifier) {
+fun Toolbar(
+    viewModel: ToolbarViewModel, 
+    dataUsageViewModel: FooterActionsDataUsageViewModel? = null,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
+    
+    // Check which icons should be shown
+    val showSettingsIcon = Settings.System.getIntForUser(
+        context.contentResolver,
+        Settings.System.QS_SHOW_SETTINGS_ICON,
+        1,
+        UserHandle.USER_CURRENT
+    ) == 1
+    
+    val showPowerMenuIcon = Settings.System.getIntForUser(
+        context.contentResolver,
+        Settings.System.QS_SHOW_POWER_MENU_ICON,
+        1,
+        UserHandle.USER_CURRENT
+    ) == 1
     
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         viewModel.userSwitcherViewModel?.let {
@@ -49,12 +69,7 @@ fun Toolbar(viewModel: ToolbarViewModel, modifier: Modifier = Modifier) {
 
         EditModeButton(viewModel.editModeButtonViewModel)
 
-        if (Settings.System.getIntForUser(
-            context.contentResolver,
-            Settings.System.QS_SHOW_SETTINGS_ICON,
-            1,
-            UserHandle.USER_CURRENT
-        ) == 1) {
+        if (showSettingsIcon) {
             IconButton(
                 viewModel.settingsButtonViewModel,
                 useModifierBasedExpandable = true,
@@ -66,6 +81,7 @@ fun Toolbar(viewModel: ToolbarViewModel, modifier: Modifier = Modifier) {
             BuildNumber(
                 viewModelFactory = viewModel.buildNumberViewModelFactory,
                 textColor = MaterialTheme.colorScheme.onSurface,
+                dataUsageViewModel = dataUsageViewModel,
                 modifier =
                     Modifier.borderOnFocus(
                             color = MaterialTheme.colorScheme.secondary,
@@ -75,12 +91,7 @@ fun Toolbar(viewModel: ToolbarViewModel, modifier: Modifier = Modifier) {
             )
         }
 
-        if (Settings.System.getIntForUser(
-            context.contentResolver,
-            Settings.System.QS_SHOW_POWER_MENU_ICON,
-            1,
-            UserHandle.USER_CURRENT
-        ) == 1) {
+        if (showPowerMenuIcon) {
             IconButton(
                 { viewModel.powerButtonViewModel },
                 useModifierBasedExpandable = true,
