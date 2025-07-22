@@ -68,6 +68,7 @@ import com.android.systemui.statusbar.policy.DeviceProvisionedController;
 import com.android.systemui.util.Assert;
 import com.android.systemui.util.CopyOnLoopListenerSet;
 import com.android.systemui.util.IListenerSet;
+import com.android.systemui.util.ScrimUtils;
 import com.android.systemui.util.kotlin.JavaAdapterKt;
 
 import dagger.Lazy;
@@ -306,6 +307,7 @@ public final class DozeServiceHost implements DozeHost {
         for (Callback callback : mCallbacks) {
             callback.onDozingChanged(dozing);
         }
+        ScrimUtils.get().onDozingChanged(dozing);
         mDozeInteractor.setIsDozing(dozing);
         mStatusBarStateController.setIsDozing(dozing);
     }
@@ -349,6 +351,7 @@ public final class DozeServiceHost implements DozeHost {
             }
 
             private void setPulsing(boolean pulsing) {
+                ScrimUtils.get().setPulsing(pulsing);
                 mStatusBarKeyguardViewManager.setPulsing(pulsing);
                 mShadeLockscreenInteractor.setPulsing(pulsing);
                 mStatusBarStateController.setPulsing(pulsing);
