@@ -84,6 +84,7 @@ import com.android.systemui.statusbar.pipeline.shared.ui.binder.HomeStatusBarVie
 import com.android.systemui.statusbar.pipeline.shared.ui.binder.StatusBarVisibilityChangeListener;
 import com.android.systemui.statusbar.pipeline.shared.ui.viewmodel.HomeStatusBarViewModel;
 import com.android.systemui.statusbar.pipeline.shared.ui.viewmodel.HomeStatusBarViewModel.HomeStatusBarViewModelFactory;
+import com.android.systemui.statusbar.notification.headsup.HeadsUpManager;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
 import com.android.systemui.statusbar.window.StatusBarWindowController;
 import com.android.systemui.statusbar.window.StatusBarWindowControllerStore;
@@ -103,6 +104,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
@@ -169,6 +171,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private final DemoModeController mDemoModeController;
     private final StatusBarWindowControllerStore mStatusBarWindowControllerStore;
     private final StatusBarConfigurationControllerStore mStatusBarConfigurationControllerStore;
+    private final HeadsUpManager mHeadsUpManager;
 
     private List<String> mBlockedIcons = new ArrayList<>();
     private Map<Startable, Startable.State> mStartableStates = new ArrayMap<>();
@@ -278,7 +281,8 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
             KeyguardUpdateMonitor keyguardUpdateMonitor,
             DemoModeController demoModeController,
             StatusBarWindowControllerStore statusBarWindowControllerStore,
-            StatusBarConfigurationControllerStore statusBarConfigurationControllerStore) {
+            StatusBarConfigurationControllerStore statusBarConfigurationControllerStore,
+            Optional<HeadsUpManager> headsUpManager) {
         mHomeStatusBarComponentFactory = homeStatusBarComponentFactory;
         mOngoingCallController = ongoingCallController;
         mAnimationScheduler = animationScheduler;
@@ -304,6 +308,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mDemoModeController = demoModeController;
         mStatusBarWindowControllerStore = statusBarWindowControllerStore;
         mStatusBarConfigurationControllerStore = statusBarConfigurationControllerStore;
+        mHeadsUpManager = headsUpManager.orElse(null);
     }
 
     private final DemoMode mDemoModeCallback = new DemoMode() {
@@ -549,6 +554,26 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mNotificationIconAreaInner = notificationIcons;
         int displayId = mHomeStatusBarComponent.getDisplayId();
         mNicBindingDisposable = mNicViewBinder.bindWhileAttached(notificationIcons, displayId);
+
+        // Setup combined notification counter with KeyguardStateController and HeadsUpManager
+        com.android.systemui.statusbar.phone.ui.CombinedNotificationCounter combinedCounter =
+                notificationIconArea.findViewById(R.id.combined_notification_counter);
+        if (combinedCounter != null) {
+            if (mKeyguardStateController != null) {
+                combinedCounter.setKeyguardStateController(mKeyguardStateController);
+            }
+            if (mHeadsUpManager != null) {
+                combinedCounter.setHeadsUpManager(mHeadsUpManager);
+            }
+            // Register with DarkIconDispatcher for color updates
+            com.android.systemui.plugins.DarkIconDispatcher darkIconDispatcher = 
+                    mHomeStatusBarComponent.getDarkIconDispatcher();
+            if (darkIconDispatcher != null) {
+                darkIconDispatcher.addDarkReceiver(combinedCounter);
+            }
+            // Bind to notification count flow
+            mNicViewBinder.bindCombinedCounter(combinedCounter, displayId);
+        }
 
         if (!StatusBarRootModernization.isEnabled()) {
             updateNotificationIconAreaAndOngoingActivityChip(/* animate= */ false);

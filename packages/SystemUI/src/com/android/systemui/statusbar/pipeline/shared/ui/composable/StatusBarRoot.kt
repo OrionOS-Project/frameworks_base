@@ -392,6 +392,20 @@ fun StatusBarRoot(
                     context.displayId,
                 )
 
+                // Setup combined notification counter with KeyguardStateController and HeadsUpManager
+                val combinedCounter =
+                    notificationIconArea.findViewById<com.android.systemui.statusbar.phone.ui.CombinedNotificationCounter>(
+                        R.id.combined_notification_counter
+                    )
+                if (combinedCounter != null) {
+                    combinedCounter.setKeyguardStateController(keyguardStateController)
+                    combinedCounter.setHeadsUpManager(headsUpManager)
+                    // Register with DarkIconDispatcher for color updates
+                    darkIconDispatcher.addDarkReceiver(combinedCounter)
+                    // Bind to notification count flow
+                    notificationIconsBinder.bindCombinedCounter(combinedCounter, context.displayId)
+                }
+
                 if (StatusBarAlwaysUseRegionSampling.isAnyRegionSamplingEnabled) {
                     bindRegionSamplingViewModel(
                         context.displayId,

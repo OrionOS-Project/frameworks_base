@@ -41,7 +41,21 @@ constructor(
     private val defaultDisplayViewStore: StatusBarNotificationIconViewStore,
     private val connectedDisplaysViewStoreFactory:
         ConnectedDisplaysStatusBarNotificationIconViewStore.Factory,
+    private val iconsInteractor: com.android.systemui.statusbar.notification.icon.domain.interactor.StatusBarNotificationIconsInteractor,
 ) {
+
+    fun bindCombinedCounter(
+        counter: com.android.systemui.statusbar.phone.ui.CombinedNotificationCounter,
+        displayId: Int
+    ): DisposableHandle {
+        return counter.repeatWhenAttached {
+            lifecycleScope.launch {
+                iconsInteractor.notificationCount.collect { count ->
+                    counter.updateNotificationCount(count)
+                }
+            }
+        }
+    }
 
     fun bindWhileAttached(view: NotificationIconContainer, displayId: Int): DisposableHandle {
         return traceSection("NICStatusBar#bindWhileAttached") {

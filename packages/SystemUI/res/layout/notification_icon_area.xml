@@ -14,9 +14,26 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License
   -->
-<com.android.systemui.statusbar.phone.NotificationIconContainer
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/notificationIcons"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:clipChildren="false"/>
+    android:orientation="horizontal"
+    android:paddingStart="4sp">
+
+    <!-- Combined notification counter chip - BEFORE notification icons so it appears first -->
+    <com.android.systemui.statusbar.phone.ui.CombinedNotificationCounter
+        android:id="@+id/combined_notification_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        
+        <include layout="@layout/combined_notification_counter" />
+        
+    </com.android.systemui.statusbar.phone.ui.CombinedNotificationCounter>
+
+    <com.android.systemui.statusbar.phone.NotificationIconContainer
+        android:id="@+id/notificationIcons"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:clipChildren="false"/>
+        
+</LinearLayout>

@@ -956,6 +956,10 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         bubbles.setExpandListener(listener);
     }
 
+    public HeadsUpManager getHeadsUpManager() {
+        return mHeadsUpManager;
+    }
+
     @Override
     public void start() {
         mScreenLifecycle.addObserver(mScreenObserver);
