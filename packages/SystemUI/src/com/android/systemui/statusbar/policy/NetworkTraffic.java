@@ -267,12 +267,12 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
         }
     }
 
-    private RelativeSizeSpan getSpeedRelativeSizeSpan() {
-        return new RelativeSizeSpan(0.70f);
+    protected RelativeSizeSpan getSpeedRelativeSizeSpan() {
+        return new RelativeSizeSpan(0.78f);
     }
 
-    private RelativeSizeSpan getUnitRelativeSizeSpan() {
-        return new RelativeSizeSpan(0.65f);
+    protected RelativeSizeSpan getUnitRelativeSizeSpan() {
+        return new RelativeSizeSpan(0.70f);
     }
 
     private Runnable mRunnable = new Runnable() {
@@ -291,7 +291,7 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
                 update();
                 break;
             case NETWORK_TRAFFIC_AUTOHIDE:
-                mAutoHideThreshold = TunerService.parseIntegerSwitch(newValue, false) ? 5 : 0;
+                mAutoHideThreshold = TunerService.parseIntegerSwitch(newValue, false) ? 10 : 0;
                 setMode();
                 update();
                 break;
@@ -344,10 +344,10 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
     }
 
     protected void setMode() {
-        setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
+        setGravity(Gravity.CENTER);
         setMaxLines(2);
         setSpacingAndFonts();
-        setTextColor(mTintColor);
+        updateTrafficDrawable();
         setWidth(mWidth);
     }
 
@@ -362,10 +362,10 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
         setTextColor(mTintColor);
     }
 
-    private void setSpacingAndFonts() {
+    protected void setSpacingAndFonts() {
         setTypeface(Typeface.create(getResources().getString(
                 com.android.internal.R.string.config_headlineFontFamily), Typeface.BOLD));
-        setLineSpacing(0.80f, 0.80f);
+        setLineSpacing(0.88f, 0.88f);
     }
 
     public void onDensityOrFontScaleChanged() {

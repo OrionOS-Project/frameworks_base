@@ -64,6 +64,23 @@ public class NetworkTrafficSB extends NetworkTraffic implements DarkReceiver, St
     }
 
     @Override
+    protected void setSpacingAndFonts() {
+        setTypeface(Typeface.create(getResources().getString(
+                com.android.internal.R.string.config_headlineFontFamily), Typeface.BOLD));
+        setLineSpacing(0.83f, 0.83f);
+    }
+
+    @Override
+    protected RelativeSizeSpan getSpeedRelativeSizeSpan() {
+        return new RelativeSizeSpan(0.70f);
+    }
+
+    @Override
+    protected RelativeSizeSpan getUnitRelativeSizeSpan() {
+        return new RelativeSizeSpan(0.60f);
+    }
+
+    @Override
     public void onDarkChanged(ArrayList<Rect> areas, float darkIntensity, int tint) {
         mTintColor = DarkIconDispatcher.getTint(areas, this, tint);
         updateTrafficDrawable();
