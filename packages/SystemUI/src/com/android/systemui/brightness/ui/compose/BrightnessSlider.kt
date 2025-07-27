@@ -21,6 +21,8 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.AnimatedStateListDrawable
 import android.graphics.drawable.StateListDrawable
 import android.os.UserHandle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.provider.Settings
 import android.view.MotionEvent
 import android.widget.ImageButton
@@ -214,6 +216,9 @@ fun BrightnessSlider(
     val hasAutoBrightness = context.resources.getBoolean(
         com.android.internal.R.bool.config_automatic_brightness_available
     )
+
+    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    val EFFECT_CLICK = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -418,6 +423,7 @@ fun BrightnessSlider(
 
                     button.setColorFilter(autoBrightnessIconTint.toArgb(), PorterDuff.Mode.SRC_IN)
                     button.setOnClickListener {
+                        vibrator.vibrate(EFFECT_CLICK)
                         coroutineScope.launch {
                             onIconClick()
                         }
