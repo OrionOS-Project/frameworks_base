@@ -4207,7 +4207,8 @@ public final class NotificationPanelViewController implements
                 return false;
             }
 
-            if (mDoubleTapToSleepEnabled && !mPulsing && !mDozing) {
+            boolean headsUpVisible = mHeadsUpAnimatingAway || mHeadsUpPinnedMode;
+            if (mDoubleTapToSleepEnabled && !mPulsing && !mDozing && !headsUpVisible) {
                 mDoubleTapGesture.onTouchEvent(event);
             }
 
