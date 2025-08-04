@@ -2,5 +2,5 @@
 <resources>
     <string name="app_name">Перегляд статистики батареї</string>
     <string name="display_dashboard_summary">Перегляньте детальну статистику використання акумулятора</string>
-    <string name="header">Статистика батареї</string>
+    <string name="header">Статистика акумулятора</string>
 </resources>
