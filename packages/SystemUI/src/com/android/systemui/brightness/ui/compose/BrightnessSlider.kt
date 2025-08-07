@@ -106,6 +106,7 @@ import com.android.systemui.brightness.ui.compose.Dimensions.IconSize
 import com.android.systemui.brightness.ui.compose.Dimensions.SliderBackgroundFrameSize
 import com.android.systemui.brightness.ui.compose.Dimensions.SliderBackgroundRoundedCorner
 import com.android.systemui.brightness.ui.compose.Dimensions.SliderTrackRoundedCorner
+import com.android.systemui.brightness.ui.compose.Dimensions.ThumbSize
 import com.android.systemui.brightness.ui.compose.Dimensions.ThumbTrackGapSize
 import com.android.systemui.brightness.ui.viewmodel.BrightnessSliderViewModel
 import com.android.systemui.brightness.ui.viewmodel.Drag
@@ -244,7 +245,7 @@ fun BrightnessSlider(
                 SliderDefaults.Thumb(
                     interactionSource = interactionSource,
                     enabled = enabled,
-                    thumbSize = DpSize(4.dp, 52.dp),
+                    thumbSize = DpSize(4.dp, ThumbSize),
                     colors = colors,
                 )
             },
