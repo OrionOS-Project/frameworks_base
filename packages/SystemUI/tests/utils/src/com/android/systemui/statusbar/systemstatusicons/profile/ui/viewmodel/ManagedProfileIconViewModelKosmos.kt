@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.systemui.scene.ui.composable.transitions
 
-import com.android.compose.animation.scene.TransitionBuilder
-import com.android.systemui.plugins.clocks.LockscreenElementKeys
+package com.android.systemui.statusbar.systemstatusicons.profile.ui.viewmodel
 
-fun TransitionBuilder.lockscreenToShadeTransition(durationScale: Double = 1.0) {
-    toShadeTransition(durationScale = durationScale)
+import android.content.Context
+import com.android.systemui.kosmos.Kosmos
+import com.android.systemui.statusbar.policy.profile.domain.interactor.managedProfileInteractor
 
-    fractionRange(end = 0.2f) { fade(LockscreenElementKeys.Root) }
-}
+val Kosmos.managedProfileIconViewModelFactory: ManagedProfileIconViewModel.Factory by
+    Kosmos.Fixture {
+        object : ManagedProfileIconViewModel.Factory {
+            override fun create(context: Context) =
+                ManagedProfileIconViewModel(context, managedProfileInteractor)
+        }
+    }
