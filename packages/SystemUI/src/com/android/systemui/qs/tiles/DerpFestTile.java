@@ -164,7 +164,7 @@ public class DerpFestTile extends QSTileImpl<State> {
 
     @Override
     protected void handleUpdateState(State state, Object arg) {
-        state.icon = ResourceIcon.get(R.drawable.ic_qs_derpfest);
+        state.icon = maybeLoadResourceIcon(R.drawable.ic_qs_derpfest);
         state.label = mDerpFestLabel;
         state.state = Tile.STATE_ACTIVE;
     }

@@ -243,14 +243,14 @@ public class MusicTile extends QSTileImpl<BooleanState> {
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
         if (mIsLoading) {
-            state.icon = ResourceIcon.get(R.drawable.ic_qs_media_play);
+            state.icon = maybeLoadResourceIcon(R.drawable.ic_qs_media_play);
             state.label = mContext.getString(R.string.quick_settings_music_loading);
             state.state = Tile.STATE_INACTIVE;
             return;
         }
 
         if (mActive) {
-            state.icon = ResourceIcon.get(R.drawable.ic_qs_media_pause);
+            state.icon = maybeLoadResourceIcon(R.drawable.ic_qs_media_pause);
             state.label = mMetadata.trackTitle != null
                 ? mMetadata.trackTitle 
                 : mContext.getString(R.string.quick_settings_music_pause);
@@ -258,7 +258,7 @@ public class MusicTile extends QSTileImpl<BooleanState> {
             mLastPlayedTrack = mMetadata.trackTitle;
             mLastActiveTime = System.currentTimeMillis();
         } else {
-            state.icon = ResourceIcon.get(R.drawable.ic_qs_media_play);
+            state.icon = maybeLoadResourceIcon(R.drawable.ic_qs_media_play);
             
             // Show last played track if within timeout
             if (mLastPlayedTrack != null && 
