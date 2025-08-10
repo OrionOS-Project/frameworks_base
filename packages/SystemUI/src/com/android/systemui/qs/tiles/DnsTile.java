@@ -58,6 +58,9 @@ public class DnsTile extends QSTileImpl<BooleanState> {
     private final SettingObserver mSetting;
     private boolean mListening;
 
+    @Nullable
+    private Icon mIcon = null;
+
     @Inject
     public DnsTile(
             QSHost host,
@@ -130,7 +133,10 @@ public class DnsTile extends QSTileImpl<BooleanState> {
     protected void handleUpdateState(BooleanState state, Object arg) {
         state.label = mContext.getString(
                 com.android.settingslib.R.string.select_private_dns_configuration_title);
-        state.icon = ResourceIcon.get(R.drawable.ic_settings_dns);
+        if (mIcon == null) {
+            mIcon = maybeLoadResourceIcon(R.drawable.ic_settings_dns);
+        }
+        state.icon = mIcon;
         state.expandedAccessibilityClassName = Switch.class.getName();
         state.contentDescription = state.label;
 

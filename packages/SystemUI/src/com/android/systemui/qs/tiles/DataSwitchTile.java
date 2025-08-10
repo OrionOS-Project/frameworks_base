@@ -181,26 +181,26 @@ public class DataSwitchTile extends QSTileImpl<BooleanState> {
         updateSimCount();
         switch (mSimCount) {
             case 0:
-                state.icon = ResourceIcon.get(R.drawable.ic_qs_data_switch_0);
+                state.icon = maybeLoadResourceIcon(R.drawable.ic_qs_data_switch_0);
                 state.value = false;
                 state.secondaryLabel = mContext.getString(R.string.tile_unavailable);
                 break;
             case 1:
-                state.icon = ResourceIcon.get(activeSIMZero
+                state.icon = maybeLoadResourceIcon(activeSIMZero
                         ? R.drawable.ic_qs_data_switch_1
                         : R.drawable.ic_qs_data_switch_2);
                 state.value = false;
                 state.secondaryLabel = mContext.getString(R.string.tile_unavailable);
                 break;
             case 2:
-                state.icon = ResourceIcon.get(activeSIMZero
+                state.icon = maybeLoadResourceIcon(activeSIMZero
                         ? R.drawable.ic_qs_data_switch_1
                         : R.drawable.ic_qs_data_switch_2);
                 state.value = true;
                 state.secondaryLabel = getActiveSlotName();
                 break;
             default:
-                state.icon = ResourceIcon.get(R.drawable.ic_qs_data_switch_1);
+                state.icon = maybeLoadResourceIcon(R.drawable.ic_qs_data_switch_1);
                 state.value = false;
                 state.secondaryLabel = mContext.getString(R.string.tile_unavailable);
                 break;

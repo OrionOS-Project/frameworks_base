@@ -51,7 +51,8 @@ public class CPUInfoTile extends QSTileImpl<BooleanState> {
     public static final String TILE_SPEC = "cpuinfo";
 
     private final SettingObserver mSetting;
-    private final Icon mIcon = ResourceIcon.get(R.drawable.ic_qs_cpu_info);
+    @Nullable
+    private Icon mIcon = null;
 
     @Inject
     public CPUInfoTile(
@@ -108,15 +109,17 @@ public class CPUInfoTile extends QSTileImpl<BooleanState> {
 
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
-        if (mSetting == null) return;
-        final int value = arg instanceof Integer ? (Integer)arg : mSetting.getValue();
-        final boolean cpuInfoEnabled = value != 0;
-        state.value = cpuInfoEnabled;
+        final int value = arg instanceof Integer ? (Integer) arg : mSetting.getValue();
+        final boolean enable = value != 0;
+        state.value = enable;
         state.label = mContext.getString(R.string.quick_settings_cpuinfo_label);
+        if (mIcon == null) {
+            mIcon = maybeLoadResourceIcon(R.drawable.ic_qs_cpu_info);
+        }
         state.icon = mIcon;
         state.contentDescription =  mContext.getString(
                 R.string.quick_settings_cpuinfo_label);
-        if (cpuInfoEnabled) {
+        if (enable) {
             state.state = Tile.STATE_ACTIVE;
         } else {
             state.state = Tile.STATE_INACTIVE;

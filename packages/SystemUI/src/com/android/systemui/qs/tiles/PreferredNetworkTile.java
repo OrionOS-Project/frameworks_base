@@ -126,7 +126,7 @@ public class PreferredNetworkTile extends QSTileImpl<State> {
     @Override
     protected void handleUpdateState(State state, Object arg) {
         updateSimCount();
-        state.icon = ResourceIcon.get(R.drawable.ic_preferred_network);
+        state.icon = maybeLoadResourceIcon(R.drawable.ic_preferred_network);
         state.label = mContext.getString(R.string.quick_settings_preferred_network_label);
 
         if (mSimCount == 0) {

@@ -164,7 +164,7 @@ public class OrionTile extends QSTileImpl<State> {
 
     @Override
     protected void handleUpdateState(State state, Object arg) {
-        state.icon = ResourceIcon.get(R.drawable.ic_qs_orion);
+        state.icon = maybeLoadResourceIcon(R.drawable.ic_qs_orion);
         state.label = mOrionLabel;
         state.state = Tile.STATE_ACTIVE;
     }

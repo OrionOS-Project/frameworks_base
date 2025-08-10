@@ -71,6 +71,9 @@ public class VpnTile extends QSTileImpl<BooleanState> {
     private final PanelInteractor mPanelInteractor;
     private final Callback mCallback = new Callback();
 
+    @Nullable
+    private Icon mIcon = null;
+
     @Inject
     public VpnTile(
             QSHost host,
@@ -192,7 +195,10 @@ public class VpnTile extends QSTileImpl<BooleanState> {
         state.value = mController.isVpnEnabled();
         state.secondaryLabel = mController.getPrimaryVpnName();
         state.contentDescription = state.label;
-        state.icon = ResourceIcon.get(R.drawable.ic_qs_vpn);
+        if (mIcon == null) {
+            mIcon = maybeLoadResourceIcon(R.drawable.ic_qs_vpn);
+        }
+        state.icon = mIcon;
         boolean hasAnyVpn = mController.getConfiguredLegacyVpns().size() > 0
                 || mController.getVpnAppPackageNames().size() > 0;
         if (mController.isVpnRestricted() || !hasAnyVpn) {

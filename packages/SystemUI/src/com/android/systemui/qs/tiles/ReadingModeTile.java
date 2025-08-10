@@ -32,6 +32,7 @@ import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.plugins.FalsingManager;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
+import com.android.systemui.plugins.qs.QSTile.Icon;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
 import com.android.systemui.qs.QSHost;
 import com.android.systemui.qs.QsEventLogger;
@@ -50,7 +51,8 @@ public class ReadingModeTile extends QSTileImpl<BooleanState> {
 
     public static final String TILE_SPEC = "reading_mode";
 
-    private final Icon mIcon = ResourceIcon.get(R.drawable.ic_qs_reader);
+    @Nullable
+    private Icon mIcon = null;
 
     private static final Intent DISPLAY_SETTINGS = new Intent("android.settings.DISPLAY_SETTINGS");
 
@@ -97,7 +99,12 @@ public class ReadingModeTile extends QSTileImpl<BooleanState> {
 
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
-        state.value = isReadingModeEnabled();
+        final boolean enable = isReadingModeEnabled();
+        state.value = enable;
+        state.label = mContext.getString(R.string.quick_settings_reading_mode);
+        if (mIcon == null) {
+            mIcon = maybeLoadResourceIcon(R.drawable.ic_qs_reader);
+        }
         state.icon = mIcon;
         if (state.value) {
             state.contentDescription = mContext.getString(
@@ -108,7 +115,6 @@ public class ReadingModeTile extends QSTileImpl<BooleanState> {
                     R.string.accessibility_quick_settings_reading_mode_off);
             state.state = Tile.STATE_INACTIVE;
         }
-        state.label = getTileLabel();
     }
 
     @Override
