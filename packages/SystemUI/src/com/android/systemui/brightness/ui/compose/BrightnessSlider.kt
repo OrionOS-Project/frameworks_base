@@ -18,6 +18,8 @@ package com.android.systemui.brightness.ui.compose
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.os.UserHandle
+import android.provider.Settings
 import android.view.MotionEvent
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -334,7 +336,12 @@ fun BrightnessSlider(
             }
         )
 
-        if (hasAutoBrightness) {
+        if (hasAutoBrightness && Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.QS_SHOW_AUTO_BRIGHTNESS,
+            1,
+            UserHandle.USER_CURRENT
+        ) == 1) {
             Spacer(modifier = Modifier.width(8.dp))
 
             val coroutineScope = rememberCoroutineScope()
