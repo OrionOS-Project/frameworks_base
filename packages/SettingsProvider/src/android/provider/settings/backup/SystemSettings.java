@@ -130,7 +130,8 @@ public class SystemSettings {
         	Settings.System.QS_BRIGHTNESS_POSITION_BOTTOM,
                 Settings.System.QS_SHOW_AUTO_BRIGHTNESS,
                 Settings.System.QS_SHOW_SETTINGS_ICON,
-                Settings.System.QS_SHOW_POWER_MENU_ICON
+                Settings.System.QS_SHOW_POWER_MENU_ICON,
+                Settings.System.QS_SHOW_EDIT_BUTTON
         ));
         if (Flags.backUpSmoothDisplayAndForcePeakRefreshRate()) {
             settings.add(Settings.System.PEAK_REFRESH_RATE);

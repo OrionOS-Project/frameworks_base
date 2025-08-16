@@ -6975,6 +6975,12 @@ public final class Settings {
         public static final String QS_SHOW_POWER_MENU_ICON = "qs_show_power_menu_icon";
 
         /**
+         * Whether to show the edit button in quick settings panel.
+         * @hide
+         */
+        public static final String QS_SHOW_EDIT_BUTTON = "qs_show_edit_button";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate

@@ -58,6 +58,13 @@ fun Toolbar(
         UserHandle.USER_CURRENT
     ) == 1
     
+    val showEditButton = Settings.System.getIntForUser(
+        context.contentResolver,
+        Settings.System.QS_SHOW_EDIT_BUTTON,
+        1,
+        UserHandle.USER_CURRENT
+    ) == 1
+    
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         viewModel.userSwitcherViewModel?.let {
             IconButton(
@@ -67,7 +74,9 @@ fun Toolbar(
             )
         }
 
-        EditModeButton(viewModel.editModeButtonViewModel)
+        if (showEditButton) {
+            EditModeButton(viewModel.editModeButtonViewModel)
+        }
 
         if (showSettingsIcon) {
             IconButton(

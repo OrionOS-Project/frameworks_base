@@ -16,6 +16,8 @@
 
 package com.android.systemui.qs.panels.ui.compose
 
+import android.os.UserHandle
+import android.provider.Settings
 import android.view.MotionEvent
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Column
@@ -37,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
@@ -160,6 +163,13 @@ private fun FooterBar(
     editButtonViewModelFactory: EditModeButtonViewModel.Factory,
     dataUsageViewModel: FooterActionsDataUsageViewModel? = null,
 ) {
+    val context = LocalContext.current
+    val showEditButton = Settings.System.getIntForUser(
+        context.contentResolver,
+        Settings.System.QS_SHOW_EDIT_BUTTON,
+        1,
+        UserHandle.USER_CURRENT
+    ) == 1
     val editButtonViewModel =
         rememberViewModel(traceName = "PaginatedGridLayout-editButtonViewModel") {
             editButtonViewModelFactory.create()
@@ -200,7 +210,9 @@ private fun FooterBar(
         )
         Row(Modifier.weight(1f)) {
             Spacer(modifier = Modifier.weight(1f))
-            EditModeButton(viewModel = editButtonViewModel)
+            if (showEditButton) {
+                EditModeButton(viewModel = editButtonViewModel)
+            }
         }
     }
 }
