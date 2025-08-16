@@ -24,7 +24,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.os.UserHandle
+import android.provider.Settings
 import com.android.systemui.compose.modifiers.sysuiResTag
 import com.android.systemui.development.ui.compose.BuildNumber
 import com.android.systemui.qs.footer.ui.compose.IconButton
@@ -33,6 +36,8 @@ import com.android.systemui.qs.ui.compose.borderOnFocus
 
 @Composable
 fun Toolbar(viewModel: ToolbarViewModel, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         viewModel.userSwitcherViewModel?.let {
             IconButton(
@@ -44,11 +49,18 @@ fun Toolbar(viewModel: ToolbarViewModel, modifier: Modifier = Modifier) {
 
         EditModeButton(viewModel.editModeButtonViewModel)
 
-        IconButton(
-            viewModel.settingsButtonViewModel,
-            useModifierBasedExpandable = true,
-            Modifier.sysuiResTag("settings_button_container"),
-        )
+        if (Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.QS_SHOW_SETTINGS_ICON,
+            1,
+            UserHandle.USER_CURRENT
+        ) == 1) {
+            IconButton(
+                viewModel.settingsButtonViewModel,
+                useModifierBasedExpandable = true,
+                Modifier.sysuiResTag("settings_button_container"),
+            )
+        }
 
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
             BuildNumber(
@@ -63,10 +75,17 @@ fun Toolbar(viewModel: ToolbarViewModel, modifier: Modifier = Modifier) {
             )
         }
 
-        IconButton(
-            { viewModel.powerButtonViewModel },
-            useModifierBasedExpandable = true,
-            Modifier.sysuiResTag("pm_lite"),
-        )
+        if (Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.QS_SHOW_POWER_MENU_ICON,
+            1,
+            UserHandle.USER_CURRENT
+        ) == 1) {
+            IconButton(
+                { viewModel.powerButtonViewModel },
+                useModifierBasedExpandable = true,
+                Modifier.sysuiResTag("pm_lite"),
+            )
+        }
     }
 }

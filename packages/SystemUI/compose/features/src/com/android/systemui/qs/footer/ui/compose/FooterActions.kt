@@ -71,6 +71,8 @@ import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import android.os.UserHandle
+import android.provider.Settings
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -224,6 +226,8 @@ fun FooterActions(
             }
 
             val useModifierBasedExpandable = remember { QSComposeFragment.isEnabled }
+            val context = LocalContext.current
+            
             SecurityButton({ security }, useModifierBasedExpandable, Modifier.weight(1f))
             ForegroundServicesButton({ foregroundServices }, useModifierBasedExpandable)
             IconButton(
@@ -231,12 +235,28 @@ fun FooterActions(
                 useModifierBasedExpandable,
                 Modifier.sysuiResTag("multi_user_switch"),
             )
-            IconButton(
-                { viewModel.settings },
-                useModifierBasedExpandable,
-                Modifier.sysuiResTag("settings_button_container"),
-            )
-            IconButton({ power }, useModifierBasedExpandable, Modifier.sysuiResTag("pm_lite"))
+            
+            if (Settings.System.getIntForUser(
+                context.contentResolver,
+                Settings.System.QS_SHOW_SETTINGS_ICON,
+                1,
+                UserHandle.USER_CURRENT
+            ) == 1) {
+                IconButton(
+                    { viewModel.settings },
+                    useModifierBasedExpandable,
+                    Modifier.sysuiResTag("settings_button_container"),
+                )
+            }
+            
+            if (Settings.System.getIntForUser(
+                context.contentResolver,
+                Settings.System.QS_SHOW_POWER_MENU_ICON,
+                1,
+                UserHandle.USER_CURRENT
+            ) == 1) {
+                IconButton({ power }, useModifierBasedExpandable, Modifier.sysuiResTag("pm_lite"))
+            }
         }
     }
 }
