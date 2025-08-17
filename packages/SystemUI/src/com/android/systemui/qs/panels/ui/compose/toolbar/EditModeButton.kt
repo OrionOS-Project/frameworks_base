@@ -18,8 +18,6 @@ package com.android.systemui.qs.panels.ui.compose.toolbar
 
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -27,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.systemui.qs.panels.ui.viewmodel.toolbar.EditModeButtonViewModel
@@ -48,7 +47,7 @@ fun EditModeButton(viewModel: EditModeButtonViewModel, modifier: Modifier = Modi
                 ),
         ) {
             Icon(
-                imageVector = Icons.Default.Edit,
+                painter = painterResource(id = R.drawable.ic_qs_edit),
                 contentDescription = stringResource(id = R.string.accessibility_quick_settings_edit),
             )
         }
