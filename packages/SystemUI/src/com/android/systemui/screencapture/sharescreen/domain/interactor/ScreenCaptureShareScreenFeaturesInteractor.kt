@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.android.systemui.screencapture.sharescreen.largescreen.ui.compose
+package com.android.systemui.screencapture.sharescreen.domain.interactor
 
-import androidx.compose.runtime.Composable
-import com.android.systemui.screencapture.sharescreen.largescreen.ui.viewmodel.PreShareViewModel
+import com.android.systemui.Flags
+import com.android.systemui.dagger.SysUISingleton
 
-/** Main component for the screen share UI. */
-@Composable
-fun PreShareUI(viewModel: PreShareViewModel) {
-    PreShareToolbar(viewModel = viewModel, expanded = true, onCloseClick = {})
+@SysUISingleton
+object ScreenCaptureShareScreenFeaturesInteractor {
 
-    // TODO: Add PreShareSelector here.
+    val isLargeScreenSharingEnabled: Boolean
+        get() = Flags.largeScreenSharing()
 }
