@@ -33,34 +33,34 @@ class TileSquishinessRepository @Inject constructor(
     private val context: Context
 ) {
     private val _squishiness = MutableStateFlow(1f)
-    private val _isSquishingEnabled = MutableStateFlow(true)
+    private val _tileShapeMode = MutableStateFlow(TileShapeMode.NORMAL)
     
     private val mainHandler = Handler(Looper.getMainLooper())
     
     private val settingsObserver = object : ContentObserver(mainHandler) {
         override fun onChange(selfChange: Boolean) {
-            updateSquishingEnabled()
+            updateTileShapeMode()
         }
     }
 
     init {
-        // Register observer for the tile squishing setting
+        // Register observer for the tile shape mode setting
         context.contentResolver.registerContentObserver(
             Settings.System.getUriFor(Settings.System.QS_ENABLE_TILE_SQUISHING),
             false,
             settingsObserver
         )
-        updateSquishingEnabled()
+        updateTileShapeMode()
     }
     
-    private fun updateSquishingEnabled() {
-        val isEnabled = Settings.System.getIntForUser(
+    private fun updateTileShapeMode() {
+        val modeValue = Settings.System.getIntForUser(
             context.contentResolver,
             Settings.System.QS_ENABLE_TILE_SQUISHING,
-            1,
+            0, // Default to NORMAL (0)
             UserHandle.USER_CURRENT
-        ) == 1
-        _isSquishingEnabled.value = isEnabled
+        )
+        _tileShapeMode.value = TileShapeMode.fromInt(modeValue)
     }
     
     // Expose the raw squishiness value - the shape logic is handled separately
@@ -68,14 +68,13 @@ class TileSquishinessRepository @Inject constructor(
 
     /**
      * Returns the effective tile state for shape calculation.
-     * When squishing is disabled, tiles should appear as inactive (round) regardless of their actual state.
+     * Based on the tile shape mode, tiles can appear normal, all round, or all squared.
      */
     fun getEffectiveTileStateForShape(actualState: Int): Int {
-        return if (_isSquishingEnabled.value) {
-            actualState
-        } else {
-            // Return inactive state to make tiles appear round
-            com.android.systemui.qs.tiles.base.shared.model.QSTileState.ActivationState.INACTIVE.legacyState
+        return when (_tileShapeMode.value) {
+            TileShapeMode.NORMAL -> actualState
+            TileShapeMode.ALL_ROUND -> com.android.systemui.qs.tiles.base.shared.model.QSTileState.ActivationState.INACTIVE.legacyState
+            TileShapeMode.ALL_SQUARED -> com.android.systemui.qs.tiles.base.shared.model.QSTileState.ActivationState.ACTIVE.legacyState
         }
     }
 
@@ -85,5 +84,20 @@ class TileSquishinessRepository @Inject constructor(
     
     fun destroy() {
         context.contentResolver.unregisterContentObserver(settingsObserver)
+    }
+    
+    /**
+     * Enum representing the different tile shape modes
+     */
+    enum class TileShapeMode(val value: Int) {
+        NORMAL(0),      // Normal squishy behavior based on tile state
+        ALL_ROUND(1),   // All tiles appear round (inactive)
+        ALL_SQUARED(2); // All tiles appear squared (active)
+        
+        companion object {
+            fun fromInt(value: Int): TileShapeMode {
+                return values().find { it.value == value } ?: NORMAL
+            }
+        }
     }
 }
