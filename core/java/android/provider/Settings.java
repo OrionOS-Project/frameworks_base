@@ -7117,6 +7117,19 @@ public final class Settings {
         public static final String QS_SHOW_EDIT_BUTTON = "qs_show_edit_button";
 
         /**
+         * Customize QS tile shape.
+         * <p>Value is an int. Our scheme (full circle as option 3, no separate square):
+         * <ul>
+         *     <li>0 = default (state-based rounded corners)</li>
+         *     <li>1 = circle-ish (large corner radius)</li>
+         *     <li>2 = rounded square</li>
+         *     <li>3 = full circle (icon-only tiles only)</li>
+         * </ul>
+         * @hide
+         */
+        public static final String QS_TILE_SHAPE = "qs_tile_shape";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate

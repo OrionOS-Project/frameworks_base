@@ -177,6 +177,7 @@ import com.android.systemui.qs.panels.ui.compose.EditTileListState.Companion.INV
 import com.android.systemui.qs.panels.ui.compose.dragAndDropRemoveZone
 import com.android.systemui.qs.panels.ui.compose.dragAndDropTileList
 import com.android.systemui.qs.panels.ui.compose.dragAndDropTileSource
+import com.android.systemui.qs.panels.ui.compose.infinitegrid.CommonTileDefaults.ActiveTileCornerRadius
 import com.android.systemui.qs.panels.ui.compose.infinitegrid.CommonTileDefaults.InactiveCornerRadius
 import com.android.systemui.qs.panels.ui.compose.infinitegrid.CommonTileDefaults.TileArrangementPadding
 import com.android.systemui.qs.panels.ui.compose.infinitegrid.CommonTileDefaults.TileHeight
@@ -188,6 +189,7 @@ import com.android.systemui.qs.panels.ui.compose.infinitegrid.EditModeTileDefaul
 import com.android.systemui.qs.panels.ui.compose.infinitegrid.EditModeTileDefaults.CurrentTilesGridPadding
 import com.android.systemui.qs.panels.ui.compose.infinitegrid.EditModeTileDefaults.GridBackgroundCornerRadius
 import com.android.systemui.qs.panels.ui.compose.infinitegrid.EditModeTileDefaults.TilePlacementSpec
+import com.android.systemui.qs.panels.ui.compose.infinitegrid.rememberTileShapeMode
 import com.android.systemui.qs.panels.ui.compose.selection.InteractiveTileContainer
 import com.android.systemui.qs.panels.ui.compose.selection.MutableSelectionState
 import com.android.systemui.qs.panels.ui.compose.selection.ResizingState
@@ -1057,6 +1059,7 @@ private fun LazyGridItemScope.TileGridCell(
             }
         },
         contentDescription = decorationClickLabel,
+        iconOnly = cell.isIcon
     ) {
         val placeableColor = MaterialTheme.colorScheme.primary.copy(alpha = .4f)
         val backgroundColor by
@@ -1128,7 +1131,7 @@ private fun LazyGridItemScope.TileGridCell(
                     CornerSize(InactiveCornerRadius),
                 )
                 .thenIf(isSelectable) { draggableModifier }
-                .tileBackground { backgroundColor }
+                .tileBackground ( { backgroundColor }, iconOnly = cell.isIcon )
                 .clickable { selectionState.onTap(cell.tile.tileSpec) }
                 .thenIf(isSelectable) { selectableModifier }
         ) {
@@ -1228,7 +1231,7 @@ private fun AvailableTileGridCell(
                         MaterialTheme.colorScheme.secondary,
                         CornerSize(InactiveCornerRadius),
                     )
-                    .tileBackground { colors.background }
+                    .tileBackground( { colors.background }, iconOnly = true)
                     .clickable(
                         enabled = !cell.isCurrent,
                         onClick = onClick,
@@ -1394,9 +1397,39 @@ private fun MeasureScope.iconHorizontalCenter(containerSize: Int): Float {
         CommonTileDefaults.TileStartPadding.toPx()
 }
 
-private fun Modifier.tileBackground(color: () -> Color): Modifier {
-    // Clip tile contents from overflowing past the tile
-    return clip(RoundedCornerShape(InactiveCornerRadius)).drawBehind { drawRect(color()) }
+@Composable
+private fun editTileShape(shapeMode: Int): RoundedCornerShape {
+    val radius = when (shapeMode) {
+        1 -> InactiveCornerRadius // Circle-ish
+        2 -> ActiveTileCornerRadius // Rounded Square
+        3 -> InactiveCornerRadius // Circle
+        else -> InactiveCornerRadius
+    }
+    return RoundedCornerShape(radius)
+}
+
+@Composable
+private fun Modifier.tileBackground(
+    color: () -> Color,
+    iconOnly: Boolean,
+): Modifier {
+    val shapeMode = rememberTileShapeMode()
+    return if (shapeMode == 3 && iconOnly) {
+        // Draw a centered circle that fits the tile's min dimension
+        drawBehind {
+            val border = 0f
+            val diameter = minOf(size.width, size.height) - border
+            val radius = diameter / 2f
+            drawCircle(
+                color = color(),
+                radius = radius,
+                center = androidx.compose.ui.geometry.Offset(size.width / 2f, size.height / 2f)
+            )
+        }
+    } else {
+        clip(editTileShape(shapeMode))
+            .drawBehind { drawRect(color()) }
+    }
 }
 
 private object EditModeTileDefaults {
