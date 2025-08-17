@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,12 +34,14 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.systemui.communal.ui.compose.extensions.detectLongPressGesture
 import com.android.systemui.development.ui.viewmodel.BuildNumberViewModel
 import com.android.systemui.lifecycle.rememberViewModel
 import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsDataUsageViewModel
 import com.android.systemui.res.R
+import com.android.systemui.text.CompatText
 
 @Composable
 fun BuildNumber(
@@ -60,8 +61,9 @@ fun BuildNumber(
         if (isVisible && dataUsageText != null) {
             val haptics = LocalHapticFeedback.current
             
-            Text(
+            CompatText(
                 text = dataUsageText,
+                fontSize = 14.sp,
                 modifier =
                     modifier
                         .focusable()
