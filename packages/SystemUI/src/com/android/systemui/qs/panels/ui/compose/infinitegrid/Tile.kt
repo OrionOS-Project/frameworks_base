@@ -135,6 +135,7 @@ fun Tile(
     tile: TileViewModel,
     iconOnly: Boolean,
     squishiness: () -> Float,
+    getEffectiveTileStateForShape: (Int) -> Int,
     coroutineScope: CoroutineScope,
     bounceableInfo: BounceableInfo,
     tileHapticsViewModelFactoryProvider: TileHapticsViewModelFactoryProvider,
@@ -167,8 +168,9 @@ fun Tile(
                 tileHapticsViewModelFactoryProvider.getHapticsViewModelFactory()?.create(tile)
             }
 
-        // TODO(b/361789146): Draw the shapes instead of clipping
-        val tileShape by TileDefaults.animateTileShapeAsState(uiState.state)
+        // Use effective state for shape calculation to make tiles appear round when squishing is disabled
+        val effectiveState = getEffectiveTileStateForShape(uiState.state)
+        val tileShape by TileDefaults.animateTileShapeAsState(effectiveState)
         val animatedColor by animateColorAsState(colors.background, label = "QSTileBackgroundColor")
         val animatedAlpha by animateFloatAsState(colors.alpha, label = "QSTileAlpha")
 
@@ -230,7 +232,7 @@ fun Tile(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 } else {
-                    val iconShape by TileDefaults.animateIconShapeAsState(uiState.state)
+                    val iconShape by TileDefaults.animateIconShapeAsState(effectiveState)
                     val secondaryClick: (() -> Unit)? =
                         {
                                 hapticsViewModel?.setTileInteractionState(

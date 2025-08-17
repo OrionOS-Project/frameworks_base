@@ -106,6 +106,7 @@ constructor(
                     tile = it.tile,
                     iconOnly = iconTilesViewModel.isIconTile(it.tile.spec),
                     squishiness = { squishiness },
+                    getEffectiveTileStateForShape = viewModel.squishinessViewModel::getEffectiveTileStateForShape,
                     tileHapticsViewModelFactoryProvider = tileHapticsViewModelFactoryProvider,
                     coroutineScope = scope,
                     bounceableInfo =

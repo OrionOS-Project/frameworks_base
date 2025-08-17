@@ -68,6 +68,7 @@ fun ContentScope.QuickQuickSettings(
                     tile = it.tile,
                     iconOnly = it.isIcon,
                     squishiness = { squishiness },
+                    getEffectiveTileStateForShape = viewModel.squishinessViewModel::getEffectiveTileStateForShape,
                     coroutineScope = scope,
                     bounceableInfo =
                         bounceables.bounceableInfo(

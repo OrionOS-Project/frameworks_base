@@ -29,4 +29,12 @@ constructor(private val repository: TileSquishinessRepository) {
     fun setSquishinessValue(value: Float) {
         repository.setSquishinessValue(value)
     }
+    
+    /**
+     * Returns the effective tile state for shape calculation.
+     * When squishing is disabled, tiles should appear as inactive (round) regardless of their actual state.
+     */
+    fun getEffectiveTileStateForShape(actualState: Int): Int {
+        return repository.getEffectiveTileStateForShape(actualState)
+    }
 }

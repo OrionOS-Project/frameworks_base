@@ -22,6 +22,14 @@ import javax.inject.Inject
 /** View model to track the squishiness of tiles. */
 class TileSquishinessViewModel
 @Inject
-constructor(tileSquishinessInteractor: TileSquishinessInteractor) {
+constructor(private val tileSquishinessInteractor: TileSquishinessInteractor) {
     val squishiness = tileSquishinessInteractor.squishiness
+    
+    /**
+     * Returns the effective tile state for shape calculation.
+     * When squishing is disabled, tiles should appear as inactive (round) regardless of their actual state.
+     */
+    fun getEffectiveTileStateForShape(actualState: Int): Int {
+        return tileSquishinessInteractor.getEffectiveTileStateForShape(actualState)
+    }
 }
