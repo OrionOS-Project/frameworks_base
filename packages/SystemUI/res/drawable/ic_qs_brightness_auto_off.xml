@@ -48,7 +48,7 @@
             android:scaleY="1">
             <path
                 android:name="manual"
-                android:pathData="M 11.994 13.159 L 10.159 7.007 L 7.929 7.007 L 7.929 16 L 9.678 16 L 9.678 12.936 L 9.56 9.809 L 11.314 16 L 12.667 16 L 14.427 9.809 L 14.31 12.936 L 14.31 16 L 16.052 16 L 16.052 7.007 L 13.822 7.007 L 11.994 13.159 Z"
+                android:pathData="M 11.994 18 c 3.31,0 6,-2.69 6,-6 0,-3.31 -2.69,-6 -6,-6 z"
                 android:fillColor="#ffffff" />
         </group>
     </group>
