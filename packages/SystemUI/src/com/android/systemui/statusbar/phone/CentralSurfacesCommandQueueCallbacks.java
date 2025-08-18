@@ -65,6 +65,7 @@ import com.android.systemui.shade.CameraLauncher;
 import com.android.systemui.shade.QuickSettingsController;
 import com.android.systemui.shade.ShadeController;
 import com.android.systemui.shade.ShadeHeaderController;
+import com.android.systemui.shade.ShadeViewController;
 import com.android.systemui.shade.domain.interactor.PanelExpansionInteractor;
 import com.android.systemui.shade.domain.interactor.ShadeInteractor;
 import com.android.systemui.statusbar.CommandQueue;
@@ -90,6 +91,7 @@ public class CentralSurfacesCommandQueueCallbacks implements CommandQueue.Callba
     private final ScreenPinningRequest mScreenPinningRequest;
     private final com.android.systemui.shade.ShadeController mShadeController;
     private final CommandQueue mCommandQueue;
+    private final ShadeViewController mShadeViewController;
     private final PanelExpansionInteractor mPanelExpansionInteractor;
     private final Lazy<ShadeInteractor> mShadeInteractorLazy;
     private final ShadeHeaderController mShadeHeaderController;
@@ -137,6 +139,7 @@ public class CentralSurfacesCommandQueueCallbacks implements CommandQueue.Callba
             ScreenPinningRequest screenPinningRequest,
             ShadeController shadeController,
             CommandQueue commandQueue,
+            ShadeViewController shadeViewController,
             PanelExpansionInteractor panelExpansionInteractor,
             Lazy<ShadeInteractor> shadeInteractorLazy,
             ShadeHeaderController shadeHeaderController,
@@ -168,6 +171,7 @@ public class CentralSurfacesCommandQueueCallbacks implements CommandQueue.Callba
         mScreenPinningRequest = screenPinningRequest;
         mShadeController = shadeController;
         mCommandQueue = commandQueue;
+        mShadeViewController = shadeViewController;
         mPanelExpansionInteractor = panelExpansionInteractor;
         mShadeInteractorLazy = shadeInteractorLazy;
         mShadeHeaderController = shadeHeaderController;
@@ -555,6 +559,15 @@ public class CentralSurfacesCommandQueueCallbacks implements CommandQueue.Callba
             mShadeController.animateCollapseShade();
         } else {
             mShadeController.animateExpandQs();
+        }
+    }
+
+    @Override
+    public void toggleSettingsPanel() {
+        if (mShadeViewController.isPanelExpanded()) {
+            mShadeController.animateCollapseShade();
+        } else {
+            animateExpandSettingsPanel(null);
         }
     }
 
