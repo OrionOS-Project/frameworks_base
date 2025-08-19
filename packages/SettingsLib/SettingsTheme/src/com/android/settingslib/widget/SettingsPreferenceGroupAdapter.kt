@@ -54,6 +54,7 @@ open class SettingsPreferenceGroupAdapter(preferenceGroup: PreferenceGroup) :
         "com.android.settingslib.widget.IllustrationPreference",
         "com.android.settings.accessibility.TextReadingPreviewPreference",
         "com.android.settings.accessibility.TextReadingResetPreference",
+        "com.android.settings.widget.ValidatedEditTextAboutPreference",
     )
 
     init {
