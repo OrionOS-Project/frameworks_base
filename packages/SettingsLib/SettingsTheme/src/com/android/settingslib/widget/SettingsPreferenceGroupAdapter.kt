@@ -50,6 +50,7 @@ open class SettingsPreferenceGroupAdapter(preferenceGroup: PreferenceGroup) :
     private val syncRunnable = Runnable { updatePreferencesList() }
     
     private val excludedClasses = setOf(
+        "com.android.settings.widget.ValidatedEditTextAboutPreference",
         "com.android.settingslib.widget.LayoutPreference",
         "com.android.settingslib.widget.IllustrationPreference",
         "com.android.settings.accessibility.TextReadingPreviewPreference",
