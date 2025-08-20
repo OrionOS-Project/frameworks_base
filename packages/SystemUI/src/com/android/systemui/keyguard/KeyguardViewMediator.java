@@ -688,8 +688,11 @@ public class KeyguardViewMediator implements CoreStartable,
         Log.d(TAG, String.format("onBeforeUserSwitching %d", userId));
         synchronized (KeyguardViewMediator.this) {
             mHandler.removeCallbacksAndMessages(mDismissToken);
+            mHandler.removeMessages(START_KEYGUARD_EXIT_ANIM);
             mHandler.removeMessages(DISMISS);
             mHandler.removeMessages(HIDE);
+            mIsKeyguardExitAnimationCanceled = true;
+
             notifyTrustedChangedLocked(mUpdateMonitor.getUserHasTrust(userId));
             resetKeyguardDonePendingLocked();
             adjustStatusBarLocked();
@@ -3662,6 +3665,12 @@ public class KeyguardViewMediator implements CoreStartable,
         }
     }
 
+    // Allows the runnable to be controlled for tests by overriding this method
+    @VisibleForTesting
+    void postAfterTraversal(Runnable runnable) {
+        DejankUtils.postAfterTraversal(runnable);
+    }
+
     /**
      * Called when we're done running the keyguard exit animation, we should now end up unlocked.
      *
@@ -3686,12 +3695,6 @@ public class KeyguardViewMediator implements CoreStartable,
             Log.d(TAG, "skip onKeyguardExitRemoteAnimationFinished showKeyguard=" + showKeyguard
                     + " surfaceAnimationRunning=" + mSurfaceBehindRemoteAnimationRunning
                     + " surfaceAnimationRequested=" + mSurfaceBehindRemoteAnimationRequested);
-            return;
-        }
-
-        if (mIsKeyguardExitAnimationCanceled) {
-            Log.d(TAG, "Ignoring exitKeyguardAndFinishSurfaceBehindRemoteAnimation. "
-                    + "mIsKeyguardExitAnimationCanceled==true");
             return;
         }
 
@@ -3731,6 +3734,14 @@ public class KeyguardViewMediator implements CoreStartable,
                     }, 25); // 25ms retry delay
                     return;
                 }
+            if (mIsKeyguardExitAnimationCanceled) {
+                Log.d(TAG, "Ignoring exitKeyguardAndFinishSurfaceBehindRemoteAnimation. "
+                        + "mIsKeyguardExitAnimationCanceled==true");
+                finishSurfaceBehindRemoteAnimation(true /* showKeyguard */);
+                setShowingLocked(true /* showing */, true /* force */,
+                            "exitKeyguardAndFinishSurfaceBehindRemoteAnimation - canceled");
+                return;
+            }
 
                 // If power manager state is correct, proceed with unlock
                 proceedWithUnlock(showKeyguard, wasShowing);
