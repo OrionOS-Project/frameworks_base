@@ -560,5 +560,6 @@ public class SecureSettingsValidators {
         VALIDATORS.put(Secure.PULSE_SOLID_UNITS_OPACITY, ANY_INTEGER_VALIDATOR);
         VALIDATORS.put(Secure.PULSE_SOLID_UNITS_ROUNDED, BOOLEAN_VALIDATOR);
         VALIDATORS.put(Secure.PULSE_VERTICAL_MIRROR, ANY_INTEGER_VALIDATOR);
+        VALIDATORS.put(Secure.QS_DATA_USAGE_CYCLE_TYPE, new InclusiveIntegerRangeValidator(0, 1));
     }
 }

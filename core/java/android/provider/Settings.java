@@ -14538,6 +14538,14 @@ public final class Settings {
         public static final String PULSE_WAVEFORM_STROKE_WIDTH = "pulse_waveform_stroke_width";
 
         /**
+         * Data usage cycle type in QS footer.
+         * 0 Daily   1 Weekly
+         * Default 0.
+         * @hide
+         */
+        public static final String QS_DATA_USAGE_CYCLE_TYPE = "qs_data_usage_cycle_type";
+
+        /**
          * These entries are considered common between the personal and the managed profile,
          * since the managed profile doesn't get to change them.
          */
