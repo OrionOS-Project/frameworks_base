@@ -1859,7 +1859,6 @@ public class KeyguardViewMediator implements CoreStartable,
 
         // Prevent keyguard going away conflicts during lock operations
         boolean isLockingOperation = mShowing || mKeyguardStateController.isKeyguardGoingAway() || mPendingLock;
-    
         // Only dispatch keyguard going away if:
         // 1. UDFPS is not configured (original logic)
         // 2. Not currently in a locking operation
