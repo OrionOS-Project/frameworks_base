@@ -5994,8 +5994,8 @@ final class ActivityRecord extends WindowToken {
                 case PAUSING:
                 case PAUSED:
                 case STARTED:
-                    addToStopping(true /* scheduleIdle */,
-                            canEnterPictureInPicture /* idleDelayed */, "makeInvisible");
+                    final boolean idleDelayed = canEnterPictureInPicture || inTransition();
+                    addToStopping(true /* scheduleIdle */, idleDelayed, "makeInvisible");
                     break;
 
                 default:
