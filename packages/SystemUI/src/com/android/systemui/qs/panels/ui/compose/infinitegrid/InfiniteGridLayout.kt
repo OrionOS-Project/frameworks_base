@@ -81,9 +81,10 @@ constructor(
         val largeTilesSpan by iconTilesViewModel.largeTilesSpanState
         // Tiles or largeTiles may be updated while this is composed, so listen to any changes
         val sizedTiles =
-            remember(tiles, largeTiles, largeTilesSpan) {
+            remember(tiles, largeTiles, largeTilesSpan, columns) {
                 tiles.map {
-                    SizedTileImpl(it, if (largeTiles.contains(it.spec)) largeTilesSpan else 1)
+                    val span = if (largeTiles.contains(it.spec)) minOf(largeTilesSpan, columns) else 1
+                    SizedTileImpl(it, span)
                 }
             }
         val bounceables =
@@ -188,14 +189,14 @@ constructor(
     ): List<List<TileViewModel>> {
 
         return PaginatableGridLayout.splitInRows(
-                tiles.map { SizedTileImpl(it, it.spec.width()) },
+                tiles.map { SizedTileImpl(it, it.spec.width(columns)) },
                 columns,
             )
             .chunked(rows)
             .map { it.flatten().map { it.tile } }
     }
 
-    private fun TileSpec.width(largeSize: Int = iconTilesViewModel.largeTilesSpan.value): Int {
-        return if (iconTilesViewModel.isIconTile(this)) 1 else largeSize
+    private fun TileSpec.width(columns: Int, largeSize: Int = iconTilesViewModel.largeTilesSpan.value): Int {
+        return if (iconTilesViewModel.isIconTile(this)) 1 else minOf(largeSize, columns)
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.compose.animation.scene.ContentScope
@@ -51,7 +52,10 @@ fun ContentScope.QuickQuickSettings(
 
     val spans by remember(sizedTiles) { derivedStateOf { sizedTiles.fastMap { it.width } } }
 
-    val columns = viewModel.columns
+    val columns by viewModel.qqsColumns.collectAsStateWithLifecycle(
+        initialValue = integerResource(R.integer.quick_settings_infinite_grid_num_columns)
+    )
+    val rows = viewModel.rows
     Box(modifier = modifier) {
         GridAnchor()
         VerticalSpannedGrid(

@@ -22,11 +22,14 @@ import com.android.systemui.development.ui.viewmodel.BuildNumberViewModel
 import com.android.systemui.lifecycle.ExclusiveActivatable
 import com.android.systemui.lifecycle.Hydrator
 import com.android.systemui.media.controls.ui.controller.MediaHierarchyManager.Companion.LOCATION_QS
+import com.android.systemui.qs.panels.data.repository.QSColumnsRepository
+import com.android.systemui.qs.panels.data.repository.QuickQuickSettingsRowRepository
 import com.android.systemui.qs.panels.ui.viewmodel.toolbar.EditModeButtonViewModel
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class PaginatedGridViewModel
@@ -38,6 +41,8 @@ constructor(
     val buildNumberViewModelFactory: BuildNumberViewModel.Factory,
     val editModeButtonViewModelFactory: EditModeButtonViewModel.Factory,
     private val falsingInteractor: FalsingInteractor,
+    private val rowRepository: QuickQuickSettingsRowRepository,
+    private val columnsRepository: QSColumnsRepository,
 ) : IconTilesViewModel by iconTilesViewModel, ExclusiveActivatable() {
 
     private val hydrator = Hydrator("PaginatedGridViewModel")
@@ -45,9 +50,10 @@ constructor(
 
     var inFirstPage by inFirstPageViewModel::inFirstPage
 
-    val columns: Int
-        get() = columnsWithMediaViewModel.columns
+    val columns: Flow<Int> = columnsRepository.columns
 
+    val rows: Flow<Int> = rowRepository.rows
+    
     fun registerSideSwipeGesture() {
         falsingInteractor.isFalseTouch(QS_SWIPE_SIDE)
     }
