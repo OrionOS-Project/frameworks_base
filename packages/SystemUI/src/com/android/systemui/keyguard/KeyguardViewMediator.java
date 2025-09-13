@@ -377,6 +377,9 @@ public class KeyguardViewMediator implements CoreStartable,
     private boolean mSystemReady;
     private boolean mBootCompleted;
     private boolean mBootSendUserPresent;
+    
+    // Debouncing for exitKeyguardAndFinishSurfaceBehindRemoteAnimation to prevent flickering
+    private long mLastExitKeyguardTime = 0;
     private boolean mShuttingDown;
     private boolean mDozing;
     private boolean mAnimatingScreenOff;
@@ -3611,6 +3614,14 @@ public class KeyguardViewMediator implements CoreStartable,
      */
     public void exitKeyguardAndFinishSurfaceBehindRemoteAnimation(boolean showKeyguard) {
         Log.d(TAG, "exitKeyguardAndFinishSurfaceBehindRemoteAnimation");
+        
+        // Prevent multiple rapid calls that cause flickering
+        long currentTime = mSystemClock.uptimeMillis();
+        if (mLastExitKeyguardTime != 0 && (currentTime - mLastExitKeyguardTime) < 100) {
+            return;
+        }
+        mLastExitKeyguardTime = currentTime;
+        
         if (!mSurfaceBehindRemoteAnimationRunning && !mSurfaceBehindRemoteAnimationRequested) {
             Log.d(TAG, "skip onKeyguardExitRemoteAnimationFinished showKeyguard=" + showKeyguard
                     + " surfaceAnimationRunning=" + mSurfaceBehindRemoteAnimationRunning
@@ -3631,39 +3642,57 @@ public class KeyguardViewMediator implements CoreStartable,
 
         // Post layout changes to the next frame, so we don't hang at the end of the animation.
         DejankUtils.postAfterTraversal(() -> {
-            if (!mPM.isInteractive() && !mPendingLock) {
-                Log.e(TAG, "exitKeyguardAndFinishSurfaceBehindRemoteAnimation#postAfterTraversal:"
-                        + " mPM.isInteractive()=" + mPM.isInteractive()
-                        + " mPendingLock=" + mPendingLock + "."
-                        + " One of these being false means we re-locked the device during unlock."
-                        + " Do not proceed to finish keyguard exit and unlock.");
-                doKeyguardLocked(null);
-                finishSurfaceBehindRemoteAnimation(true /* showKeyguard */);
-                // Ensure WM is notified that we made a decision to show
-                setShowingLocked(true /* showing */, true /* force */,
-                        "exitKeyguardAndFinishSurfaceBehindRemoteAnimation - relocked");
-
-                return;
+            // Explicitly wake the device if it's not interactive
+            if (!mPM.isInteractive()) {
+                mPM.wakeUp(mSystemClock.uptimeMillis(), PowerManager.WAKE_REASON_UNKNOWN, "keyguard-unlock");
             }
+            
+            // Add a small delay to allow power manager state to stabilize during unlock
+            mHandler.postDelayed(() -> {
+                // Retry mechanism for power manager state - sometimes it takes a moment to update
+                if (!mPM.isInteractive() && !mPendingLock) {
+                    // Give it one more chance with a shorter delay
+                    mHandler.postDelayed(() -> {
+                        if (!mPM.isInteractive() && !mPendingLock) {
+                            Log.e(TAG, "exitKeyguardAndFinishSurfaceBehindRemoteAnimation#postAfterTraversal:"
+                                    + " mPM.isInteractive()=" + mPM.isInteractive()
+                                    + " mPendingLock=" + mPendingLock + "."
+                                    + " One of these being false means we re-locked the device during unlock."
+                                    + " Do not proceed to finish keyguard exit and unlock.");
+                            doKeyguardLocked(null);
+                            finishSurfaceBehindRemoteAnimation(true /* showKeyguard */);
+                            // Ensure WM is notified that we made a decision to show
+                            setShowingLocked(true /* showing */, true /* force */,
+                                    "exitKeyguardAndFinishSurfaceBehindRemoteAnimation - relocked");
+                            return;
+                        }
+                        // If power manager state is now correct, proceed with unlock
+                        proceedWithUnlock(showKeyguard, wasShowing);
+                    }, 25); // 25ms retry delay
+                    return;
+                }
 
-            onKeyguardExitFinished("exitKeyguardAndFinishSurfaceBehindRemoteAnimation");
-
-            if (mKeyguardStateController.isDismissingFromSwipe() || wasShowing) {
-                Log.d(TAG, "onKeyguardExitRemoteAnimationFinished"
-                        + "#hideKeyguardViewAfterRemoteAnimation");
-                mKeyguardUnlockAnimationControllerLazy.get().hideKeyguardViewAfterRemoteAnimation();
-            } else {
-                Log.d(TAG, "skip hideKeyguardViewAfterRemoteAnimation"
-                        + " dismissFromSwipe=" + mKeyguardStateController.isDismissingFromSwipe()
-                        + " wasShowing=" + wasShowing);
-            }
-
-            finishSurfaceBehindRemoteAnimation(showKeyguard);
-
-            // Dispatch the callback on animation finishes.
-            mUpdateMonitor.dispatchKeyguardDismissAnimationFinished();
+                // If power manager state is correct, proceed with unlock
+                proceedWithUnlock(showKeyguard, wasShowing);
+            }, 50); // 50ms delay to allow power manager state to stabilize
         });
 
+    }
+
+    /**
+     * Proceeds with the keyguard unlock process after power manager state has been verified.
+     */
+    private void proceedWithUnlock(boolean showKeyguard, boolean wasShowing) {
+        onKeyguardExitFinished("exitKeyguardAndFinishSurfaceBehindRemoteAnimation");
+
+        if (mKeyguardStateController.isDismissingFromSwipe() || wasShowing) {
+            mKeyguardUnlockAnimationControllerLazy.get().hideKeyguardViewAfterRemoteAnimation();
+        }
+
+        finishSurfaceBehindRemoteAnimation(showKeyguard);
+
+        // Dispatch the callback on animation finishes.
+        mUpdateMonitor.dispatchKeyguardDismissAnimationFinished();
     }
 
     /**

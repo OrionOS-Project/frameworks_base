@@ -71,22 +71,34 @@ sealed class TransitionInteractor(
         ownerReason: String = "",
     ): UUID? {
         toState.checkValidState()
-        if (fromState != internalTransitionInteractor.currentTransitionInfoInternal().to) {
-            Log.e(
-                name,
-                "Ignoring startTransition: This interactor asked to transition from " +
-                    "$fromState -> $toState, but we last transitioned to " +
-                    "${internalTransitionInteractor.currentTransitionInfoInternal().to}, not" +
-                    " $fromState. This should never happen - check currentTransitionInfoInternal" +
-                    " or use filterRelevantKeyguardState before starting transitions.",
-            )
-            return null
+        val currentState = internalTransitionInteractor.currentTransitionInfoInternal().to
+        if (fromState != currentState) {
+            // Allow transitions from DOZING to LOCKSCREEN when the interactor expects GONE
+            // This handles the case where the device was dozing and now needs to show keyguard
+            if (fromState == KeyguardState.GONE && currentState == KeyguardState.DOZING && 
+                toState == KeyguardState.LOCKSCREEN) {
+                Log.d(
+                    name,
+                    "Allowing transition from $currentState -> $toState (expected $fromState) " +
+                        "due to dozing to lockscreen transition: $ownerReason"
+                )
+            } else {
+                Log.e(
+                    name,
+                    "Ignoring startTransition: This interactor asked to transition from " +
+                        "$fromState -> $toState, but we last transitioned to " +
+                        "$currentState, not $fromState. This should never happen - check " +
+                        "currentTransitionInfoInternal or use filterRelevantKeyguardState before " +
+                        "starting transitions.",
+                )
+                return null
+            }
         }
 
         return transitionRepository.startTransition(
             TransitionInfo(
                 name + if (ownerReason.isNotBlank()) "($ownerReason)" else "",
-                fromState,
+                currentState, // Use actual current state instead of expected fromState
                 toState,
                 animator,
                 modeOnCanceled,
