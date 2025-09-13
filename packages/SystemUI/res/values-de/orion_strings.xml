@@ -106,4 +106,9 @@
     <string name="usage_data_weekly">diese Woche verbraucht</string>
     <string name="usage_data_default_suffix">Daten</string>
     <string name="usage_wifi_default_suffix">WLAN</string>
+
+    <!-- Flashlight Strength -->
+    <string name="flashlight_strength_title">Taschenlampenstärke</string>
+    <string name="flashlight_strength_turn_off">Ausschalten</string>
+    <string name="flashlight_strength_turn_on">Einschalten</string>
 </resources>
