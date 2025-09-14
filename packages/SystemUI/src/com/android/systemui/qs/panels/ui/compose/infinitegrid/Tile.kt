@@ -210,23 +210,28 @@ fun Tile(
                     .takeIf { uiState.handlesLongClick }
             TileContainer(
                 onClick = {
-                    var hasDetails = false
-                    if (QsDetailedView.isEnabled) {
-                        hasDetails = detailsViewModel?.onTileClicked(tile.spec) == true
-                    }
-                    if (!Flags.msdlFeedback()) {
+                    if (iconOnly && uiState.handlesSecondaryClick) {
                         vibrator.vibrate(EFFECT_CLICK)
-                    }
-                    if (!hasDetails) {
-                        // For those tile's who doesn't have a detailed view, process with their
-                        // `onClick` behavior.
-                        tile.onClick(expandable)
-                        hapticsViewModel?.setTileInteractionState(
-                            TileHapticsViewModel.TileInteractionState.CLICKED
-                        )
-                        if (uiState.accessibilityUiState.toggleableState != null) {
-                            coroutineScope.launch {
-                                currentBounceableInfo.bounceable.animateBounce()
+                        tile.onSecondaryClick()
+                    } else {
+                        var hasDetails = false
+                        if (QsDetailedView.isEnabled) {
+                            hasDetails = detailsViewModel?.onTileClicked(tile.spec) == true
+                        }
+                        if (!Flags.msdlFeedback()) {
+                            vibrator.vibrate(EFFECT_CLICK)
+                        }
+                        if (!hasDetails) {
+                            // For those tile's who doesn't have a detailed view, process with their
+                            // `onClick` behavior.
+                            tile.onClick(expandable)
+                            hapticsViewModel?.setTileInteractionState(
+                                TileHapticsViewModel.TileInteractionState.CLICKED
+                            )
+                            if (uiState.accessibilityUiState.toggleableState != null) {
+                                coroutineScope.launch {
+                                    currentBounceableInfo.bounceable.animateBounce()
+                                }
                             }
                         }
                     }
