@@ -111,4 +111,7 @@
     <string name="flashlight_strength_title">Taschenlampenstärke</string>
     <string name="flashlight_strength_turn_off">Ausschalten</string>
     <string name="flashlight_strength_turn_on">Einschalten</string>
+
+    <!-- 4G icon -->
+    <string name="show_fourg_icon_title">4G-Symbol</string>
 </resources>
