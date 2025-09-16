@@ -113,4 +113,7 @@
 
     <!-- Screen record dialog -->
     <string name="screenrecord_keep_screen_awake_label">Bildschirm wach halten</string>
+
+    <!-- 4G icon -->
+    <string name="show_fourg_icon_title">4G-Symbol</string>
 </resources>

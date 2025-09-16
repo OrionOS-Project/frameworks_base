@@ -150,4 +150,7 @@
 
     <!-- Screen record dialog -->
     <string name="screenrecord_keep_screen_awake_label">Keep the screen awake</string>
+
+    <!-- 4G icon -->
+    <string name="show_fourg_icon_title">4G icon</string>
 </resources>
