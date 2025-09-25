@@ -51,6 +51,7 @@ import android.media.session.MediaController;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.database.ContentObserver;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -62,6 +63,7 @@ import android.view.View.OnApplyWindowInsetsListener;
 import android.view.accessibility.AccessibilityEvent;
 import android.window.OnBackInvokedDispatcher;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -286,6 +288,13 @@ public abstract class Window {
      * {@link #setDecorCaptionShade(int)}.
      */
     public static final int DECOR_CAPTION_SHADE_DARK = 2;
+
+    /**
+     * Static observer for WINDOW_IGNORE_SECURE setting changes.
+     * When the setting changes, all windows are refreshed to apply the new secure flag behavior.
+     */
+    private static ContentObserver sIgnoreSecureObserver;
+    private static boolean sObserverRegistered = false;
 
     @UnsupportedAppUsage
     @UiContext
@@ -780,6 +789,54 @@ public abstract class Window {
     public Window(@UiContext Context context) {
         mContext = context;
         mFeatures = mLocalFeatures = getDefaultFeatures(context);
+        registerIgnoreSecureObserver(context);
+    }
+
+    /**
+     * Register a ContentObserver for WINDOW_IGNORE_SECURE setting changes.
+     * When the setting changes, all windows are refreshed to apply the new secure flag behavior.
+     * 
+     * @param context The context to register the observer with
+     */
+    private static void registerIgnoreSecureObserver(Context context) {
+        if (sObserverRegistered) {
+            return;
+        }
+        
+        sIgnoreSecureObserver = new ContentObserver(new Handler(context.getMainLooper())) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                refreshAllWindows();
+            }
+        };
+        
+        context.getContentResolver().registerContentObserver(
+                Settings.Global.getUriFor(Settings.Global.WINDOW_IGNORE_SECURE),
+                false, sIgnoreSecureObserver);
+        sObserverRegistered = true;
+    }
+
+    /**
+     * Force refresh of all windows to apply the current WINDOW_IGNORE_SECURE setting.
+     * This is called when the setting changes to ensure all windows respect the new behavior.
+     */
+    private static void refreshAllWindows() {
+        // Get all window views and force a layout parameter update
+        try {
+            WindowManagerGlobal global = WindowManagerGlobal.getInstance();
+            ArrayList<View> windowViews = global.getWindowViews();
+            
+            for (View view : windowViews) {
+                if (view != null && view.getLayoutParams() instanceof WindowManager.LayoutParams) {
+                    WindowManager.LayoutParams params = (WindowManager.LayoutParams) view.getLayoutParams();
+                    // Force a no-op update to trigger dispatchWindowAttributesChanged
+                    global.updateViewLayout(view, params);
+                }
+            }
+        } catch (Exception e) {
+            // Ignore exceptions during refresh - this is a best-effort operation
+        }
     }
 
     /**
