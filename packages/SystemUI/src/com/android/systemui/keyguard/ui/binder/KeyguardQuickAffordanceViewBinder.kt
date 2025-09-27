@@ -372,8 +372,23 @@ private fun VibratorHelper.playFeedback(effect: VibrationEffect, msdlPlayer: MSD
     if (!Flags.msdlFeedback()) {
         vibrate(effect)
     } else {
-        if (effect == KeyguardBottomAreaVibrations.Shake) {
-            msdlPlayer.playToken(MSDLToken.FAILURE)
+        when (effect) {
+            KeyguardBottomAreaVibrations.Shake -> {
+                msdlPlayer.playToken(MSDLToken.FAILURE)
+            }
+            KeyguardBottomAreaVibrations.Activated, KeyguardBottomAreaVibrations.ActivatedAlt -> {
+                msdlPlayer.playToken(MSDLToken.SWITCH_ON)
+            }
+            KeyguardBottomAreaVibrations.Deactivated, KeyguardBottomAreaVibrations.DeactivatedAlt -> {
+                msdlPlayer.playToken(MSDLToken.SWITCH_OFF)
+            }
+            KeyguardBottomAreaVibrations.ShakeAlt -> {
+                msdlPlayer.playToken(MSDLToken.FAILURE)
+            }
+            else -> {
+                // Fallback to traditional vibration for unknown effects
+                vibrate(effect)
+            }
         }
     }
 }
