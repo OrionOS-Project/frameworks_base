@@ -263,14 +263,10 @@ constructor(
                     shakeAnimator.doOnEnd { view.translationX = 0f }
                     shakeAnimator.start()
 
-                    vibratorHelper?.playFeedback(
-                        if (KeyguardBottomAreaVibrations.areAllPrimitivesSupported) {
-                            KeyguardBottomAreaVibrations.Shake
-                        } else {
-                            KeyguardBottomAreaVibrations.ShakeAlt
-                        },
-                        msdlPlayer,
-                    )
+                    val shakeEffect = KeyguardBottomAreaVibrations.getShakeEffect(vibratorHelper)
+                    if (shakeEffect != null) {
+                        vibratorHelper?.playFeedback(shakeEffect, msdlPlayer)
+                    }
                     logger.logQuickAffordanceTapped(viewModel.configKey)
                 }
                 view.onLongClickListener =
@@ -356,22 +352,10 @@ constructor(
                         slotId = viewModel.slotId,
                     )
                 )
-                vibratorHelper?.playFeedback(
-                    if (viewModel.isActivated) {
-                        if (KeyguardBottomAreaVibrations.areAllPrimitivesSupported) {
-                            KeyguardBottomAreaVibrations.Activated
-                        } else {
-                            KeyguardBottomAreaVibrations.ActivatedAlt
-                        }
-                    } else {
-                        if (KeyguardBottomAreaVibrations.areAllPrimitivesSupported) {
-                            KeyguardBottomAreaVibrations.Deactivated
-                        } else {
-                            KeyguardBottomAreaVibrations.DeactivatedAlt
-                        }
-                    },
-                    msdlPlayer,
-                )
+                val vibrateEffect = KeyguardBottomAreaVibrations.getVibrateEffect(vibratorHelper, viewModel.isActivated)
+                if (vibrateEffect != null) {
+                    vibratorHelper?.playFeedback(vibrateEffect, msdlPlayer)
+                }
             }
 
             onTouchListener.cancel()

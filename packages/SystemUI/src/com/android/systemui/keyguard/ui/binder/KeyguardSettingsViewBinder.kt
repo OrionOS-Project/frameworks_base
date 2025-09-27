@@ -61,12 +61,9 @@ object KeyguardSettingsViewBinder {
                             view.animateVisibility(visible = isVisible)
                             if (isVisible) {
                                 if (!Flags.msdlFeedback()) {
-                                    vibratorHelper.vibrate(
-                                        if (KeyguardBottomAreaVibrations.areAllPrimitivesSupported) {
-                                            KeyguardBottomAreaVibrations.Activated
-                                        } else {
-                                            KeyguardBottomAreaVibrations.ActivatedAlt
-                                        }
+                                    KeyguardBottomAreaVibrations.vibrate(
+                                        helper = vibratorHelper,
+                                        isActivated = true
                                     )
                                 }
                                 val textView = view.requireViewById(R.id.text) as TextView

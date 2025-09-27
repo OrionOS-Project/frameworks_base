@@ -113,20 +113,9 @@ class KeyguardQuickAffordanceOnTouchListener(
         configKey: String,
     ) {
         view.setOnClickListener {
-            vibratorHelper?.vibrate(
-                if (viewModel.isActivated) {
-                    if (KeyguardBottomAreaVibrations.areAllPrimitivesSupported) {
-                        KeyguardBottomAreaVibrations.Activated
-                    } else {
-                        KeyguardBottomAreaVibrations.ActivatedAlt
-                    }
-                } else {
-                    if (KeyguardBottomAreaVibrations.areAllPrimitivesSupported) {
-                        KeyguardBottomAreaVibrations.Deactivated
-                    } else {
-                        KeyguardBottomAreaVibrations.DeactivatedAlt
-                    }
-                }
+            KeyguardBottomAreaVibrations.vibrate(
+                helper = vibratorHelper,
+                isActivated = viewModel.isActivated
             )
             viewModel.onClicked(
                 KeyguardQuickAffordanceViewModel.OnClickedParameters(
