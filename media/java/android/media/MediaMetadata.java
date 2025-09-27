@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2014 The Android Open Source Project
  *
@@ -22,9 +23,6 @@ import android.compat.annotation.UnsupportedAppUsage;
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
@@ -966,15 +964,11 @@ public final class MediaMetadata implements Parcelable {
             if (mBitmapDimensionLimit != Integer.MAX_VALUE) {
                 for (String key : mBundle.keySet()) {
                     Object value = mBundle.get(key);
-                    if (value instanceof Bitmap bmp) {
-                        final Bitmap orig = bmp;
+                    if (value instanceof Bitmap) {
+                        Bitmap bmp = (Bitmap) value;
                         if (bmp.getHeight() > mBitmapDimensionLimit
                                 || bmp.getWidth() > mBitmapDimensionLimit) {
-                            bmp = scaleBitmap(bmp, mBitmapDimensionLimit);
-                        }
-                        Bitmap sharedBmp = bmp.asShared();
-                        if (orig != sharedBmp) {
-                            putBitmap(key, sharedBmp);
+                            putBitmap(key, scaleBitmap(bmp, mBitmapDimensionLimit));
                         }
                     }
                 }
@@ -983,25 +977,46 @@ public final class MediaMetadata implements Parcelable {
         }
 
         private Bitmap scaleBitmap(Bitmap bmp, int maxDimension) {
-            if (bmp == null) return null;
+            if (bmp == null) {
+                return null;
+            }
+            
             int srcWidth = bmp.getWidth();
             int srcHeight = bmp.getHeight();
-            float scale = Math.max(
-                (float) maxDimension / srcWidth,
-                (float) maxDimension / srcHeight
-            );
-            float scaledWidth = scale * srcWidth;
-            float scaledHeight = scale * srcHeight;
-            float dx = (maxDimension - scaledWidth) / 2f;
-            float dy = (maxDimension - scaledHeight) / 2f;
-            Bitmap output = Bitmap.createBitmap(maxDimension, maxDimension, bmp.getConfig());
-            Canvas canvas = new Canvas(output);
-            Matrix matrix = new Matrix();
-            matrix.setScale(scale, scale);
-            matrix.postTranslate(dx, dy);
-            Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
-            canvas.drawBitmap(bmp, matrix, paint);
-            return output;
+            
+            if (srcWidth <= 0 || srcHeight <= 0) {
+                return bmp;
+            }
+            
+            if (srcWidth <= maxDimension && srcHeight <= maxDimension) {
+                return bmp;
+            }
+            
+            try {
+                // Calculate proper scaling to maintain aspect ratio
+                float scale = Math.min((float) maxDimension / srcWidth, (float) maxDimension / srcHeight);
+                int scaledWidth = Math.round(srcWidth * scale);
+                int scaledHeight = Math.round(srcHeight * scale);
+                
+                // Ensure we don't exceed max dimension due to rounding
+                if (scaledWidth > maxDimension) scaledWidth = maxDimension;
+                if (scaledHeight > maxDimension) scaledHeight = maxDimension;
+                
+                // Single scaling operation - more efficient than compression approach
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bmp, scaledWidth, scaledHeight, true);
+                
+                // Only recycle original if we created a new bitmap
+                if (scaledBitmap != bmp && scaledBitmap != null) {
+                    bmp.recycle();
+                    return scaledBitmap;
+                }
+                
+                return bmp;
+            } catch (OutOfMemoryError e) {
+                return bmp; // Return original on failure
+            } catch (Exception e) {
+                return bmp; // Return original on failure
+            }
         }
     }
 }
