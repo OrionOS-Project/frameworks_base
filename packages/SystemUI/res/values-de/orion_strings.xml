@@ -97,4 +97,7 @@
 
     <!-- Name of the bluetooth battery level status bar setting. -->
     <string name="status_bar_bluetooth_battery_level">Bluetooth-Akkustand</string>
+
+    <!-- Data disabled icon -->
+    <string name="data_disabled_icon_title">Symbol für deaktivierte Daten</string>
 </resources>
