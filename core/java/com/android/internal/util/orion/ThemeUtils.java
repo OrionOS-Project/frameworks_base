@@ -59,6 +59,7 @@ public class ThemeUtils {
 
     public static final String FONT_KEY = "android.theme.customization.font";
     public static final String ICON_SHAPE_KEY= "android.theme.customization.adaptive_icon_shape";
+    public static final String LOCK_CLOCK_FONT_KEY = "android.theme.customization.lockscreen_clock_font";
 
     public static final Comparator<OverlayInfo> OVERLAY_INFO_COMPARATOR =
             Comparator.comparingInt(a -> a.priority);
@@ -176,6 +177,23 @@ public class ThemeUtils {
         return fontlist;
     }
 
+    public List<Typeface> getLockscreenClockFonts() {
+        final List<Typeface> fontlist = new ArrayList<>();
+            for (String overlayPackage : getOverlayPackagesForCategory(LOCK_CLOCK_FONT_KEY)) {
+                try {
+                    overlayRes = overlayPackage.equals("android") ? Resources.getSystem()
+                           : pm.getResourcesForApplication(overlayPackage);
+                    final String font = overlayRes.getString(
+                            overlayRes.getIdentifier("config_clockFontFamily",
+                            "string", overlayPackage));
+                    fontlist.add(Typeface.create(font, Typeface.NORMAL));
+                } catch (NameNotFoundException | NotFoundException e) {
+                // Do nothing
+                }
+            }
+        return fontlist;
+    }
+
     public List<ShapeDrawable> getShapeDrawables() {
         final List<ShapeDrawable> shapelist = new ArrayList<>();
             for (String overlayPackage : getOverlayPackagesForCategory(ICON_SHAPE_KEY)) {
@@ -231,5 +249,57 @@ public class ThemeUtils {
             }
         }
         return true;
+    }
+
+    public static String getCurrentClockFontOverlay() {
+        final IOverlayManager overlayManager = IOverlayManager.Stub
+                .asInterface(ServiceManager.getService(Context.OVERLAY_SERVICE));
+        for (String overlayPackage : getLockscreenClockFontOverlayPackages()) {
+            try {
+                OverlayInfo info = overlayManager.getOverlayInfo(overlayPackage, USER_SYSTEM);
+                if (info != null && info.isEnabled()) {
+                    return info.packageName.toLowerCase();
+                } else {
+                    continue;
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private static List<String> getLockscreenClockFontOverlayPackages() {
+        String category = LOCK_CLOCK_FONT_KEY;
+        List<String> overlays = new ArrayList<>();
+        List<String> mPkgs = new ArrayList<>();
+        overlays.add("android");
+        for (OverlayInfo info : getOverlayInfosStatic(LOCK_CLOCK_FONT_KEY, "android")) {
+            if (LOCK_CLOCK_FONT_KEY.equals(info.getCategory())) {
+                mPkgs.add(info.getPackageName());
+            }
+        }
+        Collections.sort(mPkgs);
+        overlays.addAll(mPkgs);
+        return overlays;
+    }
+
+    private static List<OverlayInfo> getOverlayInfosStatic(String category, String target) {
+        final IOverlayManager overlayManager = IOverlayManager.Stub
+                .asInterface(ServiceManager.getService(Context.OVERLAY_SERVICE));
+        final List<OverlayInfo> filteredInfos = new ArrayList<>();
+        try {
+            List<OverlayInfo> overlayInfos = overlayManager
+                    .getOverlayInfosForTarget(target, USER_SYSTEM);
+            for (OverlayInfo overlayInfo : overlayInfos) {
+                if (category.equals(overlayInfo.category)) {
+                    filteredInfos.add(overlayInfo);
+                }
+            }
+        } catch (RemoteException re) {
+            throw re.rethrowFromSystemServer();
+        }
+        filteredInfos.sort(OVERLAY_INFO_COMPARATOR);
+        return filteredInfos;
     }
 }
