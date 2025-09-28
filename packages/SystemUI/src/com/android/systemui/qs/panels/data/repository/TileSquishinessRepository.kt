@@ -30,16 +30,18 @@ import com.android.systemui.dagger.qualifiers.Application
 
 @SysUISingleton
 class TileSquishinessRepository @Inject constructor(
-    private val context: Context
+private val context: Context
 ) {
     private val _squishiness = MutableStateFlow(1f)
     private val _tileShapeMode = MutableStateFlow(TileShapeMode.NORMAL)
+    private val _brightnessMatchTileShape = MutableStateFlow(false)
     
     private val mainHandler = Handler(Looper.getMainLooper())
     
     private val settingsObserver = object : ContentObserver(mainHandler) {
         override fun onChange(selfChange: Boolean) {
             updateTileShapeMode()
+            updateBrightnessMatchTileShape()
         }
     }
 
@@ -50,7 +52,14 @@ class TileSquishinessRepository @Inject constructor(
             false,
             settingsObserver
         )
+        // Register observer for the brightness match tile shape setting
+        context.contentResolver.registerContentObserver(
+            Settings.System.getUriFor(Settings.System.QS_BRIGHTNESS_MATCH_TILE_SHAPE),
+            false,
+            settingsObserver
+        )
         updateTileShapeMode()
+        updateBrightnessMatchTileShape()
     }
     
     private fun updateTileShapeMode() {
@@ -63,8 +72,24 @@ class TileSquishinessRepository @Inject constructor(
         _tileShapeMode.value = TileShapeMode.fromInt(modeValue)
     }
     
+    private fun updateBrightnessMatchTileShape() {
+        val isEnabled = Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.QS_BRIGHTNESS_MATCH_TILE_SHAPE,
+            0, // Default to disabled
+            UserHandle.USER_CURRENT
+        ) == 1
+        _brightnessMatchTileShape.value = isEnabled
+    }
+    
     // Expose the raw squishiness value - the shape logic is handled separately
     val squishiness: StateFlow<Float> = _squishiness
+    
+    // Expose the brightness match tile shape setting
+    val brightnessMatchTileShape: StateFlow<Boolean> = _brightnessMatchTileShape
+    
+    // Expose the current tile shape mode for brightness matching
+    val tileShapeMode: StateFlow<TileShapeMode> = _tileShapeMode
 
     /**
      * Returns the effective tile state for shape calculation.

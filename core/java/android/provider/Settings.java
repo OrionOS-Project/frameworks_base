@@ -6987,6 +6987,12 @@ public final class Settings {
         public static final String QS_ENABLE_TILE_SQUISHING = "qs_enable_tile_squishing";
 
         /**
+         * Whether to match brightness slider shape to tile shape mode.
+         * @hide
+         */
+        public static final String QS_BRIGHTNESS_MATCH_TILE_SHAPE = "qs_brightness_match_tile_shape";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate

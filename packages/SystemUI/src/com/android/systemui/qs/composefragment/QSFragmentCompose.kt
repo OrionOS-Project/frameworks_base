@@ -61,6 +61,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -929,6 +930,9 @@ constructor(
             )
         ) {
             AlwaysDarkMode {
+                val brightnessMatchTileShape by viewModel.squishinessInteractor.brightnessMatchTileShape.collectAsState()
+                val tileShapeMode by viewModel.squishinessInteractor.tileShapeMode.collectAsState()
+                
                 BrightnessSliderContainer(
                     viewModel =
                         viewModel.containerViewModel.brightnessSliderViewModel,
@@ -938,6 +942,8 @@ constructor(
                             ContainerColors.defaultContainerColor,
                         ),
                     modifier = Modifier.fillMaxWidth(),
+                    brightnessMatchTileShape = brightnessMatchTileShape,
+                    tileShapeMode = tileShapeMode.value,
                 )
             }
         }

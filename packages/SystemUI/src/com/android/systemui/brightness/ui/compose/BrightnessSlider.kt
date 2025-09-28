@@ -330,7 +330,15 @@ fun BrightnessSlider(
                                     )
                                 }
                             },
-                    trackCornerSize = SliderTrackRoundedCorner,
+                    trackCornerSize = if (brightnessMatchTileShape) {
+                        when (tileShapeMode) {
+                            1 -> SliderTrackRoundedCornerAllRound // ALL_ROUND
+                            2 -> SliderTrackRoundedCornerAllSquared // ALL_SQUARED
+                            else -> SliderTrackRoundedCorner // NORMAL
+                        }
+                    } else {
+                        SliderTrackRoundedCorner
+                    },
                     trackInsideCornerSize = 2.dp,
                     drawStopIndicator = null,
                     thumbTrackGapSize = ThumbTrackGapSize,
@@ -381,7 +389,17 @@ fun BrightnessSlider(
                 },
                 modifier = Modifier
                     .size(ThumbSize)
-                    .clip(CircleShape)
+                    .clip(
+                        if (brightnessMatchTileShape) {
+                            when (tileShapeMode) {
+                                1 -> CircleShape // ALL_ROUND - use circle
+                                2 -> RoundedCornerShape(8.dp) // ALL_SQUARED - use rounded rectangle
+                                else -> CircleShape // NORMAL - use circle (default)
+                            }
+                        } else {
+                            CircleShape
+                        }
+                    )
                     .background(autoBrightnessBackgroundColor),
                 update = { button ->
                     val targetState =
@@ -452,6 +470,8 @@ fun BrightnessSliderContainer(
     viewModel: BrightnessSliderViewModel,
     modifier: Modifier = Modifier,
     containerColors: ContainerColors,
+    brightnessMatchTileShape: Boolean = false,
+    tileShapeMode: Int = 0, // 0 = NORMAL, 1 = ALL_ROUND, 2 = ALL_SQUARED
 ) {
     val gamma = viewModel.currentBrightness.value
     if (gamma == BrightnessSliderViewModel.initialValue.value) { // Ignore initial negative value.
@@ -512,7 +532,17 @@ fun BrightnessSliderContainer(
             modifier =
                 Modifier.borderOnFocus(
                         color = MaterialTheme.colorScheme.secondary,
-                        cornerSize = CornerSize(SliderTrackRoundedCorner),
+                        cornerSize = CornerSize(
+                            if (brightnessMatchTileShape) {
+                                when (tileShapeMode) {
+                                    1 -> SliderTrackRoundedCornerAllRound // ALL_ROUND
+                                    2 -> SliderTrackRoundedCornerAllSquared // ALL_SQUARED
+                                    else -> SliderTrackRoundedCorner // NORMAL
+                                }
+                            } else {
+                                SliderTrackRoundedCorner
+                            }
+                        ),
                     )
                     .then(if (viewModel.showMirror) Modifier.drawInOverlay() else Modifier)
                     .sliderBackground(containerColor)
@@ -548,6 +578,8 @@ private object Dimensions {
     val SliderBackgroundFrameSize = DpSize(10.dp, 6.dp)
     val SliderBackgroundRoundedCorner = 24.dp
     val SliderTrackRoundedCorner = 12.dp
+    val SliderTrackRoundedCornerAllRound = 24.dp // More rounded for ALL_ROUND mode
+    val SliderTrackRoundedCornerAllSquared = 4.dp // Less rounded for ALL_SQUARED mode
     val IconSize = DpSize(28.dp, 28.dp)
     val IconPadding = 6.dp
     val ThumbTrackGapSize = 6.dp

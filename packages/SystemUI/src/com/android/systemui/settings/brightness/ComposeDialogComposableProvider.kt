@@ -51,6 +51,8 @@ private fun BrightnessSliderForDialog(
         viewModel = viewModel,
         containerColors = ContainerColors.singleColor(ContainerColors.defaultContainerColor),
         modifier = Modifier.fillMaxWidth().padding(8.dp),
+        brightnessMatchTileShape = false, // Dialog doesn't need tile shape matching
+        tileShapeMode = 0, // Default to NORMAL
     )
 }
 

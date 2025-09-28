@@ -25,6 +25,8 @@ class TileSquishinessInteractor
 @Inject
 constructor(private val repository: TileSquishinessRepository) {
     val squishiness = repository.squishiness
+    val brightnessMatchTileShape = repository.brightnessMatchTileShape
+    val tileShapeMode = repository.tileShapeMode
 
     fun setSquishinessValue(value: Float) {
         repository.setSquishinessValue(value)

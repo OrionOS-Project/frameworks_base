@@ -24,6 +24,8 @@ class TileSquishinessViewModel
 @Inject
 constructor(private val tileSquishinessInteractor: TileSquishinessInteractor) {
     val squishiness = tileSquishinessInteractor.squishiness
+    val brightnessMatchTileShape = tileSquishinessInteractor.brightnessMatchTileShape
+    val tileShapeMode = tileSquishinessInteractor.tileShapeMode
     
     /**
      * Returns the effective tile state for shape calculation.
