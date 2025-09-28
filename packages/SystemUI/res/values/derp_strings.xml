@@ -123,4 +123,7 @@
 
     <!-- Name of the bluetooth battery level status bar setting. -->
     <string name="status_bar_bluetooth_battery_level">Bluetooth battery level</string>
+
+    <!-- Data disabled icon -->
+    <string name="data_disabled_icon_title">Data disabled icon</string>
 </resources>
