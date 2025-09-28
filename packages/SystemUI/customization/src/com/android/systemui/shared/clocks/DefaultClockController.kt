@@ -22,6 +22,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
+import com.android.internal.util.orion.ThemeUtils
 import com.android.systemui.customization.R
 import com.android.systemui.log.core.MessageBuffer
 import com.android.systemui.plugins.clocks.AlarmData
@@ -217,13 +218,31 @@ class DefaultClockController(
 
         override fun onLocaleChanged(locale: Locale) {
             val nf = NumberFormat.getInstance(locale)
-            if (nf.format(FORMAT_NUMBER.toLong()) == burmeseNumerals) {
-                clocks.forEach { it.setLineSpacingScale(burmeseLineSpacing) }
-            } else {
-                clocks.forEach { it.setLineSpacingScale(defaultLineSpacing) }
+            val density = resources.displayMetrics.density
+
+            // Dynamic font spacing based on current clock font overlay
+            val fontName = ThemeUtils.getCurrentClockFontOverlay()
+            val lineSpacing = when {
+                // Handle special locales first
+                nf.format(FORMAT_NUMBER.toLong()) == burmeseNumerals -> burmeseLineSpacing
+                
+                // Handle specific clock fonts with custom spacing
+                fontName?.contains("sans", ignoreCase = true) == true -> 0.88f
+                fontName?.contains("google", ignoreCase = true) == true -> defaultLineSpacing
+                fontName?.contains("apice", ignoreCase = true) == true -> 0.92f
+                fontName?.contains("coolstory", ignoreCase = true) == true -> 0.92f
+                fontName?.contains("evolve", ignoreCase = true) == true -> 0.92f
+                fontName?.contains("monospace", ignoreCase = true) == true -> 0.95f
+                fontName?.contains("serif", ignoreCase = true) == true -> 0.90f
+                
+                // Default fallback
+                else -> defaultLineSpacing
             }
 
-            clocks.forEach { it.refreshFormat() }
+            clocks.forEach { clock ->
+                clock.setLineSpacingScale(lineSpacing)
+                clock.refreshFormat()
+            }
         }
 
         override fun onWeatherDataChanged(data: WeatherData) {}
