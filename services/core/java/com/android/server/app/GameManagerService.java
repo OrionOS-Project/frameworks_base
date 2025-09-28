@@ -1589,6 +1589,9 @@ public final class GameManagerService extends IGameManagerService.Stub {
                 }
             }
         }, new IntentFilter(Intent.ACTION_SHUTDOWN));
+        // Start to observe our Settings.Secure.GAME_OVERLAY
+        // after boot completed.
+        new SettingsObserver(mHandler);
         Slog.v(TAG, "Game loading power mode OFF (game manager service start/restart)");
         mPowerManagerInternal.setPowerMode(Mode.GAME_LOADING, false);
         Slog.v(TAG, "Game power mode OFF (game manager service start/restart)");
@@ -1597,10 +1600,6 @@ public final class GameManagerService extends IGameManagerService.Stub {
         mGameDefaultFrameRateValue = (float) mSysProps.getInt(
                 PROPERTY_RO_SURFACEFLINGER_GAME_DEFAULT_FRAME_RATE, 60);
         Slog.v(TAG, "Game Default Frame Rate : " + mGameDefaultFrameRateValue);
-        
-        // Start to observe our Settings.Secure.GAME_OVERLAY
-        // after boot completed.
-        new SettingsObserver(mHandler);
     }
 
     private void sendUserMessage(int userId, int what, String eventForLog, int delayMillis) {
@@ -2391,28 +2390,26 @@ public final class GameManagerService extends IGameManagerService.Stub {
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
-            synchronized (mDeviceConfigLock) {
-                String newValue = Settings.Secure.getStringForUser(mContentResolver,
-                        Settings.Secure.GAME_OVERLAY, UserHandle.USER_CURRENT);
-                if (newValue == null) return;
-                // We write key and value of the device_config property as a single string
-                // from our GameSpace.
-                // ';;' is the separator betweeen key and value.
-                // Example: com.libremobileos.game;;mode=2,downscaleFactor=0.7:mode=3,downscaleFactor=0.8
-                // So split the key and value from the string
-                // and set the device_config propery.
-                String[] parsedValues = newValue.split(";;");
-                // Value should contain both package name and config.
-                // Otherwise don't do anything.
-                if (parsedValues.length < 2) return;
-                // We don't need to care about any format and all.
-                // It will be handled by the GamePackageConfiguration while
-                // parsing the device_config property.
-                String packageName = parsedValues[0];
-                String configValue = parsedValues[1];
-                DeviceConfig.setProperty(DeviceConfig.NAMESPACE_GAME_OVERLAY,
-                        packageName, configValue, false);
-            }
+            String newValue = Settings.Secure.getStringForUser(mContentResolver,
+                    Settings.Secure.GAME_OVERLAY, UserHandle.USER_CURRENT);
+            if (newValue == null) return;
+            // We write key and value of the device_config property as a single string
+            // from our GameSpace.
+            // ';;' is the separator betweeen key and value.
+            // Example: org.derpfest.game;;mode=2,downscaleFactor=0.7:mode=3,downscaleFactor=0.8
+            // So split the key and value from the string
+            // and set the device_config propery.
+            String[] parsedValues = newValue.split(";;");
+            // Value should contain both package name and config.
+            // Otherwise don't do anything.
+            if (parsedValues.length < 2) return;
+            // We don't need to care about any format and all.
+            // It will be handled by the GamePackageConfiguration while
+            // parsing the device_config property.
+            String packageName = parsedValues[0];
+            String configValue = parsedValues[1];
+            DeviceConfig.setProperty(DeviceConfig.NAMESPACE_GAME_OVERLAY,
+                    packageName, configValue, false);
         }
     }
 
