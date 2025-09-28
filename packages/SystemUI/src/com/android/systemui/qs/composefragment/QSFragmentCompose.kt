@@ -930,8 +930,21 @@ constructor(
             )
         ) {
             AlwaysDarkMode {
-                val brightnessMatchTileShape by viewModel.squishinessInteractor.brightnessMatchTileShape.collectAsState()
-                val tileShapeMode by viewModel.squishinessInteractor.tileShapeMode.collectAsState()
+                val brightnessMatchTileShape by viewModel
+                    .quickQuickSettingsViewModel
+                    .squishinessViewModel
+                    .brightnessMatchTileShape
+                    .collectAsState()
+                val tileShapeMode by viewModel
+                    .quickQuickSettingsViewModel
+                    .squishinessViewModel
+                    .tileShapeMode
+                    .collectAsState()
+                val brightnessSliderShape by viewModel
+                    .quickQuickSettingsViewModel
+                    .squishinessViewModel
+                    .brightnessSliderShape
+                    .collectAsState()
                 
                 BrightnessSliderContainer(
                     viewModel =
@@ -944,6 +957,7 @@ constructor(
                     modifier = Modifier.fillMaxWidth(),
                     brightnessMatchTileShape = brightnessMatchTileShape,
                     tileShapeMode = tileShapeMode.value,
+                    brightnessSliderShape = brightnessSliderShape,
                 )
             }
         }

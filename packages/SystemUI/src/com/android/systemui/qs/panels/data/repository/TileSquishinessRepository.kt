@@ -35,6 +35,7 @@ private val context: Context
     private val _squishiness = MutableStateFlow(1f)
     private val _tileShapeMode = MutableStateFlow(TileShapeMode.NORMAL)
     private val _brightnessMatchTileShape = MutableStateFlow(false)
+    private val _brightnessSliderShape = MutableStateFlow(0) // 0 = default, 1 = circle, 2 = rounded square
     
     private val mainHandler = Handler(Looper.getMainLooper())
     
@@ -42,6 +43,7 @@ private val context: Context
         override fun onChange(selfChange: Boolean) {
             updateTileShapeMode()
             updateBrightnessMatchTileShape()
+            updateBrightnessSliderShape()
         }
     }
 
@@ -58,8 +60,15 @@ private val context: Context
             false,
             settingsObserver
         )
+        // Register observer for the independent brightness slider shape setting
+        context.contentResolver.registerContentObserver(
+            Settings.System.getUriFor(Settings.System.QS_BRIGHTNESS_SLIDER_SHAPE),
+            false,
+            settingsObserver
+        )
         updateTileShapeMode()
         updateBrightnessMatchTileShape()
+        updateBrightnessSliderShape()
     }
     
     private fun updateTileShapeMode() {
@@ -82,11 +91,24 @@ private val context: Context
         _brightnessMatchTileShape.value = isEnabled
     }
     
+    private fun updateBrightnessSliderShape() {
+        val shapeValue = Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.QS_BRIGHTNESS_SLIDER_SHAPE,
+            0, // Default to default shape
+            UserHandle.USER_CURRENT
+        )
+        _brightnessSliderShape.value = shapeValue
+    }
+    
     // Expose the raw squishiness value - the shape logic is handled separately
     val squishiness: StateFlow<Float> = _squishiness
     
     // Expose the brightness match tile shape setting
     val brightnessMatchTileShape: StateFlow<Boolean> = _brightnessMatchTileShape
+    
+    // Expose the independent brightness slider shape setting
+    val brightnessSliderShape: StateFlow<Int> = _brightnessSliderShape
     
     // Expose the current tile shape mode for brightness matching
     val tileShapeMode: StateFlow<TileShapeMode> = _tileShapeMode

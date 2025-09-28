@@ -282,5 +282,6 @@ public class SystemSettingsValidators {
         VALIDATORS.put(System.QS_SHOW_EDIT_BUTTON, BOOLEAN_VALIDATOR);
         VALIDATORS.put(System.QS_ENABLE_TILE_SQUISHING, new InclusiveIntegerRangeValidator(0, 2));
         VALIDATORS.put(System.QS_BRIGHTNESS_MATCH_TILE_SHAPE, BOOLEAN_VALIDATOR);
+        VALIDATORS.put(System.QS_BRIGHTNESS_SLIDER_SHAPE, new InclusiveIntegerRangeValidator(0, 2));
     }
 }

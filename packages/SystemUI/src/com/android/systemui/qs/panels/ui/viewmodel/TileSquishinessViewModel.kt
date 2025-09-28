@@ -25,6 +25,7 @@ class TileSquishinessViewModel
 constructor(private val tileSquishinessInteractor: TileSquishinessInteractor) {
     val squishiness = tileSquishinessInteractor.squishiness
     val brightnessMatchTileShape = tileSquishinessInteractor.brightnessMatchTileShape
+    val brightnessSliderShape = tileSquishinessInteractor.brightnessSliderShape
     val tileShapeMode = tileSquishinessInteractor.tileShapeMode
     
     /**

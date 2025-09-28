@@ -53,6 +53,7 @@ private fun BrightnessSliderForDialog(
         modifier = Modifier.fillMaxWidth().padding(8.dp),
         brightnessMatchTileShape = false, // Dialog doesn't need tile shape matching
         tileShapeMode = 0, // Default to NORMAL
+        brightnessSliderShape = 0, // Default shape
     )
 }
 
