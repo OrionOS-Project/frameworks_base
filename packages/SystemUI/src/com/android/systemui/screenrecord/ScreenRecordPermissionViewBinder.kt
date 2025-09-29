@@ -110,6 +110,7 @@ class ScreenRecordPermissionViewBinder(
     private lateinit var longerDurationSwitch: CompoundButton
     private lateinit var skipTimeSwitch: CompoundButton
     private lateinit var hevcSwitch: CompoundButton
+    private lateinit var keepAwakeSwitch: CompoundButton
     private lateinit var tapsView: View
     private lateinit var options: Spinner
 
@@ -160,6 +161,7 @@ class ScreenRecordPermissionViewBinder(
         longerDurationSwitch = containerView.requireViewById(R.id.screenrecord_longer_timeout_switch)
         skipTimeSwitch = containerView.requireViewById(R.id.screenrecord_skip_time_switch)
         hevcSwitch = containerView.requireViewById(R.id.screenrecord_hevc_switch)
+        keepAwakeSwitch = containerView.requireViewById(R.id.screenrecord_keep_screen_awake_switch)
 
         tapsView = containerView.requireViewById(R.id.show_taps)
         updateTapsViewVisibility()
@@ -172,6 +174,7 @@ class ScreenRecordPermissionViewBinder(
         longerDurationSwitch.setOnTouchListener { _, event -> event.action == ACTION_MOVE }
         skipTimeSwitch.setOnTouchListener { _, event -> event.action == ACTION_MOVE }
         hevcSwitch.setOnTouchListener { _, event -> event.action == ACTION_MOVE }
+        keepAwakeSwitch.setOnTouchListener { _, event -> event.action == ACTION_MOVE }
 
         options = containerView.requireViewById(R.id.screen_recording_options)
         val a: ArrayAdapter<*> =
@@ -237,6 +240,7 @@ class ScreenRecordPermissionViewBinder(
         val lowQuality = lowQualitySwitch.isChecked
         val longerDuration = longerDurationSwitch.isChecked
         val hevc = hevcSwitch.isChecked
+        val keepAwake = keepAwakeSwitch.isChecked
         val startIntent =
             PendingIntent.getForegroundService(
                 userContext,
@@ -251,6 +255,7 @@ class ScreenRecordPermissionViewBinder(
                     lowQuality,
                     longerDuration,
                     hevc,
+                    keepAwake,
                 ),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
