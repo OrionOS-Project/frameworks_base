@@ -33,12 +33,12 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.internal.R;
-import com.android.internal.util.orion.KeyProviderManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -429,24 +429,15 @@ public class PropImitationHooks {
         }
     }
 
-    private static boolean isCallerPlayIntegrity() {
+    public static boolean isCallerPlayIntegrity() {
         return Arrays.stream(Thread.currentThread().getStackTrace())
                 .map(StackTraceElement::getClassName)
                 .anyMatch(name -> name.toLowerCase(Locale.US).contains("droidguard"));
     }
 
-    public static void onEngineGetCertificateChain() {
-        // If a keybox is found, don't block key attestation
-        /*if (KeyProviderManager.isKeyboxAvailable()) {
-            dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
-            return;
-        }*/
-
-        // Check stack for Play Integrity
-        if (isCallerPlayIntegrity()) {
-            dlog("Blocked key attestation for play integrity");
-            throw new UnsupportedOperationException();
-        }
+    public static Certificate[] onEngineGetCertificateChain() {       
+        dlog("Blocked key attestation for play integrity");
+        return new Certificate[0];
     }
 
     public static void dlog(String msg) {
