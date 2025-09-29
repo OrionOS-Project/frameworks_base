@@ -16,7 +16,6 @@
 
 package com.android.systemui.qs.footer.ui.compose
 
-import com.android.compose.theme.PlatformTheme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -122,7 +121,7 @@ fun ContentScope.FooterActionsWithAnimatedVisibility(
             ) + fadeOut(tween(customizingAnimationDuration)),
         modifier = modifier.fillMaxWidth(),
     ) {
-        PlatformTheme(isDarkTheme = isSystemInDarkTheme()) {
+        QuickSettingsTheme {
             // This view has its own horizontal padding
             // TODO(b/321716470) This should use a lifecycle tied to the scene.
             Element(QuickSettings.Elements.FooterActions, Modifier) {
@@ -340,11 +339,7 @@ fun IconButton(
     modifier: Modifier = Modifier,
 ) {
     Expandable(
-        color = if (isSystemInDarkTheme()) {
-            colorResource(id = android.R.color.system_neutral1_800)
-        } else {
-            colorResource(id = android.R.color.system_neutral1_0)
-        },
+        color = MaterialTheme.colorScheme.surfaceVariant,
         shape = CircleShape,
         onClick = model.onClick,
         modifier =
@@ -352,6 +347,7 @@ fun IconButton(
                 color = MaterialTheme.colorScheme.secondary,
                 CornerSize(percent = 50),
             ),
+        borderStroke = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         useModifierBasedImplementation = useModifierBasedExpandable,
     ) {
         val tint = model.iconTint?.let { MaterialTheme.colorScheme.onSurface } ?: Color.Unspecified
@@ -377,7 +373,7 @@ private fun NumberButton(
     val interactionSource = remember { MutableInteractionSource() }
 
     Expandable(
-        color = MaterialTheme.colorScheme.outlineVariant,
+        color = MaterialTheme.colorScheme.surfaceVariant,
         shape = CircleShape,
         onClick = onClick,
         interactionSource = interactionSource,
@@ -386,6 +382,7 @@ private fun NumberButton(
                 color = MaterialTheme.colorScheme.secondary,
                 CornerSize(percent = 50),
             ),
+        borderStroke = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         useModifierBasedImplementation = useModifierBasedExpandable,
     ) {
         Box(Modifier.size(40.dp)) {
@@ -401,7 +398,7 @@ private fun NumberButton(
                             this.contentDescription = contentDescription
                         },
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurface,
                     // TODO(b/242040009): This should only use a standard text style instead and
                     // should not override the text size.
                     fontSize = 18.sp,
@@ -439,13 +436,9 @@ private fun TextButton(
 ) {
     Expandable(
         shape = CircleShape,
-        color = if (isSystemInDarkTheme()) {
-            colorResource(id = android.R.color.system_neutral1_800)
-        } else {
-            colorResource(id = android.R.color.system_neutral1_0)
-        },
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        borderStroke = BorderStroke(0.dp, MaterialTheme.colorScheme.outlineVariant),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        borderStroke = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         modifier =
             modifier
                 .padding(horizontal = 4.dp)
