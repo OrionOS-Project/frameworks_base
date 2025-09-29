@@ -47,6 +47,11 @@
         sysui:ignoreRightInset="true"
     />
 
+    <include layout="@layout/status_bar_expanded"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:visibility="invisible" />
+
     <com.android.systemui.navigation.pulse.VisualizerView
         android:id="@+id/visualizerview"
         android:gravity="bottom"
@@ -55,11 +60,6 @@
         android:layout_height="match_parent"
         android:visibility="visible"
         sysui:ignoreRightInset="true" />
-
-    <include layout="@layout/status_bar_expanded"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:visibility="invisible" />
 
     <com.android.systemui.statusbar.LightRevealScrim
         android:id="@+id/light_reveal_scrim"
