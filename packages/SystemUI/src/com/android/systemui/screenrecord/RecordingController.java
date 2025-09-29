@@ -23,6 +23,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
+import android.media.MediaFormat;
 import android.media.projection.StopReason;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -165,6 +168,20 @@ public class RecordingController
         return mScreenRecordPermissionDialogDelegateFactory
                 .create(this, getHostUserHandle(), getHostUid(), onStartRecordingClicked)
                 .createDialog();
+    }
+
+    /** Returns true when a hardware-accelerated HEVC encoder is available on device. */
+    public boolean isHEVCAllowed() {
+        MediaCodecList codecList = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        for (MediaCodecInfo info : codecList.getCodecInfos()) {
+            if (!info.isEncoder() || !info.isHardwareAccelerated()) continue;
+            for (String type : info.getSupportedTypes()) {
+                if (type.equalsIgnoreCase(MediaFormat.MIMETYPE_VIDEO_HEVC)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
