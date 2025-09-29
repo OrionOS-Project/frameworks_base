@@ -37,6 +37,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CompoundButton
 import android.widget.Spinner
+import android.media.MediaCodecList
+import android.media.MediaFormat
 import androidx.annotation.LayoutRes
 import com.android.systemui.Prefs
 import com.android.systemui.mediaprojection.MediaProjectionCaptureTarget
@@ -198,6 +200,12 @@ class ScreenRecordPermissionViewBinder(
                 }
             }
         options.isLongClickable = false
+
+        // Disable HEVC when hardware accelerated codec is not available
+        if (!hasHevcHwEncoder()) {
+            Prefs.putInt(userContextProvider.userContext, PREF_HEVC, 0)
+            containerView.requireViewById<View>(R.id.show_hevc).visibility = GONE
+        }
 
         loadPrefs();
     }
@@ -384,5 +392,20 @@ class ScreenRecordPermissionViewBinder(
                     (!filterDeviceTypeFlag || it.type in RECORDABLE_DISPLAY_TYPES)
             }
         }
+    }
+
+    private fun hasHevcHwEncoder(): Boolean {
+        val mediaCodecList = MediaCodecList(MediaCodecList.REGULAR_CODECS)
+        for (codecInfo in mediaCodecList.codecInfos) {
+            if (!codecInfo.isEncoder || !codecInfo.isHardwareAccelerated) {
+                continue
+            }
+            for (type in codecInfo.supportedTypes) {
+                if (type.equals(MediaFormat.MIMETYPE_VIDEO_HEVC, ignoreCase = true)) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
