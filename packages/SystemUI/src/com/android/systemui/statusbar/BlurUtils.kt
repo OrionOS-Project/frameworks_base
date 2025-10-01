@@ -76,9 +76,13 @@ constructor(
     /** When this is true, early wakeup flag is not reset on surface flinger when blur drops to 0 */
     private var persistentEarlyWakeupRequired = false
 
+    /** Custom blur radius percentage (0-200%, 100% = system default) */
+    private var customBlurPercentage = 100 // 100% = system default
+
     init {
         dumpManager.registerDumpable(this)
         earlyWakeupInfo.token = Binder()
+        instance = this
     }
 
     @VisibleForTesting
@@ -89,7 +93,27 @@ constructor(
         if (ratio == 0f) {
             return 0f
         }
-        return MathUtils.lerp(minBlurRadius, maxBlurRadius, ratio)
+        
+        // Apply custom blur percentage to system radius
+        val effectiveMinRadius: Float
+        val effectiveMaxRadius: Float
+        
+        if (customBlurPercentage == 100) {
+            // Use system defaults (100%)
+            effectiveMinRadius = minBlurRadius
+            effectiveMaxRadius = maxBlurRadius
+        } else if (customBlurPercentage == 0) {
+            // No blur (0%)
+            return 0f
+        } else {
+            // Apply percentage scaling to system values
+            val systemMin = minBlurRadius * (customBlurPercentage / 100f)
+            val systemMax = maxBlurRadius * (customBlurPercentage / 100f)
+            effectiveMinRadius = systemMin.coerceAtLeast(1f)
+            effectiveMaxRadius = systemMax.coerceAtLeast(1f)
+        }
+        
+        return MathUtils.lerp(effectiveMinRadius, effectiveMaxRadius, ratio)
     }
 
     /**
@@ -305,6 +329,14 @@ constructor(
         }
     }
 
+    /**
+     * Sets the custom blur intensity as percentage.
+     * @param percentage Value from 0-200% (0% = no blur, 100% = system default, 200% = double intensity)
+     */
+    fun setCustomBlurIntensity(percentage: Int) {
+        customBlurPercentage = percentage.coerceIn(0, 200)
+    }
+
     companion object {
         const val TRACK_NAME = "BlurUtils"
         private const val TAG = "BlurUtils"
@@ -313,5 +345,12 @@ constructor(
         private val SET_PERSISTENT_EARLY_WAKEUP_TRACE_NAME =
             BlurUtils::class.java.name + "::setPersistentEarlyWakeup"
         private val isLoggable = Log.isLoggable(TAG, Log.VERBOSE) || Build.IS_ENG
+        
+        @JvmStatic
+        var instance: BlurUtils? = null
+            private set
+            
+        @JvmStatic
+        fun getBlurUtilsInstance(): BlurUtils? = instance
     }
 }
