@@ -961,6 +961,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
         Uri statusbarBrightnessControl = Settings.System.getUriFor(
                 Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL);
+        Uri blurIntensity = Settings.System.getUriFor(Settings.System.BLUR_INTENSITY);
         ContentObserver contentObserver = new ContentObserver(null) {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
@@ -972,12 +973,26 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                     if (mPhoneStatusBarViewController != null) {
                         mPhoneStatusBarViewController.setBrightnessControlEnabled(mBrightnessControl);
                     }
+                } else if (uri.equals(blurIntensity)) {
+                    int newValue = Settings.System.getIntForUser(mContext.getContentResolver(),
+                            Settings.System.BLUR_INTENSITY, 100, // 100% = system default
+                            UserHandle.USER_CURRENT);
+                    mContext.getMainExecutor().execute(() -> {
+                        com.android.systemui.statusbar.BlurUtils blurUtilsInstance = 
+                                com.android.systemui.statusbar.BlurUtils.getBlurUtilsInstance();
+                        if (blurUtilsInstance != null) {
+                            blurUtilsInstance.setCustomBlurIntensity(newValue);
+                        }
+                    });
                 }
             }
         };
         mContext.getContentResolver().registerContentObserver(
                 statusbarBrightnessControl, false, contentObserver);
+        mContext.getContentResolver().registerContentObserver(
+                blurIntensity, false, contentObserver);
         contentObserver.onChange(true, statusbarBrightnessControl);
+        contentObserver.onChange(true, blurIntensity);
 
         mDisplayManager = mContext.getSystemService(DisplayManager.class);
 
