@@ -87,4 +87,6 @@
          Should be set to dt2w max time / 2 when needed -->
     <integer name="config_singleTapDelay">0</integer>
 
+    <!-- Package name of the edge cutout overlay -->
+    <string name="config_edge_cutout_overlay_package">com.libremobileos.overlay.customization.edgecutout</string>
 </resources>

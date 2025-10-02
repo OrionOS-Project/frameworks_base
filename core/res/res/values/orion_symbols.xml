@@ -73,4 +73,6 @@
          Should be set to dt2w max time / 2 when needed -->
     <java-symbol type="integer" name="config_singleTapDelay" />
 
+    <!-- Package name of the edge cutout overlay -->
+    <java-symbol type="string" name="config_edge_cutout_overlay_package" />
 </resources>
