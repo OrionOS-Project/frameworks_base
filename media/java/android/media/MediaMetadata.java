@@ -1009,9 +1009,8 @@ public final class MediaMetadata implements Parcelable {
                 // Single scaling operation - more efficient than compression approach
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap(bmp, scaledWidth, scaledHeight, true);
                 
-                // Only recycle original if we created a new bitmap
-                if (scaledBitmap != bmp && scaledBitmap != null) {
-                    bmp.recycle();
+                // Return the scaled bitmap if creation was successful
+                if (scaledBitmap != null) {
                     return scaledBitmap;
                 }
                 
