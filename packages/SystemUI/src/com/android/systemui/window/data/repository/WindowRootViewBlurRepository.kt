@@ -108,7 +108,7 @@ constructor(
             }
             val resolver = context.contentResolver
             resolver.registerContentObserver(
-                Settings.Secure.getUriFor("notification_row_transparency"),
+                Settings.Secure.getUriFor(Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY),
                 true,
                 observer
             )
@@ -122,7 +122,7 @@ constructor(
     private fun isTranslucentEnabled(): Boolean {
         return Settings.Secure.getIntForUser(
             context.contentResolver,
-            "notification_row_transparency",
+            Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
             1, UserHandle.USER_CURRENT) == 1
     }
 

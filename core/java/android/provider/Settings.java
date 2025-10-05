@@ -13702,6 +13702,12 @@ public final class Settings {
         public static final String EDGE_CUTOUT = "edge_cutout";
 
         /**
+         * Translucent notifications
+         * @hide
+         */
+        public static final String NOTIFICATION_ROW_TRANSPARENCY = "notification_row_transparency";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *

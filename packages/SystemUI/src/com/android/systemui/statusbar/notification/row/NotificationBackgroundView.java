@@ -16,7 +16,6 @@
 
 package com.android.systemui.statusbar.notification.row;
 
-import static com.android.systemui.Flags.notificationRowTransparency;
 import static com.android.systemui.util.ColorUtilKt.hexColorString;
 
 import android.content.Context;

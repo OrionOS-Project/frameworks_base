@@ -2336,7 +2336,7 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
                     UserHandle.USER_ALL);
                     mPanelView.getContext().getContentResolver().registerContentObserver(
                     Settings.Secure.getUriFor(
-                            "notification_row_transparency"),
+                            Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY),
                     true, mTranslucentObserver,
                     UserHandle.USER_ALL);
             mOneFingerQuickSettingsInterceptObserver.onChange(true);
