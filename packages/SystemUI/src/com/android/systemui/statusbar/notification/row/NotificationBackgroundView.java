@@ -84,6 +84,8 @@ public class NotificationBackgroundView extends View implements Dumpable,
     
     private boolean mIsBlurSupported = false;
     private int mTransparencyLevel = 85; // Default transparency level (0-100)
+    private boolean mIsHeadsUp = false;
+    private boolean mOnKeyguard = false;
 
     public NotificationBackgroundView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -326,9 +328,12 @@ public class NotificationBackgroundView extends View implements Dumpable,
                 ? ColorUtils.setAlphaComponent(mTintColor, (int) (MAX_ALPHA * 0.9f))
                 : mNormalColor;
         
-        // Apply transparency level (0-100) to the color
-        float alphaMultiplier = mTransparencyLevel / 100f;
-        color = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
+        // Apply transparency level (0-100) to the color only when in notification shade
+        // Don't apply transparency to heads-up notifications or lockscreen notifications
+        if (!mIsHeadsUp && !mOnKeyguard) {
+            float alphaMultiplier = mTransparencyLevel / 100f;
+            color = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
+        }
         
         getBaseBackgroundLayer().setColorFilter(
                 new PorterDuffColorFilter(
@@ -339,8 +344,12 @@ public class NotificationBackgroundView extends View implements Dumpable,
         if (mBackground instanceof LayerDrawable && ((LayerDrawable) mBackground).getNumberOfLayers() > 1) {
             Drawable statefulLayer = getStatefulBackgroundLayer();
             if (statefulLayer != null) {
-                // Apply transparency to stateful layer as well
-                int statefulColor = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
+                // Apply transparency to stateful layer as well, only when in notification shade
+                int statefulColor = color;
+                if (!mIsHeadsUp && !mOnKeyguard) {
+                    float alphaMultiplier = mTransparencyLevel / 100f;
+                    statefulColor = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
+                }
                 statefulLayer.setColorFilter(
                         new PorterDuffColorFilter(
                                 statefulColor,
@@ -543,6 +552,20 @@ public class NotificationBackgroundView extends View implements Dumpable,
     
     public void setTransparencyLevel(int transparencyLevel) {
         mTransparencyLevel = Math.max(0, Math.min(100, transparencyLevel));
+        if (mIsBlurSupported) {
+            updateBaseLayerColor();
+        }
+    }
+    
+    public void setHeadsUp(boolean isHeadsUp) {
+        mIsHeadsUp = isHeadsUp;
+        if (mIsBlurSupported) {
+            updateBaseLayerColor();
+        }
+    }
+    
+    public void setOnKeyguard(boolean onKeyguard) {
+        mOnKeyguard = onKeyguard;
         if (mIsBlurSupported) {
             updateBaseLayerColor();
         }

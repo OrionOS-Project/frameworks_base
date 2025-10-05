@@ -1009,6 +1009,10 @@ public class ExpandableNotificationRow extends ActivatableNotificationView
         if (mIsBlurSupported) {
             updateColors();
         }
+        // Update background context for transparency
+        if (mBackgroundNormal != null) {
+            mBackgroundNormal.setHeadsUp(isHeadsUp);
+        }
     }
 
     /**
@@ -3189,6 +3193,10 @@ public class ExpandableNotificationRow extends ActivatableNotificationView
             }
             if (mIsBlurSupported) {
                 updateColors();
+            }
+            // Update background context for transparency
+            if (mBackgroundNormal != null) {
+                mBackgroundNormal.setOnKeyguard(onKeyguard);
             }
         }
     }
