@@ -50,6 +50,9 @@ interface WindowRootViewBlurRepository {
     val isBlurSupported: StateFlow<Boolean>
     
     val isTranslucentSupported: StateFlow<Boolean>
+    
+    /** Notification row transparency level (0-100) */
+    val notificationRowTransparencyLevel: StateFlow<Int>
 
     var blurAppliedListener: BlurAppliedListener?
 
@@ -117,13 +120,45 @@ constructor(
         }
         .stateIn(scope, SharingStarted.WhileSubscribed(), isTranslucentEnabled())
 
+    override val notificationRowTransparencyLevel: StateFlow<Int> =
+        conflatedCallbackFlow {
+            val sendUpdate = {
+                trySendWithFailureLogging(
+                    getNotificationRowTransparencyLevel(),
+                    TAG,
+                    "unable to send notification row transparency level change",
+                )
+            }
+            val observer = object : ContentObserver(null) {
+                override fun onChange(selfChange: Boolean) = sendUpdate()
+            }
+            val resolver = context.contentResolver
+            resolver.registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY),
+                true,
+                observer
+            )
+            sendUpdate()
+            awaitClose { resolver.unregisterContentObserver(observer) }
+        }
+        .stateIn(scope, SharingStarted.WhileSubscribed(), getNotificationRowTransparencyLevel())
+
     override var blurAppliedListener: BlurAppliedListener? = null
 
     private fun isTranslucentEnabled(): Boolean {
+        // Treat transparency as enabled when level > 0 (0..100)
+        val level = Settings.Secure.getIntForUser(
+            context.contentResolver,
+            Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
+            85, UserHandle.USER_CURRENT)
+        return level > 0
+    }
+
+    private fun getNotificationRowTransparencyLevel(): Int {
         return Settings.Secure.getIntForUser(
             context.contentResolver,
             Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
-            1, UserHandle.USER_CURRENT) == 1
+            85, UserHandle.USER_CURRENT)
     }
 
     private fun isBlurAllowed(): Boolean {

@@ -180,8 +180,8 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
         mBackgroundNormal = findViewById(R.id.backgroundNormal);
         mFakeShadow = findViewById(R.id.fake_shadow);
         mShadowHidden = mFakeShadow.getVisibility() != VISIBLE;
-        setBackgroundToNormalColor();
         initBackground();
+        setBackgroundToNormalColor();
         updateBackgroundTint();
         updateOutlineAlpha();
     }
@@ -340,6 +340,12 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
         mBackgroundNormal.setIsBlurSupported(isBlurSupported);
         if (usedTransparentBackground != usesTransparentBackground()) {
             updateBackgroundColors();
+        }
+    }
+    
+    public void setTransparencyLevel(int transparencyLevel) {
+        if (mBackgroundNormal != null) {
+            mBackgroundNormal.setTransparencyLevel(transparencyLevel);
         }
     }
 

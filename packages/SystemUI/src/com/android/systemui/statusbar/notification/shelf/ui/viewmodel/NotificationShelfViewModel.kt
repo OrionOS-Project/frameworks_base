@@ -54,6 +54,8 @@ constructor(
     }
 
     val isBlurSupported: Flow<Boolean> = windowRootViewBlurInteractor.isTranslucentSupported
+    
+    val transparencyLevel: Flow<Int> = windowRootViewBlurInteractor.notificationRowTransparencyLevel
 
     /** Notifies that the user has clicked the shelf. */
     fun onShelfClicked() {

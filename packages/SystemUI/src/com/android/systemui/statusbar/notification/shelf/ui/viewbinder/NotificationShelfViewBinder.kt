@@ -49,6 +49,8 @@ object NotificationShelfViewBinder {
             }
 
             launch { viewModel.isBlurSupported.collect(shelf::setIsBlurSupported) }
+            
+            launch { viewModel.transparencyLevel.collect(shelf::setTransparencyLevel) }
 
             registerViewListenersWhileAttached(shelf, viewModel)
         }

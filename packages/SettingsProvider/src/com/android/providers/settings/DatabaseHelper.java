@@ -2202,6 +2202,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
             loadIntegerSetting(stmt, Settings.Secure.LONG_PRESS_TIMEOUT,
                     R.integer.def_long_press_timeout_millis);
 
+            loadIntegerSetting(stmt, Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
+                    R.integer.def_notification_row_transparency);
+
             loadBooleanSetting(stmt, Settings.Secure.TOUCH_EXPLORATION_ENABLED,
                     R.bool.def_touch_exploration_enabled);
 

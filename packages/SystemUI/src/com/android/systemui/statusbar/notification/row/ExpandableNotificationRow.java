@@ -3198,6 +3198,12 @@ public class ExpandableNotificationRow extends ActivatableNotificationView
             updateColors();
         }
     }
+    
+    public void setTransparencyLevel(int transparencyLevel) {
+        if (mBackgroundNormal != null) {
+            mBackgroundNormal.setTransparencyLevel(transparencyLevel);
+        }
+    }
 
     @Override
     public int getHeightWithoutLockscreenConstraints() {

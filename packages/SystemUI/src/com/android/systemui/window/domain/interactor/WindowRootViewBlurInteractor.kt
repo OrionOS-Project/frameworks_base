@@ -87,6 +87,9 @@ constructor(
     val isBlurCurrentlySupported: StateFlow<Boolean> = repository.isBlurSupported
     
     val isTranslucentSupported: StateFlow<Boolean> = repository.isTranslucentSupported
+    
+    /** Notification row transparency level (0-100) */
+    val notificationRowTransparencyLevel: StateFlow<Int> = repository.notificationRowTransparencyLevel
 
     /** Radius of blur to be applied on the window root view. */
     val blurRadiusRequestedByShade: StateFlow<Int> = repository.blurRequestedByShade.asStateFlow()

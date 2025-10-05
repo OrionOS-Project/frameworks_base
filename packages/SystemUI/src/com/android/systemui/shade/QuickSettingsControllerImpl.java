@@ -2334,11 +2334,10 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
                             LineageSettings.System.STATUS_BAR_QUICK_QS_PULLDOWN),
                     false, mOneFingerQuickSettingsInterceptObserver,
                     UserHandle.USER_ALL);
-                    mPanelView.getContext().getContentResolver().registerContentObserver(
-                    Settings.Secure.getUriFor(
-                            Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY),
-                    true, mTranslucentObserver,
-                    UserHandle.USER_ALL);
+        mPanelView.getContext().getContentResolver().registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY),
+                true, mTranslucentObserver,
+                UserHandle.USER_ALL);
             mOneFingerQuickSettingsInterceptObserver.onChange(true);
             mTranslucentObserver.onChange(true);
             updateExpansion();

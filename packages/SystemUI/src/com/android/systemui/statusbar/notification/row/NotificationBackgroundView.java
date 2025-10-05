@@ -21,6 +21,7 @@ import static com.android.systemui.util.ColorUtilKt.hexColorString;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -82,6 +83,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
     private boolean mDrawDismissButtonCutout = false;
     
     private boolean mIsBlurSupported = false;
+    private int mTransparencyLevel = 85; // Default transparency level (0-100)
 
     public NotificationBackgroundView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -95,6 +97,8 @@ public class NotificationBackgroundView extends View implements Dumpable,
 
     public void setNormalColor(int color) {
         mNormalColor = color;
+        // Apply transparency when normal color is set
+        updateBaseLayerColor();
     }
 
     @Override
@@ -321,10 +325,28 @@ public class NotificationBackgroundView extends View implements Dumpable,
         int color = isColorized()
                 ? ColorUtils.setAlphaComponent(mTintColor, (int) (MAX_ALPHA * 0.9f))
                 : mNormalColor;
+        
+        // Apply transparency level (0-100) to the color
+        float alphaMultiplier = mTransparencyLevel / 100f;
+        color = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
+        
         getBaseBackgroundLayer().setColorFilter(
                 new PorterDuffColorFilter(
                         color,
                         PorterDuff.Mode.SRC)); // SRC operator discards the drawable's color+alpha
+        
+        // Also apply transparency to the stateful layer if it exists
+        if (mBackground instanceof LayerDrawable && ((LayerDrawable) mBackground).getNumberOfLayers() > 1) {
+            Drawable statefulLayer = getStatefulBackgroundLayer();
+            if (statefulLayer != null) {
+                // Apply transparency to stateful layer as well
+                int statefulColor = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
+                statefulLayer.setColorFilter(
+                        new PorterDuffColorFilter(
+                                statefulColor,
+                                PorterDuff.Mode.SRC));
+            }
+        }
     }
 
     public void setTint(int tintColor) {
@@ -517,5 +539,12 @@ public class NotificationBackgroundView extends View implements Dumpable,
     
     public void setIsBlurSupported(boolean isBlurSupported) {
         mIsBlurSupported = isBlurSupported;
+    }
+    
+    public void setTransparencyLevel(int transparencyLevel) {
+        mTransparencyLevel = Math.max(0, Math.min(100, transparencyLevel));
+        if (mIsBlurSupported) {
+            updateBaseLayerColor();
+        }
     }
 }
