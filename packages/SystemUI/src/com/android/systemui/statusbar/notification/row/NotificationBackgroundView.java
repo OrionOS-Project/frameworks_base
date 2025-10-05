@@ -23,6 +23,8 @@ import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Path;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
@@ -86,6 +88,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
     private int mTransparencyLevel = 85; // Default transparency level (0-100)
     private boolean mIsHeadsUp = false;
     private boolean mOnKeyguard = false;
+    private boolean mContextAware = true; // Default to context-aware behavior
 
     public NotificationBackgroundView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -328,9 +331,14 @@ public class NotificationBackgroundView extends View implements Dumpable,
                 ? ColorUtils.setAlphaComponent(mTintColor, (int) (MAX_ALPHA * 0.9f))
                 : mNormalColor;
         
-        // Apply transparency level (0-100) to the color only when in notification shade
-        // Don't apply transparency to heads-up notifications or lockscreen notifications
-        if (!mIsHeadsUp && !mOnKeyguard) {
+        // Apply transparency level (0-100) to the color
+        // Context-aware behavior: only apply to notification shade unless user disabled context awareness
+        boolean shouldApplyTransparency = true;
+        if (mContextAware) {
+            shouldApplyTransparency = !mIsHeadsUp && !mOnKeyguard;
+        }
+        
+        if (shouldApplyTransparency) {
             float alphaMultiplier = mTransparencyLevel / 100f;
             color = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
         }
@@ -344,9 +352,9 @@ public class NotificationBackgroundView extends View implements Dumpable,
         if (mBackground instanceof LayerDrawable && ((LayerDrawable) mBackground).getNumberOfLayers() > 1) {
             Drawable statefulLayer = getStatefulBackgroundLayer();
             if (statefulLayer != null) {
-                // Apply transparency to stateful layer as well, only when in notification shade
+                // Apply transparency to stateful layer as well
                 int statefulColor = color;
-                if (!mIsHeadsUp && !mOnKeyguard) {
+                if (shouldApplyTransparency) {
                     float alphaMultiplier = mTransparencyLevel / 100f;
                     statefulColor = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
                 }
@@ -569,5 +577,19 @@ public class NotificationBackgroundView extends View implements Dumpable,
         if (mIsBlurSupported) {
             updateBaseLayerColor();
         }
+    }
+    
+    public void setContextAware(boolean contextAware) {
+        mContextAware = contextAware;
+        if (mIsBlurSupported) {
+            updateBaseLayerColor();
+        }
+    }
+    
+    private boolean isContextAwareTransparency() {
+        return Settings.Secure.getIntForUser(
+            getContext().getContentResolver(),
+            Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY_CONTEXT_AWARE,
+            1, UserHandle.USER_CURRENT) == 1;
     }
 }

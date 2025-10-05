@@ -90,6 +90,9 @@ constructor(
     
     /** Notification row transparency level (0-100) */
     val notificationRowTransparencyLevel: StateFlow<Int> = repository.notificationRowTransparencyLevel
+    
+    /** Whether transparency should be context-aware (0 = everywhere, 1 = notification shade only) */
+    val notificationRowTransparencyContextAware: StateFlow<Boolean> = repository.notificationRowTransparencyContextAware
 
     /** Radius of blur to be applied on the window root view. */
     val blurRadiusRequestedByShade: StateFlow<Int> = repository.blurRequestedByShade.asStateFlow()

@@ -3212,6 +3212,12 @@ public class ExpandableNotificationRow extends ActivatableNotificationView
             mBackgroundNormal.setTransparencyLevel(transparencyLevel);
         }
     }
+    
+    public void setContextAware(boolean contextAware) {
+        if (mBackgroundNormal != null) {
+            mBackgroundNormal.setContextAware(contextAware);
+        }
+    }
 
     @Override
     public int getHeightWithoutLockscreenConstraints() {

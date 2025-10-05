@@ -53,6 +53,9 @@ interface WindowRootViewBlurRepository {
     
     /** Notification row transparency level (0-100) */
     val notificationRowTransparencyLevel: StateFlow<Int>
+    
+    /** Whether transparency should be context-aware (0 = everywhere, 1 = notification shade only) */
+    val notificationRowTransparencyContextAware: StateFlow<Boolean>
 
     var blurAppliedListener: BlurAppliedListener?
 
@@ -143,6 +146,29 @@ constructor(
         }
         .stateIn(scope, SharingStarted.WhileSubscribed(), getNotificationRowTransparencyLevel())
 
+    override val notificationRowTransparencyContextAware: StateFlow<Boolean> =
+        conflatedCallbackFlow {
+            val sendUpdate = {
+                trySendWithFailureLogging(
+                    isNotificationRowTransparencyContextAware(),
+                    TAG,
+                    "unable to send notification row transparency context aware change",
+                )
+            }
+            val observer = object : ContentObserver(null) {
+                override fun onChange(selfChange: Boolean) = sendUpdate()
+            }
+            val resolver = context.contentResolver
+            resolver.registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY_CONTEXT_AWARE),
+                true,
+                observer
+            )
+            sendUpdate()
+            awaitClose { resolver.unregisterContentObserver(observer) }
+        }
+        .stateIn(scope, SharingStarted.WhileSubscribed(), isNotificationRowTransparencyContextAware())
+
     override var blurAppliedListener: BlurAppliedListener? = null
 
     private fun isTranslucentEnabled(): Boolean {
@@ -159,6 +185,13 @@ constructor(
             context.contentResolver,
             Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
             85, UserHandle.USER_CURRENT)
+    }
+
+    private fun isNotificationRowTransparencyContextAware(): Boolean {
+        return Settings.Secure.getIntForUser(
+            context.contentResolver,
+            Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY_CONTEXT_AWARE,
+            1, UserHandle.USER_CURRENT) == 1
     }
 
     private fun isBlurAllowed(): Boolean {
