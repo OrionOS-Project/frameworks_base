@@ -882,11 +882,17 @@ public class MediaControlPanel {
                 mArtworkBoundId = reqId;
 
                 MediaSessionManager.Companion.get().onAlbumArtChanged(albumArt);
-                MediaSessionManager.Companion.get().onMediaColorsChanged(colorScheme.getAccent1().getS100());
+                if (colorScheme != null) {
+                    MediaSessionManager.Companion.get().onMediaColorsChanged(colorScheme.getAccent1().getS100());
+                }
 
                 // Transition Colors to current color scheme
                 boolean colorSchemeChanged;
-                colorSchemeChanged = mColorSchemeTransition.updateColorScheme(colorScheme);
+                if (colorScheme != null) {
+                    colorSchemeChanged = mColorSchemeTransition.updateColorScheme(colorScheme);
+                } else {
+                    colorSchemeChanged = false;
+                }
 
                 // Bind the album view to the artwork or a transition drawable
                 ImageView albumView = mMediaViewHolder.getAlbumView();
