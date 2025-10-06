@@ -903,10 +903,10 @@ public class RemoteInputView extends LinearLayout implements View.OnClickListene
     }
     
     private boolean translucentEnabled() {
-        // Enabled if transparency level > 0 (0..100)
+        // Enabled if transparency level > 0 (0 = opaque, 100 = transparent)
         return Settings.Secure.getIntForUser(mContext.getContentResolver(),
                 Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
-                85, UserHandle.USER_CURRENT) > 0;
+                15, UserHandle.USER_CURRENT) > 0;
     }
 
     /** Handler for button click on send action in IME. */

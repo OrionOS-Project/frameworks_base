@@ -172,11 +172,11 @@ constructor(
     override var blurAppliedListener: BlurAppliedListener? = null
 
     private fun isTranslucentEnabled(): Boolean {
-        // Treat transparency as enabled when level > 0 (0..100)
+        // Treat transparency as enabled when level > 0 (0 = opaque, 100 = transparent)
         val level = Settings.Secure.getIntForUser(
             context.contentResolver,
             Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
-            85, UserHandle.USER_CURRENT)
+            15, UserHandle.USER_CURRENT)
         return level > 0
     }
 
@@ -184,7 +184,7 @@ constructor(
         return Settings.Secure.getIntForUser(
             context.contentResolver,
             Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
-            85, UserHandle.USER_CURRENT)
+            15, UserHandle.USER_CURRENT)
     }
 
     private fun isNotificationRowTransparencyContextAware(): Boolean {

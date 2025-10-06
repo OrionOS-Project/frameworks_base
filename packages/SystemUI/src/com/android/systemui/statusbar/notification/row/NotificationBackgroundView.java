@@ -85,7 +85,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
     private boolean mDrawDismissButtonCutout = false;
     
     private boolean mIsBlurSupported = false;
-    private int mTransparencyLevel = 85; // Default transparency level (0-100)
+    private int mTransparencyLevel = 15; // Default transparency level (0-100)
     private boolean mIsHeadsUp = false;
     private boolean mOnKeyguard = false;
     private boolean mContextAware = true; // Default to context-aware behavior
@@ -339,7 +339,8 @@ public class NotificationBackgroundView extends View implements Dumpable,
         }
         
         if (shouldApplyTransparency) {
-            float alphaMultiplier = mTransparencyLevel / 100f;
+            // Reverse the slider: 0 = opaque (100% alpha), 100 = transparent (0% alpha)
+            float alphaMultiplier = (100 - mTransparencyLevel) / 100f;
             color = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
         }
         
@@ -355,7 +356,8 @@ public class NotificationBackgroundView extends View implements Dumpable,
                 // Apply transparency to stateful layer as well
                 int statefulColor = color;
                 if (shouldApplyTransparency) {
-                    float alphaMultiplier = mTransparencyLevel / 100f;
+                    // Reverse the slider: 0 = opaque (100% alpha), 100 = transparent (0% alpha)
+                    float alphaMultiplier = (100 - mTransparencyLevel) / 100f;
                     statefulColor = ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alphaMultiplier));
                 }
                 statefulLayer.setColorFilter(

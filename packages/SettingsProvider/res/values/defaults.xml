@@ -346,5 +346,5 @@
     <bool name="config_increaseMinContrast">true</bool>
 
     <!-- Default for Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY -->
-    <integer name="def_notification_row_transparency">85</integer>
+    <integer name="def_notification_row_transparency">15</integer>
 </resources>
