@@ -50,7 +50,9 @@ constructor(
 
     var inFirstPage by inFirstPageViewModel::inFirstPage
 
-    val columns: Flow<Int> = columnsRepository.columns
+    // Use the media-aware column count so pagination matches the actual rendered grid
+    val columns: Int
+        get() = columnsWithMediaViewModel.columns
 
     val rows: Flow<Int> = rowRepository.rows
     
