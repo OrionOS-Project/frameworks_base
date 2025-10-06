@@ -19,6 +19,7 @@
 package com.android.internal.util;
 
 import android.app.ActivityTaskManager;
+import android.app.ActivityThread;
 import android.app.Application;
 import android.app.TaskStackListener;
 import android.content.ComponentName;
@@ -34,12 +35,12 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.internal.R;
+import com.android.internal.util.orion.KeyProviderManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -434,15 +435,30 @@ public class PropImitationHooks {
         }
     }
 
-    public static boolean isCallerPlayIntegrity() {
+    private static boolean isCallerPlayIntegrity() {
         return Arrays.stream(Thread.currentThread().getStackTrace())
                 .map(StackTraceElement::getClassName)
                 .anyMatch(name -> name.toLowerCase(Locale.US).contains("droidguard"));
     }
 
-    public static Certificate[] onEngineGetCertificateChain() {       
-        dlog("Blocked key attestation for play integrity");
-        return new Certificate[0];
+    public static void onEngineGetCertificateChain() {
+        Context context = ActivityThread.currentApplication();
+        if (context == null) {
+            Log.e(TAG, "Context is null in onEngineGetCertificateChain");
+            return;
+        }
+    
+        if ((Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.GMS_CERT_CHAIN, 0) == 1)
+                && KeyProviderManager.isKeyboxAvailable()) {
+            dlog("Allowing gms / finsky to get cert chain");
+            return;
+        }
+
+        // Check stack for Play Integrity
+        if (isCallerPlayIntegrity()) {
+            dlog("Blocked key attestation for play integrity");
+            throw new UnsupportedOperationException();
+        }
     }
 
     public static boolean hasSystemFeature(String name, boolean has) {

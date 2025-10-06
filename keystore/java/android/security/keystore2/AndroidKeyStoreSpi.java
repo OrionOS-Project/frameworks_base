@@ -179,9 +179,7 @@ public class AndroidKeyStoreSpi extends KeyStoreSpi {
 
     @Override
     public Certificate[] engineGetCertificateChain(String alias) {
-        if (PropImitationHooks.isCallerPlayIntegrity()) {
-            return PropImitationHooks.onEngineGetCertificateChain();
-        }
+        PropImitationHooks.onEngineGetCertificateChain();
 
         KeyEntryResponse response = getKeyMetadata(alias);
 
