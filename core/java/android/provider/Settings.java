@@ -13714,6 +13714,12 @@ public final class Settings {
         public static final String NOTIFICATION_ROW_TRANSPARENCY_CONTEXT_AWARE = "notification_row_transparency_context_aware";
 
         /**
+         * Enables ambient wallpaper and AOD enhancements (0 = disabled, 1 = enabled)
+         * @hide
+         */
+        public static final String AMBIENT_AOD = "ambient_aod";
+
+        /**
          * Whether to allow gms to get certificate chain or not.
          * @hide
          */

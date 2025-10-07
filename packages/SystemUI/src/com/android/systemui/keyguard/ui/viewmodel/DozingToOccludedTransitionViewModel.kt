@@ -24,7 +24,8 @@ import com.android.systemui.keyguard.shared.model.KeyguardState.DOZING
 import com.android.systemui.keyguard.shared.model.KeyguardState.OCCLUDED
 import com.android.systemui.keyguard.ui.KeyguardTransitionAnimationFlow
 import com.android.systemui.keyguard.ui.transitions.DeviceEntryIconTransition
-import com.android.systemui.shared.Flags.ambientAod
+import android.os.UserHandle
+import android.provider.Settings
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +36,10 @@ import kotlinx.coroutines.flow.Flow
 @SysUISingleton
 class DozingToOccludedTransitionViewModel
 @Inject
-constructor(animationFlow: KeyguardTransitionAnimationFlow) : DeviceEntryIconTransition {
+constructor(
+    animationFlow: KeyguardTransitionAnimationFlow,
+    private val context: android.content.Context
+) : DeviceEntryIconTransition {
     private val transitionAnimation =
         animationFlow.setup(
             duration = FromAodTransitionInteractor.TO_OCCLUDED_DURATION,
@@ -67,4 +71,9 @@ constructor(animationFlow: KeyguardTransitionAnimationFlow) : DeviceEntryIconTra
     }
 
     override val deviceEntryParentViewAlpha = transitionAnimation.immediatelyTransitionTo(0f)
+
+    private fun ambientAod(): Boolean {
+        return Settings.Secure.getIntForUser(context.contentResolver,
+                Settings.Secure.AMBIENT_AOD, 1, UserHandle.USER_CURRENT) == 1
+    }
 }

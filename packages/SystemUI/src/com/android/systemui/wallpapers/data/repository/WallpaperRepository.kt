@@ -37,7 +37,6 @@ import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.dagger.qualifiers.Background
 import com.android.systemui.res.R as SysUIR
 import com.android.systemui.shade.ShadeDisplayAware
-import com.android.systemui.shared.Flags.ambientAod
 import com.android.systemui.shared.Flags.extendedWallpaperEffects
 import com.android.systemui.user.data.model.SelectedUserModel
 import com.android.systemui.user.data.model.SelectionStatus
@@ -216,6 +215,11 @@ constructor(
                     initialValue = null,
                 )
         }
+
+    private fun ambientAod(): Boolean {
+        return Settings.Secure.getIntForUser(context.contentResolver,
+                Settings.Secure.AMBIENT_AOD, 1, UserHandle.USER_CURRENT) == 1
+    }
 
     companion object {
         private val TAG = WallpaperRepositoryImpl::class.simpleName

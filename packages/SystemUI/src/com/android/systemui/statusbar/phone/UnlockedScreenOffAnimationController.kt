@@ -7,6 +7,7 @@ import android.content.Context
 import android.database.ContentObserver
 import android.os.Handler
 import android.os.PowerManager
+import android.os.UserHandle
 import android.provider.Settings
 import android.view.Display
 import android.view.Surface
@@ -25,7 +26,6 @@ import com.android.systemui.keyguard.WakefulnessLifecycle
 import com.android.systemui.shade.ShadeViewController
 import com.android.systemui.shade.domain.interactor.PanelExpansionInteractor
 import com.android.systemui.shade.domain.interactor.ShadeLockscreenInteractor
-import com.android.systemui.shared.Flags.ambientAod
 import com.android.systemui.statusbar.CircleReveal
 import com.android.systemui.statusbar.LightRevealScrim
 import com.android.systemui.statusbar.NotificationShadeWindowController
@@ -418,5 +418,10 @@ constructor(
      */
     fun isScreenOffLightRevealAnimationPlaying(): Boolean {
         return lightRevealAnimationPlaying
+    }
+
+    private fun ambientAod(): Boolean {
+        return Settings.Secure.getIntForUser(context.contentResolver,
+                Settings.Secure.AMBIENT_AOD, 1, UserHandle.USER_CURRENT) == 1
     }
 }

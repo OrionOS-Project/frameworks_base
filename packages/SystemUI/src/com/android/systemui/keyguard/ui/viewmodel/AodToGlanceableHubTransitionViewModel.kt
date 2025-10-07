@@ -27,7 +27,8 @@ import com.android.systemui.keyguard.ui.KeyguardTransitionAnimationFlow
 import com.android.systemui.keyguard.ui.transitions.DeviceEntryIconTransition
 import com.android.systemui.keyguard.ui.transitions.GlanceableHubTransition
 import com.android.systemui.scene.shared.model.Scenes
-import com.android.systemui.shared.Flags.ambientAod
+import android.os.UserHandle
+import android.provider.Settings
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +39,7 @@ class AodToGlanceableHubTransitionViewModel
 constructor(
     animationFlow: KeyguardTransitionAnimationFlow,
     blurFactory: GlanceableHubBlurComponent.Factory,
+    private val context: android.content.Context
 ) : DeviceEntryIconTransition, GlanceableHubTransition {
     private val transitionAnimation =
         animationFlow
@@ -75,4 +77,9 @@ constructor(
 
     override val windowBlurRadius: Flow<Float> =
         blurFactory.create(transitionAnimation).getBlurProvider().enterBlurRadius
+
+    private fun ambientAod(): Boolean {
+        return Settings.Secure.getIntForUser(context.contentResolver,
+                Settings.Secure.AMBIENT_AOD, 1, UserHandle.USER_CURRENT) == 1
+    }
 }

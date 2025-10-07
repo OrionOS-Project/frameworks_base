@@ -23,7 +23,8 @@ import com.android.app.animation.Interpolators.ALPHA_IN
 import com.android.app.tracing.coroutines.launchTraced as launch
 import com.android.systemui.keyguard.ui.viewmodel.LightRevealScrimViewModel
 import com.android.systemui.lifecycle.repeatWhenAttached
-import com.android.systemui.shared.Flags.ambientAod
+import android.os.UserHandle
+import android.provider.Settings
 import com.android.systemui.statusbar.LightRevealScrim
 import com.android.systemui.wallpapers.ui.viewmodel.WallpaperViewModel
 
@@ -34,9 +35,10 @@ object LightRevealScrimViewBinder {
         viewModel: LightRevealScrimViewModel,
         wallpaperViewModel: WallpaperViewModel,
     ) {
+        val context = revealScrim.context
         revealScrim.repeatWhenAttached {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                if (ambientAod()) {
+                if (ambientAod(context)) {
                     launch("$TAG#wallpaperViewModel.wallpaperSupportsAmbientMode") {
                         wallpaperViewModel.wallpaperSupportsAmbientMode.collect {
                             viewModel.setWallpaperSupportsAmbientMode(it)
@@ -81,4 +83,9 @@ object LightRevealScrimViewBinder {
     }
 
     private const val TAG = "LightRevealScrimViewBinder"
+
+    private fun ambientAod(context: android.content.Context): Boolean {
+        return Settings.Secure.getIntForUser(context.contentResolver,
+                Settings.Secure.AMBIENT_AOD, 1, UserHandle.USER_CURRENT) == 1
+    }
 }

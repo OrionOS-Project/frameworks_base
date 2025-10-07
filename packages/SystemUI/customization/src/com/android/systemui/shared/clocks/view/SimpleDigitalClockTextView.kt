@@ -47,7 +47,8 @@ import com.android.systemui.plugins.clocks.VPoint
 import com.android.systemui.plugins.clocks.VPointF
 import com.android.systemui.plugins.clocks.VPointF.Companion.size
 import com.android.systemui.plugins.clocks.VRectF
-import com.android.systemui.shared.Flags.ambientAod
+import android.os.UserHandle
+import android.provider.Settings
 import com.android.systemui.shared.clocks.CanvasUtil.translate
 import com.android.systemui.shared.clocks.CanvasUtil.use
 import com.android.systemui.shared.clocks.ClockContext
@@ -694,5 +695,10 @@ open class SimpleDigitalClockTextView(
         private fun fromAxes(vararg axes: Pair<AxisDefinition, Float>): ClockAxisStyle {
             return ClockAxisStyle(axes.map { (def, value) -> def.tag to value }.toMap())
         }
+    }
+
+    private fun ambientAod(): Boolean {
+        return Settings.Secure.getIntForUser(context.contentResolver,
+                Settings.Secure.AMBIENT_AOD, 1, UserHandle.USER_CURRENT) == 1
     }
 }
