@@ -3847,9 +3847,11 @@ public final class NotificationPanelViewController implements
             switch (key) {
                 case ISLAND_NOTIFICATION:
                     mUseIslandNotification = TunerService.parseIntegerSwitch(newValue, false);
+                    mNotifIsland.setIslandEnabled(mUseIslandNotification && mUseHeadsUp);
                     break;
                 case HEADS_UP_NOTIFICATIONS_ENABLED:
                     mUseHeadsUp = TunerService.parseIntegerSwitch(newValue, false);
+                    mNotifIsland.setIslandEnabled(mUseIslandNotification && mUseHeadsUp);
                     break;
                 case STATUS_BAR_CUSTOM_HEADER:
                     mHeaderImageEnabled =
@@ -4525,20 +4527,15 @@ public final class NotificationPanelViewController implements
     public void showIsland(boolean show) {
         // if landNotify is showing, it must disappear for a while      -- alphi-wang-cn
         if (/* must dismiss if not show! */ !show
-                || useIslandNotification() && mUseHeadsUp) {
+                || mUseIslandNotification && mUseHeadsUp) {
             mNotifIsland.showIsland(show, getExpandedFraction());
         }
     }
 
     protected void updateIslandVisibility() {
-        if (useIslandNotification() && mUseHeadsUp) {
+        if (mUseIslandNotification && mUseHeadsUp) {
             mNotifIsland.updateIslandVisibility(getExpandedFraction());
         }
-    }
-
-    private boolean useIslandNotification() {
-        return mUseIslandNotification || mView.getContext().getResources().getConfiguration().orientation 
-            == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     private void doUpdateStatusBarCustomHeader(Drawable drawable, boolean force) {
