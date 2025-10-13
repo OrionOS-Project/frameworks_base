@@ -82,7 +82,7 @@ constructor(
                 viewModelFactory.create()
             }
 
-        val columns = viewModel.columns
+        val columns = viewModel.columnsWithMediaViewModel.columns
         val rows by viewModel.rows.collectAsStateWithLifecycle(
             initialValue = integerResource(R.integer.quick_settings_paginated_grid_num_rows)
         )

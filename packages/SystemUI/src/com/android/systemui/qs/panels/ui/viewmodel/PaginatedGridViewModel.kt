@@ -46,7 +46,7 @@ constructor(
 ) : IconTilesViewModel by iconTilesViewModel, ExclusiveActivatable() {
 
     private val hydrator = Hydrator("PaginatedGridViewModel")
-    private val columnsWithMediaViewModel = columnsWithMediaViewModelFactory.create(LOCATION_QS)
+    val columnsWithMediaViewModel = columnsWithMediaViewModelFactory.create(LOCATION_QS)
 
     var inFirstPage by inFirstPageViewModel::inFirstPage
 
