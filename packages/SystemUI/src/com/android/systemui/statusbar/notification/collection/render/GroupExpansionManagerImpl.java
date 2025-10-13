@@ -89,7 +89,7 @@ public class GroupExpansionManagerImpl implements GroupExpansionManager, Dumpabl
         }
 
         if (NotificationBundleUi.isEnabled()) {
-            for (EntryAdapter entryAdapter : mExpandedCollections) {
+            for (EntryAdapter entryAdapter : new ArrayList<>(mExpandedCollections)) {
                 boolean isInPipeline = false;
                 for (NotificationEntry entry : renderingSummaries) {
                     if (entry.getKey().equals(entryAdapter.getKey())) {
