@@ -7190,6 +7190,12 @@ public final class Settings {
         public static final String LS_MEDIA_ART_ENABLED = "ls_media_art_enabled";
 
         /**
+         * Whether to show media artwork on ambient (doze) display.
+         * @hide
+         */
+        public static final String AMBIENT_MEDIA_ART_ENABLED = "ambient_media_art_enabled";
+
+        /**
          * @hide
          */
         public static final String LS_MEDIA_ART_FILTER = "ls_media_art_filter";
