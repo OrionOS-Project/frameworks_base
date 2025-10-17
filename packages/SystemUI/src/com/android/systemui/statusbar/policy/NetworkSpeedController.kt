@@ -1,10 +1,15 @@
 /*
  * SPDX-FileCopyrightText: AxionOS Project
+ * SPDX-FileCopyrightText: crDroid Android Project
+ * SPDX-FileCopyrightText: TheParasiteProject
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package com.android.systemui.statusbar.policy
 
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.content.*
 import android.database.ContentObserver
 import android.net.*
@@ -48,9 +53,18 @@ class NetworkSpeedController private constructor(
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var speedUpdateJob: Job? = null
 
+    private val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+            .build()
+
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
-            updateConnectionState(true)
+            updateConnectionState(hasValidatedInternet(network))
+        }
+
+        override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+            updateConnectionState(hasValidatedInternet(network, caps))
         }
 
         override fun onLost(network: Network) {
@@ -68,7 +82,7 @@ class NetworkSpeedController private constructor(
         }
 
     fun init() {
-        connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
 
         contentResolver.registerContentObserver(
             Settings.Secure.getUriFor(ICON_HIDE_LIST),
@@ -84,6 +98,14 @@ class NetworkSpeedController private constructor(
             }
         }
         keyguardUpdateMonitor?.registerCallback(keyguardCallback)
+    }
+
+    private fun hasValidatedInternet(
+            network: Network, caps: NetworkCapabilities? = null): Boolean {
+        val caps = caps ?: connectivityManager.getNetworkCapabilities(network)
+        return caps != null
+                && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     private fun updateSwitchState() {
@@ -129,7 +151,7 @@ class NetworkSpeedController private constructor(
         }
 
         val iconState = NetworkSpeedIconState().apply {
-            setVisible(isConnected && isSwitchOn)
+            setVisible(isConnected && isSwitchOn && speed > AUTOHIDE_THRESHOLD)
             setSpeedText(speed)
             setSlot(slotNetworkSpeed)
         }
@@ -195,5 +217,6 @@ class NetworkSpeedController private constructor(
         const val TAG = "NetworkSpeedController"
         const val ICON_HIDE_LIST = "icon_blacklist"
         const val REFRESH_INTERVAL_MS = 4000L
+        const val AUTOHIDE_THRESHOLD = 1024L // 1KB
     }
 }
