@@ -21,7 +21,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.FloatRange
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
-import androidx.core.content.res.ResourcesCompat
 import com.android.systemui.brightness.domain.interactor.BrightnessPolicyEnforcementInteractor
 import com.android.systemui.brightness.domain.interactor.ScreenBrightnessInteractor
 import com.android.systemui.brightness.shared.model.GammaBrightness
@@ -97,9 +96,8 @@ constructor(
         falsingInteractor.isFalseTouch(Classifier.BRIGHTNESS_SLIDER)
     }
 
-    suspend fun loadImage(@DrawableRes resId: Int, context: Context): Icon.Loaded {
-        val d = ResourcesCompat.getDrawable(context.resources, resId, context.theme)
-            ?: error("Drawable $resId not found")
+    fun loadImage(@DrawableRes resId: Int, context: Context): Icon.Loaded {
+        val d = context.getDrawable(resId) ?: error("Drawable $resId not found")
         return d.asIcon(null, resId)
     }
 
