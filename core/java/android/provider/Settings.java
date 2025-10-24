@@ -14140,6 +14140,13 @@ public final class Settings {
         public static final String PULSE_AMBIENT_LIGHT_FACE_DOWN = "pulse_ambient_light_face_down";
 
         /**
+         * Style of Ambient edge light
+         * Values: "default" or "rounded"
+         * @hide
+         */
+        public static final String PULSE_AMBIENT_LIGHT_STYLE = "pulse_ambient_light_style";
+
+        /**
          * Whether to show privacy indicators for microphone and camera.
          * Default value should be from DeviceConfig.
          *

@@ -20,13 +20,18 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.database.ContentObserver
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.os.UserHandle
 import android.provider.Settings
 import android.util.AttributeSet
-import android.widget.ImageView
 import android.widget.RelativeLayout
 
 import androidx.core.view.isVisible
@@ -47,6 +52,20 @@ class PulseLightView @JvmOverloads constructor(
 
     private var lightAnimator: ValueAnimator? = null
 
+    // Canvas drawing for both styles
+    private val edgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.BUTT
+    }
+
+    private val roundedPath = Path()
+    private val roundedRect = RectF()
+    private var cornerRadius: Float = 0f
+
+    private var currentStyle = STYLE_DEFAULT
+    private var currentColor = Color.WHITE
+    private var currentProgress = 0f
+
     private var onlyWhenFaceDown = false
     private val onlyWhenFaceDownDefault by lazy {
         val default = context?.resources?.getBoolean(
@@ -60,30 +79,76 @@ class PulseLightView @JvmOverloads constructor(
     private var hbmEnabled = false
 
     init {
+        setWillNotDraw(false)
         setupContentObserver()
         lineageHardware = LineageHardwareManager.getInstance(context).also { hardware ->
             hasHbmSupport = hardware.isSupported(
                 LineageHardwareManager.FEATURE_SUNLIGHT_ENHANCEMENT
             )
         }
+
+        cornerRadius = try {
+            context?.resources?.getDimension(
+                context.resources.getIdentifier(
+                    "rounded_corner_radius",
+                    "dimen",
+                    "android"
+                )
+            ) ?: (32f * (context?.resources?.displayMetrics?.density ?: 1f))
+        } catch (e: Exception) {
+            32f * (context?.resources?.displayMetrics?.density ?: 1f)
+        }
     }
 
     private fun setupContentObserver() {
         val pulseAmbientLightFaceDown = Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_FACE_DOWN)
-        val contentObserver = object: ContentObserver(null) {
+        val pulseAmbientLightStyle = Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_STYLE)
+        val pulseAmbientLightWidth = Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_WIDTH)
+        
+        val contentObserver = object: ContentObserver(Handler(Looper.getMainLooper())) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
-                onlyWhenFaceDown = Settings.Secure.getIntForUser(
-                    context.contentResolver,
-                    PULSE_AMBIENT_LIGHT_FACE_DOWN,
-                    onlyWhenFaceDownDefault,
-                    UserHandle.USER_CURRENT
-                ) != 0
-                updateBackgroundColor()
+                when (uri) {
+                    pulseAmbientLightFaceDown -> {
+                        onlyWhenFaceDown = Settings.Secure.getIntForUser(
+                            context.contentResolver,
+                            PULSE_AMBIENT_LIGHT_FACE_DOWN,
+                            onlyWhenFaceDownDefault,
+                            UserHandle.USER_CURRENT
+                        ) != 0
+                        updateBackgroundColor()
+                    }
+                    pulseAmbientLightStyle -> {
+                        currentStyle = Settings.Secure.getStringForUser(
+                            context.contentResolver,
+                            PULSE_AMBIENT_LIGHT_STYLE,
+                            UserHandle.USER_CURRENT
+                        ) ?: STYLE_DEFAULT
+                        invalidate()
+                    }
+                    pulseAmbientLightWidth -> {
+                        val width = Settings.Secure.getIntForUser(
+                            context.contentResolver,
+                            PULSE_AMBIENT_LIGHT_WIDTH,
+                            125,
+                            UserHandle.USER_CURRENT
+                        )
+                        edgePaint.strokeWidth = width.toFloat()
+                        invalidate()
+                    }
+                }
             }
         }
+        
         context.contentResolver.registerContentObserver(
-                pulseAmbientLightFaceDown, false, contentObserver, UserHandle.USER_CURRENT)
+            pulseAmbientLightFaceDown, false, contentObserver, UserHandle.USER_CURRENT)
+        context.contentResolver.registerContentObserver(
+            pulseAmbientLightStyle, false, contentObserver, UserHandle.USER_CURRENT)
+        context.contentResolver.registerContentObserver(
+            pulseAmbientLightWidth, false, contentObserver, UserHandle.USER_CURRENT)
+        
         contentObserver.onChange(true, pulseAmbientLightFaceDown)
+        contentObserver.onChange(true, pulseAmbientLightStyle)
+        contentObserver.onChange(true, pulseAmbientLightWidth)
     }
 
     private fun updateBackgroundColor() {
@@ -114,49 +179,39 @@ class PulseLightView @JvmOverloads constructor(
     fun startAnimation(notificationPackageName: String) {
         // Make it visible
         isVisible = true
+        
         val lightDuration = Settings.Secure.getIntForUser(
             context.contentResolver,
             Settings.Secure.PULSE_AMBIENT_LIGHT_DURATION, 2,
             UserHandle.USER_CURRENT
         ) * 1000L
+        
         val repeat = Settings.Secure.getIntForUser(
             context.contentResolver,
             Settings.Secure.PULSE_AMBIENT_LIGHT_REPEAT_COUNT, 0,
             UserHandle.USER_CURRENT
         )
-        val width = Settings.Secure.getIntForUser(
-            context.contentResolver,
-            Settings.Secure.PULSE_AMBIENT_LIGHT_WIDTH, 125,
-            UserHandle.USER_CURRENT
-        )
-        val color = getLightColor(notificationPackageName)
-        val leftView = requireViewById<ImageView>(R.id.animation_left)
-        val rightView = requireViewById<ImageView>(R.id.animation_right)
-        leftView.setColorFilter(color)
-        rightView.setColorFilter(color)
-        leftView.layoutParams.width = width
-        rightView.layoutParams.width = width
+        
+        currentColor = getLightColor(notificationPackageName)
+        edgePaint.color = currentColor
+        
         lightAnimator = ValueAnimator.ofFloat(*floatArrayOf(0.0f, 2.0f)).apply {
             duration = lightDuration
             repeatCount = repeat
             repeatMode = ValueAnimator.RESTART
             addListener(this@PulseLightView)
             addUpdateListener { animation ->
-                // onAnimationStart() is being called before waking screen in ambient mode.
-                // So HBM don't get enabled since it needs the screen to be on.
-                // To fix this, Just try to enable HBM here too.
                 enableHbm()
-                val progress = animation.animatedValue as Float
-                leftView.scaleY = progress
-                rightView.scaleY = progress
+                currentProgress = animation.animatedValue as Float
+                
                 var alpha = 1.0f
-                if (progress <= 0.3f) {
-                    alpha = progress / 0.3f
-                } else if (progress >= 1.0f) {
-                    alpha = 2.0f - progress
+                if (currentProgress <= 0.3f) {
+                    alpha = currentProgress / 0.3f
+                } else if (currentProgress >= 1.0f) {
+                    alpha = 2.0f - currentProgress
                 }
-                leftView.alpha = alpha
-                rightView.alpha = alpha
+                setAlpha(alpha)
+                invalidate()
             }
             start()
         }
@@ -166,6 +221,74 @@ class PulseLightView @JvmOverloads constructor(
         isVisible = false
         lightAnimator?.cancel()
         lightAnimator = null
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        
+        if (!isVisible || currentProgress == 0f) return
+        
+        when (currentStyle) {
+            STYLE_ROUNDED -> drawRoundedEdges(canvas)
+            else -> drawDefaultEdges(canvas)
+        }
+    }
+
+    private fun drawDefaultEdges(canvas: Canvas) {
+        val halfStroke = edgePaint.strokeWidth / 2
+        edgePaint.strokeCap = Paint.Cap.BUTT
+        edgePaint.alpha = 255
+        edgePaint.maskFilter = null
+        
+        // Left edge
+        val leftScaleY = currentProgress.coerceIn(0f, 1f)
+        val leftHeight = height * leftScaleY
+        val leftTop = (height - leftHeight) / 2
+        
+        canvas.drawLine(
+            halfStroke,
+            leftTop,
+            halfStroke,
+            leftTop + leftHeight,
+            edgePaint
+        )
+        
+        // Right edge
+        val rightScaleY = currentProgress.coerceIn(0f, 1f)
+        val rightHeight = height * rightScaleY
+        val rightTop = (height - rightHeight) / 2
+        
+        canvas.drawLine(
+            width - halfStroke,
+            rightTop,
+            width - halfStroke,
+            rightTop + rightHeight,
+            edgePaint
+        )
+    }
+
+    private fun drawRoundedEdges(canvas: Canvas) {
+        val halfStroke = edgePaint.strokeWidth / 2
+        edgePaint.strokeCap = Paint.Cap.ROUND
+        edgePaint.alpha = 255
+        edgePaint.maskFilter = null
+        
+        roundedRect.set(
+            halfStroke,
+            halfStroke,
+            width.toFloat() - halfStroke,
+            height.toFloat() - halfStroke
+        )
+        
+        roundedPath.reset()
+        roundedPath.addRoundRect(
+            roundedRect,
+            cornerRadius,
+            cornerRadius,
+            Path.Direction.CW
+        )
+        
+        canvas.drawPath(roundedPath, edgePaint)
     }
 
     private fun getLightColor(notificationPackageName: String): Int {
@@ -186,7 +309,6 @@ class PulseLightView @JvmOverloads constructor(
                         iconColor
                     } ?: 0
                 } catch (e: Exception) {
-                    // Nothing to do
                     0
                 }
             }
@@ -208,9 +330,7 @@ class PulseLightView @JvmOverloads constructor(
     private fun enableHbm() {
         if (onlyWhenFaceDown && hasHbmSupport && !hbmEnabled) {
             lineageHardware?.let { hardware ->
-                // Enable high brightness mode
                 hardware.set(LineageHardwareManager.FEATURE_SUNLIGHT_ENHANCEMENT, true)
-                // Update the state.
                 hbmEnabled = hardware.get(LineageHardwareManager.FEATURE_SUNLIGHT_ENHANCEMENT)
             }
         }
@@ -219,7 +339,6 @@ class PulseLightView @JvmOverloads constructor(
     private fun disableHbm() {
         if (onlyWhenFaceDown && hasHbmSupport) {
             lineageHardware?.let { hardware ->
-                // Disable high brightness mode
                 hardware.set(LineageHardwareManager.FEATURE_SUNLIGHT_ENHANCEMENT, false)
                 hbmEnabled = false
             }
@@ -230,10 +349,16 @@ class PulseLightView @JvmOverloads constructor(
         // Color modes
         private const val COLOR_MODE_APP = 0
         private const val COLOR_MODE_AUTO = 1
-        // private const val COLOR_MODE_MANUAL = 2 (not used here)
+
+        // Styles
+        private const val STYLE_DEFAULT = "default"
+        private const val STYLE_ROUNDED = "rounded"
 
         private const val PULSE_AMBIENT_LIGHT_FACE_DOWN =
                 Settings.Secure.PULSE_AMBIENT_LIGHT_FACE_DOWN
+        private const val PULSE_AMBIENT_LIGHT_STYLE =
+                Settings.Secure.PULSE_AMBIENT_LIGHT_STYLE
+        private const val PULSE_AMBIENT_LIGHT_WIDTH =
+                Settings.Secure.PULSE_AMBIENT_LIGHT_WIDTH
     }
-
 }
