@@ -127,6 +127,7 @@ class PulseLightView @JvmOverloads constructor(
                             PULSE_AMBIENT_LIGHT_STYLE,
                             UserHandle.USER_CURRENT
                         ) ?: STYLE_DEFAULT
+                        if (useRainbowGradient) updateRainbowGradient()
                         invalidate()
                     }
                     pulseAmbientLightWidth -> {
@@ -197,14 +198,15 @@ class PulseLightView @JvmOverloads constructor(
         )
         
         currentColor = getLightColor(notificationPackageName)
-        useRainbowGradient = (currentColor == COLOR_RAINBOW)
         
-        if (useRainbowGradient) {
-            updateRainbowGradient()
-        } else {
+        if (currentColor != COLOR_RAINBOW) {
+            useRainbowGradient = false
             edgePaint.shader = null
             edgePaint.color = currentColor
             edgePaint.alpha = 255
+        } else {
+            useRainbowGradient = true
+            updateRainbowGradient()
         }
         
         lightAnimator = ValueAnimator.ofFloat(*floatArrayOf(0.0f, 2.0f)).apply {
@@ -240,13 +242,17 @@ class PulseLightView @JvmOverloads constructor(
         
         if (!isVisible || currentProgress == 0f) return
         
-        if (useRainbowGradient) {
-            updateRainbowGradient()
-        }
-        
         when (currentStyle) {
             STYLE_ROUNDED -> drawRoundedEdges(canvas)
             else -> drawDefaultEdges(canvas)
+        }
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (useRainbowGradient) {
+            updateRainbowGradient()
+            invalidate()
         }
     }
 
@@ -364,25 +370,20 @@ class PulseLightView @JvmOverloads constructor(
     }
 
     private fun updateRainbowGradient() {
-        if (width == 0 || height == 0) return
+        if (width == 0 || height == 0) {
+            post { _updateRainbowGradient() }
+        } else {
+            _updateRainbowGradient()
+        }
+    }
 
-        val colors = intArrayOf(
-            0xFFFF0000.toInt(), // Red
-            0xFFFF7F00.toInt(), // Orange
-            0xFFFFFF00.toInt(), // Yellow
-            0xFF00FF00.toInt(), // Green
-            0xFF0000FF.toInt(), // Blue
-            0xFF4B0082.toInt(), // Indigo
-            0xFF9400D3.toInt(), // Violet
-            0xFFFF0000.toInt()  // Red (wrap around)
-        )
-
+    private fun _updateRainbowGradient() {
         edgePaint.shader = when (currentStyle) {
             STYLE_ROUNDED -> {
                 SweepGradient(
                     width / 2f,
                     height / 2f,
-                    colors,
+                    RAINBOW,
                     null
                 )
             }
@@ -392,7 +393,7 @@ class PulseLightView @JvmOverloads constructor(
                     0f,
                     0f,
                     height.toFloat(),
-                    colors,
+                    RAINBOW,
                     null,
                     Shader.TileMode.CLAMP
                 )
@@ -409,6 +410,11 @@ class PulseLightView @JvmOverloads constructor(
         
         // Color constants
         private const val COLOR_RAINBOW = -1
+        private val RAINBOW = intArrayOf(
+            0xFFFF0000.toInt(), 0xFFFF7F00.toInt(), 0xFFFFFF00.toInt(),
+            0xFF00FF00.toInt(), 0xFF0000FF.toInt(), 0xFF4B0082.toInt(),
+            0xFF9400D3.toInt(), 0xFFFF0000.toInt()
+        )
 
         // Styles
         private const val STYLE_DEFAULT = "default"
