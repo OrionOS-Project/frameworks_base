@@ -760,7 +760,6 @@ class PulseLightView @JvmOverloads constructor(
     private fun startEffectAnimation() {
         if (effectAnimator?.isRunning == true) return
         if (currentAnimationEffect == EFFECT_NONE) return
-        sparkles.clear()
 
         val duration = when (currentAnimationEffect) {
             EFFECT_BREATHING -> 3000L
@@ -776,12 +775,24 @@ class PulseLightView @JvmOverloads constructor(
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.RESTART
             interpolator = android.view.animation.LinearInterpolator()
-
             addUpdateListener { animator ->
                 effectProgress = animator.animatedValue as Float
                 invalidate()
             }
-
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationEnd(animation: Animator) {
+                    effectAnimator = null
+                    effectProgress = 0f
+                    sparkles.clear()
+                }
+                override fun onAnimationCancel(animation: Animator) {
+                    effectAnimator = null
+                    effectProgress = 0f
+                    sparkles.clear()
+                }
+                override fun onAnimationStart(animation: Animator) {}
+                override fun onAnimationRepeat(animation: Animator) {}
+            })
             start()
         }
     }
