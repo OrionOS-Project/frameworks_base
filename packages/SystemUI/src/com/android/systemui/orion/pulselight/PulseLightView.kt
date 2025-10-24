@@ -23,6 +23,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
@@ -54,6 +55,8 @@ class PulseLightView @JvmOverloads constructor(
 ) : RelativeLayout(context, attrs, defStyleAttr, defStyleRes), Animator.AnimatorListener {
 
     private var lightAnimator: ValueAnimator? = null
+    private var rainbowAnimator: ValueAnimator? = null
+    private var rainbowRotation: Float = 0f
 
     // Canvas drawing for both styles
     private val edgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -229,10 +232,13 @@ class PulseLightView @JvmOverloads constructor(
             }
             start()
         }
+        
+        startRainbowAnimation(lightDuration)
     }
 
     fun stopAnimation() {
         isVisible = false
+        stopRainbowAnimation()
         lightAnimator?.cancel()
         lightAnimator = null
     }
@@ -254,6 +260,13 @@ class PulseLightView @JvmOverloads constructor(
             updateRainbowGradient()
             invalidate()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        stopRainbowAnimation()
+        lightAnimator?.cancel()
+        lightAnimator = null
     }
 
     private fun drawDefaultEdges(canvas: Canvas) {
@@ -380,25 +393,57 @@ class PulseLightView @JvmOverloads constructor(
     private fun _updateRainbowGradient() {
         edgePaint.shader = when (currentStyle) {
             STYLE_ROUNDED -> {
-                SweepGradient(
-                    width / 2f,
-                    height / 2f,
-                    RAINBOW,
-                    null
-                )
+                val matrix = Matrix()
+                matrix.postRotate(rainbowRotation, width / 2f, height / 2f)
+                SweepGradient(width / 2f, height / 2f, RAINBOW, null).also {
+                    it.setLocalMatrix(matrix)
+                }
             }
             else -> {
+                val offset = (rainbowRotation / 360f) * height
                 LinearGradient(
-                    0f,
-                    0f,
-                    0f,
-                    height.toFloat(),
-                    RAINBOW,
-                    null,
-                    Shader.TileMode.CLAMP
+                    0f, -offset, 0f, height.toFloat() - offset,
+                    RAINBOW, null, Shader.TileMode.REPEAT
                 )
             }
         }
+    }
+
+    private fun startRainbowAnimation(pulseDuration: Long) {
+        if (!useRainbowGradient || edgePaint.shader == null) return
+        if (rainbowAnimator?.isRunning == true) return
+
+        rainbowAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
+            duration = pulseDuration
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.RESTART
+            interpolator = android.view.animation.LinearInterpolator()
+            addUpdateListener { animator ->
+                if (!useRainbowGradient) return@addUpdateListener
+                rainbowRotation = animator.animatedValue as Float
+                _updateRainbowGradient()
+                invalidate()
+            }
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationEnd(animation: Animator) {
+                    rainbowAnimator = null
+                    rainbowRotation = 0f
+                }
+                override fun onAnimationCancel(animation: Animator) {
+                    rainbowAnimator = null
+                    rainbowRotation = 0f
+                }
+                override fun onAnimationStart(animation: Animator) {}
+                override fun onAnimationRepeat(animation: Animator) {}
+            })
+            start()
+        }
+    }
+
+    private fun stopRainbowAnimation() {
+        rainbowAnimator?.cancel()
+        rainbowAnimator = null
+        rainbowRotation = 0f
     }
 
     companion object {
