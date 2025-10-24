@@ -262,10 +262,10 @@ class PulseLightView @JvmOverloads constructor(
             start()
         }
         
-        startRainbowAnimation(lightDuration)
         if (currentAnimationEffect != EFFECT_NONE) {
             startEffectAnimation()
         }
+        startRainbowAnimation(lightDuration)
     }
 
     fun stopAnimation() {
@@ -319,8 +319,8 @@ class PulseLightView @JvmOverloads constructor(
             }
         }
         
-        // Only draw normal edges if not a special effect
-        if (currentAnimationEffect !in listOf(EFFECT_WAVE, EFFECT_SPARKLE, EFFECT_CHASE, EFFECT_COMET)) {
+        // Only draw normal edges if not a moving effect
+        if (currentAnimationEffect !in MOVING_EFFECTS) {
             canvas.drawLine(halfStroke, 0f, halfStroke, height.toFloat(), edgePaint)
             canvas.drawLine(width - halfStroke, 0f, width - halfStroke, height.toFloat(), edgePaint)
         }
@@ -721,6 +721,7 @@ class PulseLightView @JvmOverloads constructor(
 
     private fun startRainbowAnimation(pulseDuration: Long) {
         if (!useRainbowGradient || edgePaint.shader == null) return
+        if (currentAnimationEffect in MOVING_EFFECTS) return
         if (rainbowAnimator?.isRunning == true) return
 
         rainbowAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
@@ -825,6 +826,7 @@ class PulseLightView @JvmOverloads constructor(
         private const val EFFECT_SPARKLE = "sparkle"
         private const val EFFECT_CHASE = "chase"
         private const val EFFECT_COMET = "comet"
+        private val MOVING_EFFECTS = arrayOf(EFFECT_WAVE, EFFECT_SPARKLE, EFFECT_CHASE, EFFECT_COMET)
 
         private const val PULSE_AMBIENT_LIGHT_FACE_DOWN =
                 Settings.Secure.PULSE_AMBIENT_LIGHT_FACE_DOWN
