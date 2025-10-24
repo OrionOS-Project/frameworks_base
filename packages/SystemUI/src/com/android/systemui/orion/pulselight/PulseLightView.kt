@@ -22,9 +22,12 @@ import android.database.ContentObserver
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
+import android.graphics.Shader
+import android.graphics.SweepGradient
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Handler
@@ -65,6 +68,7 @@ class PulseLightView @JvmOverloads constructor(
     private var currentStyle = STYLE_DEFAULT
     private var currentColor = Color.WHITE
     private var currentProgress = 0f
+    private var useRainbowGradient = false
 
     private var onlyWhenFaceDown = false
     private val onlyWhenFaceDownDefault by lazy {
@@ -193,8 +197,15 @@ class PulseLightView @JvmOverloads constructor(
         )
         
         currentColor = getLightColor(notificationPackageName)
-        edgePaint.color = currentColor
-        edgePaint.alpha = 255
+        useRainbowGradient = (currentColor == COLOR_RAINBOW)
+        
+        if (useRainbowGradient) {
+            updateRainbowGradient()
+        } else {
+            edgePaint.shader = null
+            edgePaint.color = currentColor
+            edgePaint.alpha = 255
+        }
         
         lightAnimator = ValueAnimator.ofFloat(*floatArrayOf(0.0f, 2.0f)).apply {
             duration = lightDuration
@@ -228,6 +239,10 @@ class PulseLightView @JvmOverloads constructor(
         super.onDraw(canvas)
         
         if (!isVisible || currentProgress == 0f) return
+        
+        if (useRainbowGradient) {
+            updateRainbowGradient()
+        }
         
         when (currentStyle) {
             STYLE_ROUNDED -> drawRoundedEdges(canvas)
@@ -316,7 +331,11 @@ class PulseLightView @JvmOverloads constructor(
                 Utils.getColorAccentDefaultColor(context)
             }
 
-            else -> {
+            COLOR_MODE_RAINBOW -> {
+                COLOR_RAINBOW
+            }
+
+            else -> { // COLOR_MODE_MANUAL or any other value
                 Settings.Secure.getIntForUser(
                     context.contentResolver,
                     Settings.Secure.PULSE_AMBIENT_LIGHT_COLOR, -9777409 /* hex - #FF6ACEFF */,
@@ -344,10 +363,52 @@ class PulseLightView @JvmOverloads constructor(
         }
     }
 
+    private fun updateRainbowGradient() {
+        if (width == 0 || height == 0) return
+
+        val colors = intArrayOf(
+            0xFFFF0000.toInt(), // Red
+            0xFFFF7F00.toInt(), // Orange
+            0xFFFFFF00.toInt(), // Yellow
+            0xFF00FF00.toInt(), // Green
+            0xFF0000FF.toInt(), // Blue
+            0xFF4B0082.toInt(), // Indigo
+            0xFF9400D3.toInt(), // Violet
+            0xFFFF0000.toInt()  // Red (wrap around)
+        )
+
+        edgePaint.shader = when (currentStyle) {
+            STYLE_ROUNDED -> {
+                SweepGradient(
+                    width / 2f,
+                    height / 2f,
+                    colors,
+                    null
+                )
+            }
+            else -> {
+                LinearGradient(
+                    0f,
+                    0f,
+                    0f,
+                    height.toFloat(),
+                    colors,
+                    null,
+                    Shader.TileMode.CLAMP
+                )
+            }
+        }
+    }
+
     companion object {
         // Color modes
         private const val COLOR_MODE_APP = 0
         private const val COLOR_MODE_AUTO = 1
+        private const val COLOR_MODE_MANUAL = 2
+        private const val COLOR_MODE_RAINBOW = 3
+        
+        // Color constants
+        private const val COLOR_RAINBOW = -1
 
         // Styles
         private const val STYLE_DEFAULT = "default"
