@@ -194,6 +194,7 @@ class PulseLightView @JvmOverloads constructor(
         
         currentColor = getLightColor(notificationPackageName)
         edgePaint.color = currentColor
+        edgePaint.alpha = 255
         
         lightAnimator = ValueAnimator.ofFloat(*floatArrayOf(0.0f, 2.0f)).apply {
             duration = lightDuration
@@ -237,7 +238,6 @@ class PulseLightView @JvmOverloads constructor(
     private fun drawDefaultEdges(canvas: Canvas) {
         val halfStroke = edgePaint.strokeWidth / 2
         edgePaint.strokeCap = Paint.Cap.BUTT
-        edgePaint.alpha = 255
         edgePaint.maskFilter = null
         
         // Left edge
@@ -270,7 +270,6 @@ class PulseLightView @JvmOverloads constructor(
     private fun drawRoundedEdges(canvas: Canvas) {
         val halfStroke = edgePaint.strokeWidth / 2
         edgePaint.strokeCap = Paint.Cap.ROUND
-        edgePaint.alpha = 255
         edgePaint.maskFilter = null
         
         roundedRect.set(
