@@ -14147,6 +14147,13 @@ public final class Settings {
         public static final String PULSE_AMBIENT_LIGHT_STYLE = "pulse_ambient_light_style";
 
         /**
+         * Ambient edge light animation effect type
+         * Values: "none", "breathing", "wave", "sparkle", "chase", "comet"
+         * @hide
+         */
+        public static final String PULSE_AMBIENT_LIGHT_ANIMATION_EFFECT = "pulse_ambient_light_animation_effect";
+
+        /**
          * Whether to show privacy indicators for microphone and camera.
          * Default value should be from DeviceConfig.
          *
