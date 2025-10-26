@@ -14212,6 +14212,16 @@ public final class Settings {
         public static final String DOZE_PICK_UP_GESTURE_VIBRATE = "doze_pick_up_gesture_vibrate";
 
         /**
+         * @hide
+         */
+        public static final String PULSE_PARTICLE_COUNT = "pulse_particle_count";
+
+        /**
+         * @hide
+         */
+        public static final String PULSE_PARTICLE_SIZE = "pulse_particle_size";
+
+        /**
          * These entries are considered common between the personal and the managed profile,
          * since the managed profile doesn't get to change them.
          */
