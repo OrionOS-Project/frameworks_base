@@ -14222,6 +14222,24 @@ public final class Settings {
         public static final String PULSE_PARTICLE_SIZE = "pulse_particle_size";
 
         /**
+         * Pulse waveform show fill area
+         * @hide
+         */
+        public static final String PULSE_WAVEFORM_SHOW_FILL = "pulse_waveform_show_fill";
+
+        /**
+         * Pulse waveform show outline stroke
+         * @hide
+         */
+        public static final String PULSE_WAVEFORM_SHOW_OUTLINE = "pulse_waveform_show_outline";
+
+        /**
+         * Pulse waveform stroke width
+         * @hide
+         */
+        public static final String PULSE_WAVEFORM_STROKE_WIDTH = "pulse_waveform_stroke_width";
+
+        /**
          * These entries are considered common between the personal and the managed profile,
          * since the managed profile doesn't get to change them.
          */
