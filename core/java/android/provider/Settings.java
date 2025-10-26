@@ -14504,6 +14504,16 @@ public final class Settings {
         public static final String LOCATION_PRIVACY_INDICATOR_ENABLED = "location_privacy_indicator_enabled";
 
         /**
+         * @hide
+         */
+        public static final String PULSE_PARTICLE_COUNT = "pulse_particle_count";
+
+        /**
+         * @hide
+         */
+        public static final String PULSE_PARTICLE_SIZE = "pulse_particle_size";
+
+        /**
          * These entries are considered common between the personal and the managed profile,
          * since the managed profile doesn't get to change them.
          */
