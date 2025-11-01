@@ -967,7 +967,8 @@ public class NotifCollection implements Dumpable, PipelineDumpable {
 
     @Override
     public void dump(PrintWriter pw, @NonNull String[] args) {
-        final List<NotificationEntry> entries = new ArrayList<>(getAllNotifs());
+        // Use mReadOnlyNotificationSet directly to avoid main thread assertion during dump
+        final List<NotificationEntry> entries = new ArrayList<>(mReadOnlyNotificationSet);
         entries.sort(Comparator.comparing(NotificationEntry::getKey));
 
         pw.println("\t" + TAG + " unsorted/unfiltered notifications: " + entries.size());
