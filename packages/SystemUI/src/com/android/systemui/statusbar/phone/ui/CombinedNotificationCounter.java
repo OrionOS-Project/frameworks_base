@@ -19,6 +19,7 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.android.settingslib.Utils;
 import com.android.systemui.res.R;
 import com.android.systemui.statusbar.StatusIconDisplayable;
 import com.android.systemui.statusbar.StatusBarIconView;
@@ -72,6 +73,7 @@ public class CombinedNotificationCounter extends FrameLayout
     private int mDecorColor = Color.WHITE;
     
     private final ContentObserver mSettingsObserver;
+    private final ContentObserver mAccentColorSettingsObserver;
     
     private final Runnable mUiUpdateRunnable = new Runnable() {
         @Override
@@ -100,6 +102,13 @@ public class CombinedNotificationCounter extends FrameLayout
             }
         };
         
+        mAccentColorSettingsObserver = new ContentObserver(mHandler) {
+            @Override
+            public void onChange(boolean selfChange) {
+                requestLayout();
+            }
+        };
+        
         initialize();
     }
 
@@ -107,10 +116,13 @@ public class CombinedNotificationCounter extends FrameLayout
         // When inflated from XML, children are already inflated
         // Just set up observers and listeners
         
-        // Register observer
+        // Register observers
         mContext.getContentResolver().registerContentObserver(
             Settings.System.getUriFor(Settings.System.STATUSBAR_COMBINED_NOTIF_COUNT),
             false, mSettingsObserver, UserHandle.USER_CURRENT);
+        mContext.getContentResolver().registerContentObserver(
+            Settings.System.getUriFor(Settings.System.TINT_STATUSBAR_ICONS_WITH_ACCENT),
+            false, mAccentColorSettingsObserver, UserHandle.USER_ALL);
         
         updateCombinedCountSetting();
         
@@ -275,6 +287,7 @@ public class CombinedNotificationCounter extends FrameLayout
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mContext.getContentResolver().unregisterContentObserver(mSettingsObserver);
+        mContext.getContentResolver().unregisterContentObserver(mAccentColorSettingsObserver);
         mHandler.removeCallbacksAndMessages(null);
         
         // Remove keyguard callback
@@ -403,16 +416,32 @@ public class CombinedNotificationCounter extends FrameLayout
 
     @Override
     public void onDarkChanged(ArrayList<Rect> areas, float darkIntensity, int tint) {
-        // Update circle background to match status bar icon color
+        // Check if accent color tinting is enabled
+        boolean useAccentColor = Settings.System.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.System.TINT_STATUSBAR_ICONS_WITH_ACCENT,
+                0,
+                UserHandle.USER_CURRENT) == 1;
+        
+        int circleColor;
+        if (useAccentColor) {
+            // Use system accent color
+            circleColor = Utils.getColorAccentDefaultColor(mContext);
+        } else {
+            // Use the tint provided by DarkIconDispatcher
+            circleColor = tint;
+        }
+        
+        // Update circle background color
         View circleContainer = findViewById(R.id.circle_container);
         if (circleContainer != null && circleContainer.getBackground() instanceof GradientDrawable) {
             GradientDrawable background = (GradientDrawable) circleContainer.getBackground();
-            background.setColor(tint);
+            background.setColor(circleColor);
         }
         
         // Set text to contrasting color
         if (mCountText != null) {
-            int textColor = getContrastColor(tint);
+            int textColor = getContrastColor(circleColor);
             mCountText.setTextColor(textColor);
         }
     }
