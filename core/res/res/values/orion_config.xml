@@ -49,9 +49,6 @@
     <!-- PowerOffAlarmService -->
     <bool name="config_powerOffAlarmEnabled">false</bool>
 
-    <!-- Whether to cancel fingerprint operation if not idle -->
-    <bool name="config_fpCancelIfNotIdle">false</bool>
-
     <!-- Whether to show edge light only when the device is face down by default -->
     <bool name="config_edgeLightFaceDownEnabledByDefault">false</bool>
 
