@@ -7341,6 +7341,12 @@ public final class Settings {
         public static final String FP_ERROR_VIBRATE = "fp_error_vibrate";
 
         /**
+         * Whether to show Chinese lunar calendar in the quick settings header.
+         * @hide
+         */
+        public static final String QS_SHOW_LUNAR_CALENDAR = "qs_show_lunar_calendar";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
