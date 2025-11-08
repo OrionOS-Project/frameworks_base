@@ -583,6 +583,7 @@ private void updateMediaProgressCompact() {
         mIsTrackingProgress = true;
         mTrackedNotificationKey = sbn.getKey();
         mTrackedPackageName = sbn.getPackageName();
+        mLastProgressUpdateTime = System.currentTimeMillis();
         extractProgress(sbn.getNotification());
         requestUiUpdate();
     }
@@ -611,7 +612,14 @@ private void updateMediaProgressCompact() {
             return;
         }
 
-        if (System.currentTimeMillis() - mLastProgressUpdateTime > PROGRESS_TIMEOUT_MS) {
+        if (mLastProgressUpdateTime == 0) {
+            mLastProgressUpdateTime = System.currentTimeMillis();
+            return;
+        }
+
+        if (System.currentTimeMillis() - mLastProgressUpdateTime > PROGRESS_TIMEOUT_MS
+                && mCurrentProgressMax > 0
+                && mCurrentProgress >= mCurrentProgressMax) {
             clearProgressTracking();
         }
     }
