@@ -312,10 +312,7 @@ public class TunerServiceImpl extends TunerService {
     }
 
     private void addTunable(Tunable tunable, String key) {
-        if (!mTunableLookup.containsKey(key)) {
-            mTunableLookup.put(key, new CopyOnWriteArraySet<Tunable>());
-        }
-        mTunableLookup.get(key).add(tunable);
+        mTunableLookup.computeIfAbsent(key, k -> new CopyOnWriteArraySet<Tunable>()).add(tunable);
         if (LeakDetector.ENABLED) {
             mTunables.add(tunable);
             mLeakDetector.trackCollection(mTunables, "TunerService.mTunables");
