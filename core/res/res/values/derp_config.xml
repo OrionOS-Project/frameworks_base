@@ -55,4 +55,7 @@
 
     <!-- Whether to cancel fingerprint operation if not idle -->
     <bool name="config_fpCancelIfNotIdle">false</bool>
+
+    <!-- Package name of the edge cutout overlay -->
+    <string name="config_edge_cutout_overlay_package">com.libremobileos.overlay.customization.edgecutout</string>
 </resources>

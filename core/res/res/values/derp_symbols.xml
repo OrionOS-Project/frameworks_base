@@ -37,4 +37,7 @@
 
     <!-- Lock gesture -->
     <java-symbol type="string" name="gesture_locked_warning" />
+
+    <!-- Package name of the edge cutout overlay -->
+    <java-symbol type="string" name="config_edge_cutout_overlay_package" />
 </resources>

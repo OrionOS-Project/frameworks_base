@@ -13771,6 +13771,13 @@ public final class Settings {
         public static final String ADAPTIVE_CHARGING_ENABLED = "adaptive_charging_enabled";
 
         /**
+         * Whether to use edge cutout for edge devices
+         * 
+         * @hide
+         */
+        public static final String EDGE_CUTOUT = "edge_cutout";
+
+        /**
          * Whether battery saver is currently set to different schedule mode.
          *
          * @hide
