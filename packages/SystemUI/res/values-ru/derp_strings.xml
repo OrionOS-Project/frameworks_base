@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: DerpFest AOSP
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- Auto reboot Suggestion/Reminder -->
+    <string name="notification_channel_reboot_suggestion">Предложения перезагрузки</string>
+    <string name="notification_channel_reboot_suggestion_description">Уведомления для Предложений перезагрузки</string>
+    <string name="reboot_suggestion_title">Напоминание о перезагрузке</string>
+    <string name="reboot_suggestion_description">Ваше устройство включено более недели. Рекомендуется перезагрузить его.</string>
+    <string name="reboot_suggestion_now">Перезагрузить</string>
+
+    <!-- Name of the nfc status bar icon. -->
+    <string name="status_bar_nfc">NFC</string>
+
+    <!-- Label for current user in power menu options dialog -->
+    <string name="global_action_restart_systemui">SystemUI</string>
+
+    <!-- QuickSettings: InternetDialog: Summary for how many devices are connected to the hotspot [CHAR LIMIT=NONE] -->
+    <plurals name="quick_settings_internet_hotspot_summary_num_devices">
+        <item quantity="one">%d устройство подключено</item>
+        <item quantity="few">%d устройства подключено</item>
+        <item quantity="many">%d устройств подключено</item>
+        <item quantity="other">%d устройства подключено</item>
+    </plurals>
+
+    <!-- Face unlock -->
+    <string name="face_unlock_recognizing">Распознавание лица...</string>
+
+    <!-- Name of the roaming status bar icon. -->
+    <string name="status_bar_roaming">Индикатор роуминга</string>
+
+    <!-- Name of the HD calling status bar icon. -->
+    <string name="status_bar_hd_calling">HD вызов (VoLTE/VoNR)</string>
+
+    <!-- Name of the VoWiFi status bar icon. -->
+    <string name="status_bar_vowifi">Wi-Fi вызов (VoWiFi)</string>
+
+    <!-- WiFi standard numbering on statusbar -->
+    <string name="status_bar_wifi_standard">Код стандарта Wi-Fi</string>
+
+    <!-- Heads up snooze toast -->
+    <string name="heads_up_snooze_message_one_minute"><xliff:g id="string">%s</xliff:g> - Уведомления откладываются на 1 минуту.</string>
+    <string name="heads_up_snooze_message"><xliff:g id="string">%1$s</xliff:g> - Уведомления откладываются на <xliff:g id="number">%2$d</xliff:g> минут.</string>
+
+    <!-- CPUInfo tile -->
+    <string name="quick_settings_cpuinfo_label">Информация о ЦПУ</string>
+
+    <!-- Compass QS Tile -->
+    <string name="quick_settings_compass_label">Компас</string>
+    <string name="quick_settings_compass_value"><xliff:g id="degrees">%1$.0f</xliff:g>\u00b0 <xliff:g id="direction">%2$s</xliff:g></string>
+    <string name="quick_settings_compass_init">Инициализация\u2026</string>
+    <string name="quick_settings_compass_N">С</string>
+    <string name="quick_settings_compass_NE">СВ</string>
+    <string name="quick_settings_compass_E">В</string>
+    <string name="quick_settings_compass_SE">ЮВ</string>
+    <string name="quick_settings_compass_S">Ю</string>
+    <string name="quick_settings_compass_SW">ЮЗ</string>
+    <string name="quick_settings_compass_W">З</string>
+    <string name="quick_settings_compass_NW">СЗ</string>
+
+    <!-- DataSwitch Tile -->
+    <string name="qs_data_switch_label">Переключить карту для моб. данных</string>
+    <string name="qs_data_switch_sim_label">SIM %d</string>
+    <string name="qs_data_switch_sim_desc">SIM %d предпочитаяемая карта для моб. данных SIM</string>
+    <string name="qs_data_switch_sim_transient">Переключение\u2026</string>
+
+    <!-- Screenshot Tile -->
+    <string name="screenshot_long_press">Длительное нажатие - выбранный регион</string>
+
+    <!-- Language toggle tile -->
+    <string name="quick_settings_locale_label">Язык</string>
+    <string name="quick_settings_locale_more_locales_toast">Сначала настройте несколько языков</string>
+
+    <!-- Sound QS Tile -->
+    <string name="quick_settings_sound_label">Звук</string>
+    <string name="quick_settings_sound_ring">Звонок</string>
+    <string name="quick_settings_sound_vibrate">Вибрация</string>
+    <string name="quick_settings_sound_silent">Бесшумно</string>
+
+    <!-- Privacy Indicator -->
+    <string name="mic_camera_privacy_indicator_title">Индикатор использования микрофона и камеры</string>
+    <string name="location_privacy_indicator_title">Индикатор использования местоположения</string>
+    <string name="projection_privacy_indicator_title">Индикатор конфиденциальности медиапроекции</string>
+
+    <!-- Preferred network tile -->
+    <string name="quick_settings_preferred_network_label">Предпочитаемая сеть</string>
+    <string name="quick_settings_preferred_network_unsupported">Не поддерживается</string>
+
+    <!-- Music tile -->
+    <string name="quick_settings_music_label">Музыка</string>
+    <string name="quick_settings_music_play">Воспроизведение</string>
+    <string name="quick_settings_music_pause">Пауза</string>
+    <string name="quick_settings_music_loading">Загрузка...</string>
+    <string name="quick_settings_music_no_player">Нет подключенного плеера</string>
+    <string name="quick_settings_music_last_played">Последнее проигранное: %1$s</string>
+
+    <!-- USB function dialog - copied from Settings -->
+    <string name="usb_use_charging_only">Только зарядка</string>
+    <string name="usb_use_file_transfers">Передача файлов</string>
+    <string name="usb_use_photo_transfers">PTP</string>
+    <string name="usb_use_uvc_webcam">Режим веб-камеры</string>
+    <string name="usb_use_tethering">USB-модем</string>
+    <string name="usb_use_MIDI">MIDI</string>
+    <string name="usb_use">Использовать USB для</string>
+
+    <!-- DerpFest Tile -->
+    <string name="quick_derpfest_label">Настройки DerpFest</string>
+    <string name="quick_derpfest_toast">LOL, ты действительно думал, что длинное нажатие приведет тебя куда-нибудь!!!</string>
+
+    <!-- Refresh rate QS tile -->
+    <string name="refresh_rate_tile_label">Частота обновления</string>
+    <string name="refresh_rate_unknown">Неизвестно</string>
+
+    <!-- Name of the bluetooth battery level status bar setting. -->
+    <string name="status_bar_bluetooth_battery_level">Уровень зарядки Bluetooth</string>
+
+    <!-- Data disabled icon -->
+    <string name="data_disabled_icon_title">Иконка отключения передачи данных</string>
+
+    <!-- Island notification -->
+    <string name="now_playing_on">Сейчас играет на %1$s</string>
+    <string name="by_artist">%1$s от %2$s</string>
+
+    <!-- Label for UI element which allows to use lens on screenshot [CHAR LIMIT=30] -->
+    <string name="screenshot_lens_label">Объектив</string>
+
+    <!-- 5G toggle in Internet Dialog -->
+    <string name="enable_fiveg">Включить 5G</string>
+
+    <!-- Data usage info in QS footer -->
+    <string name="usage_data">использовано сегодня</string>
+    <string name="usage_data_weekly">использовано на этой неделе</string>
+    <string name="usage_data_default_suffix">Моб. данные</string>
+    <string name="usage_wifi_default_suffix">Wi-Fi</string>
+
+    <!-- Label for notification action to delete a screen recording file [CHAR LIMIT=35] -->
+    <string name="screenrecord_delete_label">Удалить</string>
+    <!-- A toast message shown after successfully deleting a screen recording [CHAR LIMIT=NONE] -->
+    <string name="screenrecord_delete_description">Запись экрана удалена</string>
+
+    <!-- Screen record dialog -->
+    <string name="screenrecord_keep_screen_awake_label">Держите экран включенным</string>
+
+    <!-- Flashlight Strength -->
+    <string name="flashlight_strength_title">Яркость фонарика</string>
+    <string name="flashlight_strength_turn_off">Включить</string>
+    <string name="flashlight_strength_turn_on">Выключить</string>
+
+    <!-- 4G icon -->
+    <string name="show_fourg_icon_title">Иконка 4G</string>
+</resources>
