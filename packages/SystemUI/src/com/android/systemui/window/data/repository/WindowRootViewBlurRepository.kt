@@ -176,7 +176,7 @@ constructor(
         val level = Settings.Secure.getIntForUser(
             context.contentResolver,
             Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
-            15, UserHandle.USER_CURRENT)
+            0, UserHandle.USER_CURRENT)
         return level > 0
     }
 
@@ -184,7 +184,7 @@ constructor(
         return Settings.Secure.getIntForUser(
             context.contentResolver,
             Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY,
-            15, UserHandle.USER_CURRENT)
+            0, UserHandle.USER_CURRENT)
     }
 
     private fun isNotificationRowTransparencyContextAware(): Boolean {
