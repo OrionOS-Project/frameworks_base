@@ -22,7 +22,6 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
-import com.android.internal.util.orion.ThemeUtils
 import com.android.systemui.customization.R
 import com.android.systemui.log.core.MessageBuffer
 import com.android.systemui.plugins.clocks.AlarmData
@@ -218,77 +217,13 @@ class DefaultClockController(
 
         override fun onLocaleChanged(locale: Locale) {
             val nf = NumberFormat.getInstance(locale)
-            val density = resources.displayMetrics.density
-
-            // Dynamic font spacing based on current clock font overlay
-            val fontName = ThemeUtils.getCurrentClockFontOverlay()
-            val lineSpacing = when {
-                // Handle special locales first
-                nf.format(FORMAT_NUMBER.toLong()) == burmeseNumerals -> burmeseLineSpacing
-
-                // Handle specific clock fonts with custom spacing
-                fontName?.contains("sans", ignoreCase = true) == true -> 0.88f
-                fontName?.contains("google", ignoreCase = true) == true -> defaultLineSpacing
-                fontName?.contains("apice", ignoreCase = true) == true -> 0.92f
-                fontName?.contains("coolstory", ignoreCase = true) == true -> 0.92f
-                fontName?.contains("evolve", ignoreCase = true) == true -> 0.92f
-                fontName?.contains("monospace", ignoreCase = true) == true -> 0.95f
-                fontName?.contains("serif", ignoreCase = true) == true -> 0.90f
-                fontName?.contains("ios", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("acfilmstrip", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("aclonica", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("almonte", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("alpha", ignoreCase = true) == true -> 1.1f
-                fontName?.contains("ampad", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("bariol", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("betsy", ignoreCase = true) == true -> 1.1f
-                fontName?.contains("bigcheese", ignoreCase = true) == true -> 0.7f
-                fontName?.contains("brandayolq", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("budmo", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("bunny", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("cat", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("cfbadnews", ignoreCase = true) == true -> 1.0f
-                fontName?.contains("cfonetwo", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("comfortaa", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("concentrate", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("easter", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("editpoints", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("fibography", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("floorlight", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("hanged", ignoreCase = true) == true -> 1.0f
-                fontName?.contains("hercules", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("hotsweat", ignoreCase = true) == true -> 1.0f
-                fontName?.contains("karamuruh", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("kgonly", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("kingthings", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("lmsclifford", ignoreCase = true) == true -> 1.0f
-                fontName?.contains("linotte", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("littlebunny", ignoreCase = true) == true -> 0.6f
-                fontName?.contains("monbijoux", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("neon", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("ninjas", ignoreCase = true) == true -> 1.0f
-                fontName?.contains("nokia", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("nothing", ignoreCase = true) == true -> 1.0f
-                fontName?.contains("ntype82", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("oneplus", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("pinewood", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("reemkufi", ignoreCase = true) == true -> 0.5f
-                fontName?.contains("remponk", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("romantiques", ignoreCase = true) == true -> 1.0f
-                fontName?.contains("roundheads", ignoreCase = true) == true -> 0.8f
-                fontName?.contains("subway", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("th3machine", ignoreCase = true) == true -> 0.9f
-                fontName?.contains("vtksdura", ignoreCase = true) == true -> 1.0f
-                fontName?.contains("znikomit", ignoreCase = true) == true -> 0.9f
-
-                // Default fallback
-                else -> defaultLineSpacing
+            if (nf.format(FORMAT_NUMBER.toLong()) == burmeseNumerals) {
+                clocks.forEach { it.setLineSpacingScale(burmeseLineSpacing) }
+            } else {
+                clocks.forEach { it.setLineSpacingScale(defaultLineSpacing) }
             }
 
-            clocks.forEach { clock ->
-                clock.setLineSpacingScale(lineSpacing)
-                clock.refreshFormat()
-            }
+            clocks.forEach { it.refreshFormat() }
         }
 
         override fun onWeatherDataChanged(data: WeatherData) {}
