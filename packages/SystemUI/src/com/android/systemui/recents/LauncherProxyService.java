@@ -315,6 +315,16 @@ public class LauncherProxyService implements CallbackController<LauncherProxyLis
         }
 
         @Override
+        public void onKeyEvent(int keycode, int displayId) {
+            verifyCallerAndClearCallingIdentityPostMain(
+                    "onKeyEvent " + KeyEvent.keyCodeToString(keycode) + " displayId=" + displayId,
+                    () -> {
+                        sendEvent(KeyEvent.ACTION_DOWN, keycode, displayId);
+                        sendEvent(KeyEvent.ACTION_UP, keycode, displayId);
+                    });
+        }
+
+        @Override
         public void injectLongPress(int keyCode) throws RemoteException {
             final int displayId = mContext.getDisplayId();
             verifyCallerAndClearCallingIdentityPostMain("longPressInjected", () -> {
@@ -326,16 +336,6 @@ public class LauncherProxyService implements CallbackController<LauncherProxyLis
                             KeyEvent.FLAG_CANCELED);
                 }, ViewConfiguration.getLongPressTimeout());
             });
-        }
-
-        @Override
-        public void onKeyEvent(int keycode, int displayId) {
-            verifyCallerAndClearCallingIdentityPostMain(
-                    "onKeyEvent " + KeyEvent.keyCodeToString(keycode) + " displayId=" + displayId,
-                    () -> {
-                        sendEvent(KeyEvent.ACTION_DOWN, keycode, displayId);
-                        sendEvent(KeyEvent.ACTION_UP, keycode, displayId);
-                    });
         }
 
         @Override
@@ -392,7 +392,7 @@ public class LauncherProxyService implements CallbackController<LauncherProxyLis
                     onTaskbarAutohideSuspend(suspend));
         }
 
-        private boolean sendEvent(int action, int code, int displayId, int repeat) {
+        private boolean sendEvent(int action, int code, int displayId, int repeat, int flags) {
             long when = SystemClock.uptimeMillis();
             final KeyEvent ev = new KeyEvent(when, when, action, code, repeat,
                     0 /* metaState */, KeyCharacterMap.VIRTUAL_KEYBOARD, 0 /* scancode */,
