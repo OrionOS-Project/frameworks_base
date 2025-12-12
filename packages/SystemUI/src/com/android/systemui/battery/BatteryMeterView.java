@@ -111,7 +111,6 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
     private boolean mIsIncompatibleCharging;
     // Error state where we know nothing about the current battery state
     private boolean mBatteryStateUnknown;
-    private boolean mBatteryStateAlert;
     // Lazily-loaded since this is expected to be a rare-if-ever state
     private Drawable mUnknownStateDrawable;
 
@@ -692,17 +691,6 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         updateShowPercent();
     }
 
-    void onBatteryAlertStateChanged(boolean isAlert) {
-        if (mBatteryStateAlert == isAlert) {
-            return;
-        }
-
-        mBatteryStateAlert = isAlert;
-        if (!newStatusBarIcons()) {
-            mAccessorizedDrawable.setAlertEnabled(isAlert);
-        }
-    }
-
     void scaleBatteryMeterViews() {
         if (!newStatusBarIcons()) {
             scaleBatteryMeterViewsLegacy();
@@ -1058,7 +1046,6 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         pw.println("    mBatteryStateUnknown: " + mBatteryStateUnknown);
         pw.println("    mIsIncompatibleCharging: " + mIsIncompatibleCharging);
         pw.println("    mPluggedIn: " + mPluggedIn);
-        pw.println("    mBatteryStateAlert: " + mBatteryStateAlert);
         pw.println("    mLevel: " + mLevel);
         pw.println("    mMode: " + mShowPercentMode);
         if (newStatusBarIcons()) {
