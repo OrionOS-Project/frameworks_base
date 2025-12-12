@@ -6971,12 +6971,6 @@ public final class Settings {
         public static final String QS_SHOW_AUTO_BRIGHTNESS = "qs_show_auto_brightness";
 
         /**
-         * Whether to show Chinese lunar calendar in the quick settings header.
-         * @hide
-         */
-        public static final String QS_SHOW_LUNAR_CALENDAR = "qs_show_lunar_calendar";
-
-        /**
          * Whether to show the settings icon in quick settings footer.
          * @hide
          */
