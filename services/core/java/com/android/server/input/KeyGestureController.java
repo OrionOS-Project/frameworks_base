@@ -424,7 +424,7 @@ final class KeyGestureController {
                     public boolean preCondition() {
                         switch (mPowerVolUpBehavior) {
                             case POWER_VOLUME_UP_BEHAVIOR_MUTE:
-                                return !mRingerToggleChord.equals(Settings.Secure.VOLUME_HUSH_OFF);
+                                return !mRingerToggleChord.equals(Settings.Secure.DERP_VOLUME_HUSH_OFF);
                             default:
                                 return true;
                         }
