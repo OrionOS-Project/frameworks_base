@@ -244,60 +244,8 @@ constructor(
             )
 
     val shouldDateWeatherBeBelowSmallClock: StateFlow<Boolean> =
-        if (com.android.systemui.shared.Flags.clockReactiveSmartspaceLayout()) {
-                combine(
-                    hasCustomWeatherDataDisplay,
-                    shadeModeInteractor.isFullWidthShade,
-                    configurationInteractor.configurationValues,
-                    keyguardClockInteractor.currentClock,
-                ) { hasCustomWeatherDataDisplay, isFullWidthShade, configurationValues, currentClock
-                    ->
-                    val isRtlLayout = configurationValues.layoutDirection == LayoutDirection.RTL
-
-                    if (hasCustomWeatherDataDisplay || isRtlLayout) {
-                        return@combine true
-                    }
-
-                    keyguardClockInteractor.currentClockFontAxesWidth?.let { fontWidth ->
-                        if (fontWidth >= FONT_WIDTH_MAX_CUTOFF) {
-                            smallClockLogBuffer.log(
-                                TAG,
-                                LogLevel.INFO,
-                                { int1 = FONT_WIDTH_MAX_CUTOFF },
-                                { "fallBelowClock:true, FontAxesWidth:$int1" },
-                            )
-                            return@combine true
-                        }
-                    }
-
-                    val screenWidthDp = configurationValues.screenWidthDp
-                    val fontScale = configurationValues.fontScale
-                    var fallBelow =
-                        isFontAndDisplaySizeBreaking(
-                            currentClock = currentClock,
-                            screenWidthDp = screenWidthDp,
-                            fontScale = fontScale,
-                            isFullWidthShade = isFullWidthShade,
-                        )
-                    smallClockLogBuffer.log(
-                        TAG,
-                        LogLevel.INFO,
-                        {
-                            int1 = screenWidthDp
-                            double1 = fontScale.toDouble()
-                            bool1 = fallBelow
-                            bool2 = !isFullWidthShade
-                        },
-                        {
-                            "fallBelowClock:$bool1, isShadeWide:$bool2, " +
-                                "Width:$int1, FontScale:$double1"
-                        },
-                    )
-                    fallBelow
-                }
-            } else {
-                flowOf(true)
-            }
+        // Force date/weather to always be below small clock as swipeable cards
+        flowOf(true)
             .stateIn(scope = backgroundScope, started = SharingStarted.Eagerly, initialValue = true)
 
     private fun isFontAndDisplaySizeBreaking(
