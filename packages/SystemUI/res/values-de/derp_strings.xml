@@ -16,6 +16,11 @@
     <string name="face_unlock_recognizing">Gesichtserkennung …</string>
 
     <!-- Internet -->
-    <string name="status_bar_settings_network_speed">Internetgeschwindigkeit</string>
-    <string name="status_bar_network_speed">network_speed</string>
+    <string name="status_bar_network_speed">Internetgeschwindigkeit</string>
+
+    <!-- QuickSettings: InternetDialog: Summary for how many devices are connected to the hotspot [CHAR LIMIT=NONE] -->
+    <plurals name="quick_settings_internet_hotspot_summary_num_devices">
+        <item quantity="one">%d Gerät verbunden</item>
+        <item quantity="other">%d Geräte verbunden</item>
+    </plurals>
 </resources>
