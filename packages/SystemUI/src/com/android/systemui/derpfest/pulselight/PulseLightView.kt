@@ -23,6 +23,8 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.os.UserHandle
 import android.provider.Settings
 import android.util.AttributeSet
@@ -70,7 +72,7 @@ class PulseLightView @JvmOverloads constructor(
 
     private fun setupContentObserver() {
         val pulseAmbientLightFaceDown = Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_FACE_DOWN)
-        val contentObserver = object: ContentObserver(null) {
+        val contentObserver = object: ContentObserver(Handler(Looper.getMainLooper())) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 onlyWhenFaceDown = Settings.Secure.getIntForUser(
                     context.contentResolver,

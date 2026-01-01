@@ -85,7 +85,7 @@ class PulseLightNotifManager @Inject constructor(
         val pulseAmbientLightRepeatCount =
                 Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_REPEAT_COUNT)
         val pulseAmbientLightFaceDown = Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_FACE_DOWN)
-        val contentObserver = object: ContentObserver(null) {
+        val contentObserver = object: ContentObserver(handler) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 when (uri) {
                     pulseAmbientLight -> {
