@@ -605,8 +605,6 @@ public class UserBackupManagerService {
                 backupManagerMonitorDumpsysUtils::deleteExpiredBMMEvents,
                 INITIALIZATION_DELAY_MILLIS);
 
-        final Context userContext = context.createContextAsUser(UserHandle.of(userId),
-                0 /* flags */);
         mBackupPreferences = new UserBackupPreferences(userContext, mBaseStateDir);
 
         // Power management
