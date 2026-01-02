@@ -591,6 +591,8 @@ android_library {
         "kairos",
         "displaylib",
         "aconfig_settings_flags_lib",
+        "smartspace-proto-java",
+        "smartspace-proto-lite-java",
         "vendor.lineage.powershare-V1-java",
         "VendorSupport-preference",
     ],
