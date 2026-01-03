@@ -105,7 +105,7 @@ open class StatusBarIconHolder protected constructor() {
         const val TYPE_NETWORK_SPEED = 6
 
         /**  */
-        const val TYPE_BLUETOOTH = 6
+        const val TYPE_BLUETOOTH = 7
 
         /** Returns a human-readable string representing the given type. */
         fun getTypeString(@IconType type: Int): String {
