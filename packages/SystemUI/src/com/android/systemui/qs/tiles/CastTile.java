@@ -147,7 +147,7 @@ public class CastTile extends QSTileImpl<BooleanState> {
 
     @Override
     public Intent getLongClickIntent() {
-        return CAST_SETTINGS;
+        return new Intent(Settings.ACTION_CAST_SETTINGS);
     }
 
     @Override
