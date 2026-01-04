@@ -13519,6 +13519,20 @@ public final class Settings {
         public static final String KEYBOX_DATA = "keybox_data";
 
         /**
+         * User selectable PIF data.
+         * @hide
+         */
+        @Readable
+        public static final String PIF_DATA = "pif_data";
+
+        /**
+         * PIF data fetched from our repo.
+         * @hide
+         */
+        @Readable
+        public static final String FETCHED_PIF = "fetched_pif";
+
+        /**
          * Control whether to hide ADB and Developer settings enable status.
          * @hide
          */
