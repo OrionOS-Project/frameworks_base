@@ -331,7 +331,10 @@ fun StatusBarRoot(
                                 )
                             }
                         }
-                    endSideContent.addView(composeView, 0)
+                    // Check if the view already has a parent before adding it
+                    if (composeView.parent == null) {
+                        endSideContent.addView(composeView, 0)
+                    }
                 }
 
                 // If the flag is enabled, create and add a compose section to the end
@@ -507,7 +510,10 @@ private fun addStartSideComposable(
         startSideExceptHeadsUp.indexOfChild(
             startSideExceptHeadsUp.findViewById(R.id.notification_icon_area)
         )
-    startSideExceptHeadsUp.addView(composeView, notificationIconAreaIndex)
+    // Check if the view already has a parent before adding it
+    if (composeView.parent == null) {
+        startSideExceptHeadsUp.addView(composeView, notificationIconAreaIndex)
+    }
 }
 
 @VisibleForTesting
@@ -583,7 +589,10 @@ private fun addBatteryComposable(
             }
         }
     phoneStatusBarView.findViewById<ViewGroup>(R.id.system_icons).apply {
-        addView(batteryComposeView, -1)
+        // Check if the view already has a parent before adding it
+        if (batteryComposeView.parent == null) {
+            addView(batteryComposeView, -1)
+        }
     }
 }
 
@@ -644,7 +653,10 @@ private fun addEndSideComposable(
         }
 
     phoneStatusBarView.findViewById<ViewGroup>(R.id.status_bar_end_side_content).apply {
-        addView(systemStatusIconsComposeView)
+        // Check if the view already has a parent before adding it
+        if (systemStatusIconsComposeView.parent == null) {
+            addView(systemStatusIconsComposeView)
+        }
     }
 }
 
