@@ -331,10 +331,12 @@ fun StatusBarRoot(
                                 )
                             }
                         }
-                    // Check if the view already has a parent before adding it
-                    if (composeView.parent == null) {
-                        endSideContent.addView(composeView, 0)
+                    // Ensure the view doesn't have a parent before adding it
+                    val composeViewParent = composeView.parent
+                    if (composeViewParent is ViewGroup) {
+                        composeViewParent.removeView(composeView)
                     }
+                    endSideContent.addView(composeView, 0)
                 }
 
                 // If the flag is enabled, create and add a compose section to the end
@@ -392,6 +394,12 @@ fun StatusBarRoot(
                     listener = null,
                 )
                 onViewCreated(phoneStatusBarView)
+                // Ensure the view doesn't have a parent before returning it to AndroidView
+                // This prevents "The specified child already has a parent" crashes during recomposition
+                val parent = phoneStatusBarView.parent
+                if (parent is ViewGroup) {
+                    parent.removeView(phoneStatusBarView)
+                }
                 phoneStatusBarView
             },
             modifier = modifier,
@@ -510,10 +518,12 @@ private fun addStartSideComposable(
         startSideExceptHeadsUp.indexOfChild(
             startSideExceptHeadsUp.findViewById(R.id.notification_icon_area)
         )
-    // Check if the view already has a parent before adding it
-    if (composeView.parent == null) {
-        startSideExceptHeadsUp.addView(composeView, notificationIconAreaIndex)
+    // Ensure the view doesn't have a parent before adding it
+    val composeViewParent = composeView.parent
+    if (composeViewParent is ViewGroup) {
+        composeViewParent.removeView(composeView)
     }
+    startSideExceptHeadsUp.addView(composeView, notificationIconAreaIndex)
 }
 
 @VisibleForTesting
@@ -589,10 +599,12 @@ private fun addBatteryComposable(
             }
         }
     phoneStatusBarView.findViewById<ViewGroup>(R.id.system_icons).apply {
-        // Check if the view already has a parent before adding it
-        if (batteryComposeView.parent == null) {
-            addView(batteryComposeView, -1)
+        // Ensure the view doesn't have a parent before adding it
+        val batteryViewParent = batteryComposeView.parent
+        if (batteryViewParent is ViewGroup) {
+            batteryViewParent.removeView(batteryComposeView)
         }
+        addView(batteryComposeView, -1)
     }
 }
 
@@ -653,10 +665,12 @@ private fun addEndSideComposable(
         }
 
     phoneStatusBarView.findViewById<ViewGroup>(R.id.status_bar_end_side_content).apply {
-        // Check if the view already has a parent before adding it
-        if (systemStatusIconsComposeView.parent == null) {
-            addView(systemStatusIconsComposeView)
+        // Ensure the view doesn't have a parent before adding it
+        val systemIconsViewParent = systemStatusIconsComposeView.parent
+        if (systemIconsViewParent is ViewGroup) {
+            systemIconsViewParent.removeView(systemStatusIconsComposeView)
         }
+        addView(systemStatusIconsComposeView)
     }
 }
 
