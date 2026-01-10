@@ -2346,7 +2346,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 toggleTorch();
                 break;
             case SCREENSHOT:
-                mScreenshotHelper.takeScreenshot(SCREENSHOT_KEY_OTHER, mHandler, null);
+                if (!mPocketLockShowing) {
+                    mScreenshotHelper.takeScreenshot(SCREENSHOT_KEY_OTHER, mHandler, null);
+                }
                 break;
             case VOLUME_PANEL:
                 toggleVolumePanel();
@@ -2659,8 +2661,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         mHandler = new PolicyHandler(injector.getLooper());
         mScreenshotHelper = new ScreenshotHelper(mContext);
-        mSwipeToScreenshot = new SwipeToScreenshotListener(mContext, () -> 
-                mScreenshotHelper.takeScreenshot(SCREENSHOT_KEY_OTHER, mHandler, null));
+        mSwipeToScreenshot = new SwipeToScreenshotListener(mContext, () -> {
+                if (!mPocketLockShowing) {
+                    mScreenshotHelper.takeScreenshot(SCREENSHOT_KEY_OTHER, mHandler, null);
+                }
+            });
         mWakeGestureListener = new MyWakeGestureListener(mContext, mHandler);
         mSettingsObserver = new SettingsObserver(mHandler);
         mSettingsObserver.observe();
