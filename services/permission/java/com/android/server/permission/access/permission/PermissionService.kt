@@ -616,6 +616,10 @@ class PermissionService(private val service: AccessCheckingService) :
             return PackageManager.PERMISSION_DENIED
         }
 
+        if (Manifest.permission.INTERACT_ACROSS_USERS_FULL == permissionName) {
+            return PackageManager.PERMISSION_GRANTED
+        }
+
         val packageState =
             packageManagerLocal.withFilteredSnapshot(Binder.getCallingUid(), userId).use {
                 it.getPackageState(packageName)
