@@ -1660,6 +1660,43 @@ public class Typeface {
 
             sSystemFontOverrides.put("google-sans", headlineTypeface);
             sSystemFontOverrides.put("google-sans-medium", create(headlineTypeface, 500, false));
+
+            // Replace variable (GSF) fonts
+            // Body and label fonts use body font
+            sSystemFontOverrides.put("variable-body-large", typeface);
+            sSystemFontOverrides.put("variable-body-medium", typeface);
+            sSystemFontOverrides.put("variable-body-small", typeface);
+            sSystemFontOverrides.put("variable-label-large", typeface);
+            sSystemFontOverrides.put("variable-label-medium", typeface);
+            sSystemFontOverrides.put("variable-label-small", typeface);
+
+            // Headline, display, and title fonts use headline font
+            sSystemFontOverrides.put("variable-headline-large", headlineTypeface);
+            sSystemFontOverrides.put("variable-headline-medium", headlineTypeface);
+            sSystemFontOverrides.put("variable-headline-small", headlineTypeface);
+            sSystemFontOverrides.put("variable-display-large", headlineTypeface);
+            sSystemFontOverrides.put("variable-display-medium", headlineTypeface);
+            sSystemFontOverrides.put("variable-display-small", headlineTypeface);
+            sSystemFontOverrides.put("variable-title-large", headlineTypeface);
+            sSystemFontOverrides.put("variable-title-medium", headlineTypeface);
+            sSystemFontOverrides.put("variable-title-small", headlineTypeface);
+
+            // Emphasized variants use the same base fonts
+            sSystemFontOverrides.put("variable-body-large-emphasized", typeface);
+            sSystemFontOverrides.put("variable-body-medium-emphasized", typeface);
+            sSystemFontOverrides.put("variable-body-small-emphasized", typeface);
+            sSystemFontOverrides.put("variable-label-large-emphasized", typeface);
+            sSystemFontOverrides.put("variable-label-medium-emphasized", typeface);
+            sSystemFontOverrides.put("variable-label-small-emphasized", typeface);
+            sSystemFontOverrides.put("variable-headline-large-emphasized", headlineTypeface);
+            sSystemFontOverrides.put("variable-headline-medium-emphasized", headlineTypeface);
+            sSystemFontOverrides.put("variable-headline-small-emphasized", headlineTypeface);
+            sSystemFontOverrides.put("variable-display-large-emphasized", headlineTypeface);
+            sSystemFontOverrides.put("variable-display-medium-emphasized", headlineTypeface);
+            sSystemFontOverrides.put("variable-display-small-emphasized", headlineTypeface);
+            sSystemFontOverrides.put("variable-title-large-emphasized", headlineTypeface);
+            sSystemFontOverrides.put("variable-title-medium-emphasized", headlineTypeface);
+            sSystemFontOverrides.put("variable-title-small-emphasized", headlineTypeface);
         }
     }
 
