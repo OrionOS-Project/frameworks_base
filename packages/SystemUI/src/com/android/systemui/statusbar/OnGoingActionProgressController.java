@@ -186,7 +186,7 @@ public class OnGoingActionProgressController implements NotificationListener.Not
         }
         // Log.d(TAG, "updateProgressIfNeeded: got notification update");
         Notification notification = sbn.getNotification();
-        if (sbn.getKey().equals(mTrackedNotificationKey)) {
+        if (mTrackedNotificationKey != null && mTrackedNotificationKey.equals(sbn.getKey())) {
             mCurrentProgressMax = notification.extras.getInt(Notification.EXTRA_PROGRESS_MAX, 100);
             mCurrentProgress = notification.extras.getInt(Notification.EXTRA_PROGRESS, 0);
             Log.d(TAG, "updateProgressIfNeeded: about to updateViews()");
@@ -255,7 +255,7 @@ public class OnGoingActionProgressController implements NotificationListener.Not
             if (!mIsTrackingProgress) {
                 return;
             }
-            if (sbn.getKey().equals(mTrackedNotificationKey)) {
+            if (mTrackedNotificationKey != null && mTrackedNotificationKey.equals(sbn.getKey())) {
                 mIsTrackingProgress = false;
                 mCurrentDrawable = null;
                 updateViews();
