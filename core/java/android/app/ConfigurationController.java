@@ -182,6 +182,12 @@ class ConfigurationController {
                 mPendingConfiguration = null;
             }
 
+            final Application app = mActivityThread.getApplication();
+            if (app != null) {
+                final Resources appResources = app.getResources();
+                Typeface.updateDefaultFont(appResources);
+            }
+
             if (config == null) {
                 return;
             }
@@ -197,9 +203,6 @@ class ConfigurationController {
                 Slog.v(TAG, "Handle configuration changed: " + config);
             }
 
-            final Application app = mActivityThread.getApplication();
-            final Resources appResources = app.getResources();
-            Typeface.updateDefaultFont(appResources);
             mResourcesManager.applyConfigurationToResources(config, compat);
             updateLocaleListFromAppContext(app.getApplicationContext());
 
