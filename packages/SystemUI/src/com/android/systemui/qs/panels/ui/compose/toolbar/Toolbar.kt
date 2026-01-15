@@ -122,6 +122,13 @@ private fun SharedTransitionScope.StandardToolbarLayout(
 ) {
     val context = LocalContext.current
     
+    val showEditButton = Settings.System.getIntForUser(
+        context.contentResolver,
+        Settings.System.QS_SHOW_EDIT_BUTTON,
+        1,
+        UserHandle.USER_CURRENT
+    ) == 1
+    
     Row(modifier) {
         // User switcher button
         IconButton(
@@ -134,7 +141,9 @@ private fun SharedTransitionScope.StandardToolbarLayout(
         // Edit mode button
         val editModeButtonViewModel =
             rememberViewModel("Toolbar") { viewModel.editModeButtonViewModelFactory.create() }
-        EditModeButton(editModeButtonViewModel, isVisible = isFullyVisible())
+        if (showEditButton) {
+            EditModeButton(editModeButtonViewModel, isVisible = isFullyVisible())
+        }
 
         // Settings button
         if (Settings.System.getIntForUser(
