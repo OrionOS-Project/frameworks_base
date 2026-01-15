@@ -7130,6 +7130,12 @@ public final class Settings {
         public static final String QS_TILE_SHAPE = "qs_tile_shape";
 
         /**
+         * Whether to use tiny taskbar on phones
+         * @hide
+         */
+        public static final String ENABLE_TINY_TASKBAR = "enable_tiny_taskbar";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
