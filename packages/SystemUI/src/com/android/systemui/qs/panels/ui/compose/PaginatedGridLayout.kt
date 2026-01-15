@@ -46,6 +46,7 @@ import com.android.systemui.compose.modifiers.sysuiResTag
 import com.android.systemui.development.ui.compose.BuildNumber
 import com.android.systemui.development.ui.viewmodel.BuildNumberViewModel
 import com.android.systemui.lifecycle.rememberViewModel
+import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsDataUsageViewModel
 import com.android.systemui.qs.panels.dagger.PaginatedBaseLayoutType
 import com.android.systemui.qs.panels.ui.compose.Dimensions.FooterHeight
 import com.android.systemui.qs.panels.ui.compose.Dimensions.InterPageSpacing
@@ -61,6 +62,7 @@ class PaginatedGridLayout
 constructor(
     private val viewModelFactory: PaginatedGridViewModel.Factory,
     @PaginatedBaseLayoutType private val delegateGridLayout: PaginatableGridLayout,
+    private val dataUsageViewModel: FooterActionsDataUsageViewModel,
 ) : GridLayout by delegateGridLayout {
     @Composable
     override fun ContentScope.TileGrid(
@@ -153,6 +155,7 @@ constructor(
                 pagerState = pagerState,
                 showArrowsInPager = viewModel.showArrowsInPagerDots,
                 editButtonViewModelFactory = viewModel.editModeButtonViewModelFactory,
+                dataUsageViewModel = dataUsageViewModel,
                 isVisible = { listening() && layoutState.isIdle() },
             )
         }
@@ -170,6 +173,7 @@ private fun FooterBar(
     pagerState: PagerState,
     showArrowsInPager: Boolean,
     editButtonViewModelFactory: EditModeButtonViewModel.Factory,
+    dataUsageViewModel: FooterActionsDataUsageViewModel? = null,
     isVisible: () -> Boolean = { true },
 ) {
     val editButtonViewModel =
@@ -191,7 +195,10 @@ private fun FooterBar(
         horizontalArrangement = spacedBy(8.dp),
     ) {
         Row(Modifier.weight(1f)) {
-            BuildNumber(viewModelFactory = buildNumberViewModelFactory)
+            BuildNumber(
+                viewModelFactory = buildNumberViewModelFactory,
+                dataUsageViewModel = dataUsageViewModel
+            )
             Spacer(modifier = Modifier.weight(1f))
         }
         PagerDots(

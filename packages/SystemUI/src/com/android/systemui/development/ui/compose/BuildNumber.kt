@@ -17,8 +17,11 @@
 package com.android.systemui.development.ui.compose
 
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.MaterialTheme
@@ -34,21 +37,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.systemui.communal.ui.compose.extensions.detectLongPressGesture
 import com.android.systemui.development.ui.viewmodel.BuildNumberViewModel
 import com.android.systemui.lifecycle.rememberViewModel
+import com.android.systemui.qs.footer.ui.viewmodel.FooterActionsDataUsageViewModel
 import com.android.systemui.qs.ui.compose.borderOnFocus
 import com.android.systemui.res.R
 
 @Composable
 fun BuildNumber(
     viewModelFactory: BuildNumberViewModel.Factory,
-    modifier: Modifier = Modifier,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
+    modifier: Modifier = Modifier,
+    dataUsageViewModel: FooterActionsDataUsageViewModel? = null,
 ) {
     val viewModel = rememberViewModel(traceName = "BuildNumber") { viewModelFactory.create() }
 
-    BuildNumber(viewModel, modifier, textColor)
+    BuildNumber(viewModel, modifier, textColor, dataUsageViewModel)
 }
 
 @Composable
@@ -56,8 +62,46 @@ fun BuildNumber(
     viewModel: BuildNumberViewModel,
     modifier: Modifier,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
+    dataUsageViewModel: FooterActionsDataUsageViewModel? = null,
 ) {
     val buildNumber = viewModel.buildNumber
+
+    // If data usage is enabled and available, show it instead of build number
+    if (dataUsageViewModel != null) {
+        val dataUsageText = dataUsageViewModel.dataUsageText.collectAsStateWithLifecycle().value
+        val isVisible = dataUsageViewModel.isVisible.collectAsStateWithLifecycle().value
+        
+        if (isVisible && dataUsageText != null) {
+            val haptics = LocalHapticFeedback.current
+            
+            Text(
+                text = dataUsageText,
+                modifier =
+                    modifier
+                        .focusable()
+                        .wrapContentWidth()
+                        .padding(start = 8.dp)
+                        .combinedClickable(
+                            onClick = { dataUsageViewModel.onDataUsageClick() },
+                            onLongClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                dataUsageViewModel.onDataUsageLongClick()
+                            }
+                        )
+                        .semantics {
+                            onLongClick("Open data usage settings") {
+                                dataUsageViewModel.onDataUsageLongClick()
+                                true
+                            }
+                        }
+                        .basicMarquee(iterations = 1, initialDelayMillis = 2000)
+                        .minimumInteractiveComponentSize(),
+                color = textColor,
+                maxLines = 1,
+            )
+            return
+        }
+    }
 
     if (buildNumber != null) {
         val haptics = LocalHapticFeedback.current

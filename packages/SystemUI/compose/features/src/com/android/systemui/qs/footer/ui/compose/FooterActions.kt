@@ -235,6 +235,21 @@ fun FooterActions(viewModel: FooterActionsViewModel, modifier: Modifier = Modifi
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             val useModifierBasedExpandable = true
 
+            // Check which icons should be shown
+            val showSettingsIcon = Settings.System.getIntForUser(
+                context.contentResolver,
+                Settings.System.QS_SHOW_SETTINGS_ICON,
+                1,
+                UserHandle.USER_CURRENT
+            ) == 1
+            
+            val showPowerMenuIcon = Settings.System.getIntForUser(
+                context.contentResolver,
+                Settings.System.QS_SHOW_POWER_MENU_ICON,
+                1,
+                UserHandle.USER_CURRENT
+            ) == 1
+
             // The viewModel to show, in order of priority:
             // 1. Text feedback
             // 2. Security
@@ -256,12 +271,7 @@ fun FooterActions(viewModel: FooterActionsViewModel, modifier: Modifier = Modifi
                 Modifier.sysuiResTag("multi_user_switch"),
             )
             
-            if (Settings.System.getIntForUser(
-                context.contentResolver,
-                Settings.System.QS_SHOW_SETTINGS_ICON,
-                1,
-                UserHandle.USER_CURRENT
-            ) == 1) {
+            if (showSettingsIcon) {
                 IconButton(
                     { settings },
                     useModifierBasedExpandable,
@@ -269,12 +279,7 @@ fun FooterActions(viewModel: FooterActionsViewModel, modifier: Modifier = Modifi
                 )
             }
             
-            if (Settings.System.getIntForUser(
-                context.contentResolver,
-                Settings.System.QS_SHOW_POWER_MENU_ICON,
-                1,
-                UserHandle.USER_CURRENT
-            ) == 1) {
+            if (showPowerMenuIcon) {
                 IconButton(
                     { viewModel.power },
                     useModifierBasedExpandable,
