@@ -79,6 +79,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
+import android.os.UserHandle
+import android.provider.Settings
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.compose.animation.Expandable
@@ -253,16 +255,32 @@ fun FooterActions(viewModel: FooterActionsViewModel, modifier: Modifier = Modifi
                 useModifierBasedExpandable,
                 Modifier.sysuiResTag("multi_user_switch"),
             )
-            IconButton(
-                { settings },
-                useModifierBasedExpandable,
-                Modifier.sysuiResTag("settings_button_container"),
-            )
-            IconButton(
-                { viewModel.power },
-                useModifierBasedExpandable,
-                Modifier.sysuiResTag("pm_lite"),
-            )
+            
+            if (Settings.System.getIntForUser(
+                context.contentResolver,
+                Settings.System.QS_SHOW_SETTINGS_ICON,
+                1,
+                UserHandle.USER_CURRENT
+            ) == 1) {
+                IconButton(
+                    { settings },
+                    useModifierBasedExpandable,
+                    Modifier.sysuiResTag("settings_button_container"),
+                )
+            }
+            
+            if (Settings.System.getIntForUser(
+                context.contentResolver,
+                Settings.System.QS_SHOW_POWER_MENU_ICON,
+                1,
+                UserHandle.USER_CURRENT
+            ) == 1) {
+                IconButton(
+                    { viewModel.power },
+                    useModifierBasedExpandable,
+                    Modifier.sysuiResTag("pm_lite"),
+                )
+            }
         }
     }
 }

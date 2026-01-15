@@ -129,7 +129,9 @@ public class SystemSettings {
                 Settings.System.PREFERRED_REGION,
                 Settings.System.CV_ENABLED,
                 Settings.System.CV_DYNAMIC_ENABLED,
-                Settings.System.CV_PREFERRED_INTENSITY
+                Settings.System.CV_PREFERRED_INTENSITY,
+                Settings.System.QS_SHOW_SETTINGS_ICON,
+                Settings.System.QS_SHOW_POWER_MENU_ICON
         ));
         if (Flags.backUpSmoothDisplayAndForcePeakRefreshRate()) {
             settings.add(Settings.System.PEAK_REFRESH_RATE);

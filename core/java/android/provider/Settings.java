@@ -7093,6 +7093,18 @@ public final class Settings {
         public static final String TRANSIENT_TASK_MODE = "transient_task_mode";
 
         /**
+         * Whether to show the settings icon in quick settings footer.
+         * @hide
+         */
+        public static final String QS_SHOW_SETTINGS_ICON = "qs_show_settings_icon";
+
+        /**
+         * Whether to show the power menu icon in quick settings footer.
+         * @hide
+         */
+        public static final String QS_SHOW_POWER_MENU_ICON = "qs_show_power_menu_icon";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate

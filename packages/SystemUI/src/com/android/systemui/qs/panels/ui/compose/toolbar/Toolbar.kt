@@ -42,6 +42,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import android.os.UserHandle
+import android.provider.Settings
 import androidx.core.graphics.drawable.toBitmap
 import com.android.compose.animation.Expandable
 import com.android.compose.theme.LocalAndroidColorScheme
@@ -63,6 +65,8 @@ fun Toolbar(
     isFullyVisible: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         val securityInfoCollapsed = viewModel.securityInfoShowCollapsed
 
@@ -92,10 +96,17 @@ fun Toolbar(
             }
         }
 
-        IconButton(
-            viewModel.powerButtonViewModel,
-            Modifier.sysuiResTag("pm_lite").minimumInteractiveComponentSize(),
-        )
+        if (Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.QS_SHOW_POWER_MENU_ICON,
+            1,
+            UserHandle.USER_CURRENT
+        ) == 1) {
+            IconButton(
+                viewModel.powerButtonViewModel,
+                Modifier.sysuiResTag("pm_lite").minimumInteractiveComponentSize(),
+            )
+        }
     }
 }
 
@@ -107,6 +118,8 @@ private fun SharedTransitionScope.StandardToolbarLayout(
     isFullyVisible: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    
     Row(modifier) {
         // User switcher button
         IconButton(
@@ -122,10 +135,17 @@ private fun SharedTransitionScope.StandardToolbarLayout(
         EditModeButton(editModeButtonViewModel, isVisible = isFullyVisible())
 
         // Settings button
-        IconButton(
-            model = viewModel.settingsButtonViewModel,
-            Modifier.sysuiResTag("settings_button_container").minimumInteractiveComponentSize(),
-        )
+        if (Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.QS_SHOW_SETTINGS_ICON,
+            1,
+            UserHandle.USER_CURRENT
+        ) == 1) {
+            IconButton(
+                model = viewModel.settingsButtonViewModel,
+                Modifier.sysuiResTag("settings_button_container").minimumInteractiveComponentSize(),
+            )
+        }
 
         // Security info button
         SecurityInfo(

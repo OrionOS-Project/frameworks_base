@@ -282,5 +282,7 @@ public class SystemSettingsValidators {
                 System.CV_PREFERRED_INTENSITY,
                 new InclusiveFloatRangeValidator(
                         CV_PREFERRED_INTENSITY_MIN, CV_PREFERRED_INTENSITY_MAX));
+        VALIDATORS.put(System.QS_SHOW_SETTINGS_ICON, BOOLEAN_VALIDATOR);
+        VALIDATORS.put(System.QS_SHOW_POWER_MENU_ICON, BOOLEAN_VALIDATOR);
     }
 }
