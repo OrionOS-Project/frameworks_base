@@ -241,6 +241,7 @@ constructor(
                     lowQuality = false,
                     longerDuration = false,
                     hevc = false,
+                    keepScreenAwake = false,
                 )
             )
         }

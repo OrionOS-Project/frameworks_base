@@ -129,6 +129,10 @@ private fun ScreenRecordingServiceInteractor.startRecording() {
             audioSource = ScreenRecordingAudioSource.NONE,
             displayId = 0,
             shouldShowTaps = false,
+            lowQuality = false,
+            longerDuration = false,
+            hevc = false,
+            keepScreenAwake = false,
         )
     )
 }

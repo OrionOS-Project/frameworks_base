@@ -59,6 +59,10 @@ class FakeScreenRecordingService : IScreenRecordingService.Stub() {
                     audioSource = ScreenRecordingAudioSource.entries[audioSource],
                     displayId = displayId,
                     shouldShowTaps = shouldShowTaps,
+                    lowQuality = false,
+                    longerDuration = false,
+                    hevc = false,
+                    keepScreenAwake = false,
                 )
             )
         _callback.value?.onRecordingStarted()

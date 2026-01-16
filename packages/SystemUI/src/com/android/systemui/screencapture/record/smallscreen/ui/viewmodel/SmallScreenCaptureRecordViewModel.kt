@@ -150,6 +150,7 @@ constructor(
                         lowQuality = lowQuality,
                         longerDuration = longerDuration,
                         hevc = hevc,
+                        keepScreenAwake = false,
                     )
                 )
             }
@@ -178,6 +179,7 @@ constructor(
                         lowQuality = lowQuality,
                         longerDuration = longerDuration,
                         hevc = hevc,
+                        keepScreenAwake = false,
                     )
                 )
             }

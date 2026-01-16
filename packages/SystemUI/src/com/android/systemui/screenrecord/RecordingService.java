@@ -95,6 +95,7 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
     private static final String EXTRA_LOW_QUALITY = "extra_lowQuality";
     private static final String EXTRA_LONGER_DURATION = "extra_longerDuration";
     private final static String EXTRA_HEVC = "extra_HEVC";
+    private static final String EXTRA_KEEP_SCREEN_AWAKE = "extra_keepScreenAwake";
 
     protected static final String ACTION_START = "com.android.systemui.screenrecord.START";
     protected static final String ACTION_SHOW_START_NOTIF =
@@ -130,6 +131,8 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
     private boolean mLowQuality;
     private boolean mLongerDuration;
     private boolean mHEVC;
+    private boolean mKeepScreenAwake;
+    private android.os.PowerManager.WakeLock mWakeLock;
 
     @Inject
     public RecordingService(ScreenRecordUxController controller, @LongRunning Executor executor,
@@ -163,7 +166,8 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
     public static Intent getStartIntent(Context context, int resultCode,
             int audioSource, boolean showTaps,
             @Nullable MediaProjectionCaptureTarget captureTarget,
-            boolean lowQuality, boolean longerDuration, boolean hevc) {
+            boolean lowQuality, boolean longerDuration, boolean hevc,
+            boolean keepScreenAwake) {
         return new Intent(context, RecordingService.class)
                 .setAction(ACTION_START)
                 .putExtra(EXTRA_RESULT_CODE, resultCode)
@@ -172,7 +176,8 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
                 .putExtra(EXTRA_CAPTURE_TARGET, captureTarget)
                 .putExtra(EXTRA_LOW_QUALITY, lowQuality)
                 .putExtra(EXTRA_LONGER_DURATION, longerDuration)
-                .putExtra(EXTRA_HEVC, hevc);
+                .putExtra(EXTRA_HEVC, hevc)
+                .putExtra(EXTRA_KEEP_SCREEN_AWAKE, keepScreenAwake);
     }
 
     /**
@@ -197,9 +202,10 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
             @Nullable MediaProjectionCaptureTarget captureTarget,
             boolean lowQuality,
             boolean longerDuration,
-            boolean hevc) {
+            boolean hevc,
+            boolean keepScreenAwake) {
         return getStartIntent(context, resultCode, audioSource, showTaps, captureTarget, lowQuality,
-            longerDuration, hevc)
+            longerDuration, hevc, keepScreenAwake)
                 .putExtra(EXTRA_DISPLAY_ID, displayId);
     }
 
@@ -232,6 +238,7 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
                 mLowQuality = intent.getBooleanExtra(EXTRA_LOW_QUALITY, false);
                 mLongerDuration = intent.getBooleanExtra(EXTRA_LONGER_DURATION, false);
                 mHEVC = intent.getBooleanExtra(EXTRA_HEVC, true);
+                mKeepScreenAwake = intent.getBooleanExtra(EXTRA_KEEP_SCREEN_AWAKE, false);
 
                 MediaProjectionCaptureTarget captureTarget =
                         intent.getParcelableExtra(EXTRA_CAPTURE_TARGET,
@@ -347,11 +354,17 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
     public void onCreate() {
         super.onCreate();
         mController.addCallback((ScreenRecordUxController.StateChangeCallback) mBinder);
+        mWakeLock = getSystemService(android.os.PowerManager.class)
+                .newWakeLock(android.os.PowerManager.SCREEN_DIM_WAKE_LOCK | android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                        "SystemUI:ScreenRecord");
     }
 
     @Override
     public void onDestroy() {
         mController.removeCallback((ScreenRecordUxController.StateChangeCallback) mBinder);
+        if (mWakeLock != null && mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
         super.onDestroy();
     }
 
@@ -371,6 +384,14 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
             intent.putExtra(EXTRA_STATE, state);
             intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
             sendBroadcast(intent, PERMISSION_SELF);
+        }
+        // manage wakelock based on state
+        if (mKeepScreenAwake && mWakeLock != null) {
+            if (state && !mWakeLock.isHeld()) {
+                mWakeLock.acquire();
+            } else if (!state && mWakeLock.isHeld()) {
+                mWakeLock.release();
+            }
         }
     }
 

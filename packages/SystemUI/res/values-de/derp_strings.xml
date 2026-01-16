@@ -110,4 +110,7 @@
     <string name="usage_data_weekly">diese Woche verbraucht</string>
     <string name="usage_data_default_suffix">Daten</string>
     <string name="usage_wifi_default_suffix">WLAN</string>
+
+    <!-- Screen record dialog -->
+    <string name="screenrecord_keep_screen_awake_label">Bildschirm wach halten</string>
 </resources>
