@@ -37,7 +37,6 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
 import com.android.internal.graphics.ColorUtils
-import com.android.systemui.SystemUIApplication
 import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.media.MediaScrimState.STATE_SCRIM_HIDDEN
 import com.android.systemui.media.MediaScrimState.STATE_SCRIM_VISIBLE
@@ -94,6 +93,8 @@ class MediaViewController @Inject constructor(
     private val sharedTypedValue = TypedValue()
 
     init {
+        INSTANCE = this
+
         context.contentResolver.registerContentObserver(
             Settings.System.getUriFor(Settings.System.LS_MEDIA_ART_ENABLED),
             false,
@@ -540,10 +541,15 @@ class MediaViewController @Inject constructor(
 
     companion object {
         private const val TAG = "MediaViewController"
+
+        @Volatile
+        private var INSTANCE: MediaViewController? = null
+
         @JvmStatic
         fun get(context: Context): MediaViewController {
-            val app = context.applicationContext as SystemUIApplication
-            return app.getSysUIComponent().mediaViewController()
+            return INSTANCE ?: throw IllegalStateException(
+                "MediaViewController not initialized"
+            )
         }
     }
 }

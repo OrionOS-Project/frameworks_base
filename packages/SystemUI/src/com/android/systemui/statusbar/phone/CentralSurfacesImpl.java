@@ -506,6 +506,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
     private final UserTracker mUserTracker;
     private final TunerService mTunerService;
     private final ActivityStarter mActivityStarter;
+    private final MediaViewController mMediaViewController;
 
     private GameSpaceManager mGameSpaceManager;
     private DisplayManager mDisplayManager;
@@ -785,7 +786,8 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
             WindowManager windowManager,
             WindowManagerProvider windowManagerProvider,
             BurnInProtectionController burnInProtectionController,
-            NotificationPanelViewController notificationPanelViewController
+            NotificationPanelViewController notificationPanelViewController,
+            MediaViewController mediaViewController
     ) {
         mContext = context;
         mNotificationsController = notificationsController;
@@ -937,6 +939,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
         mWindowManager = windowManager;
         mWindowManagerProvider = windowManagerProvider;
+        mMediaViewController = mediaViewController;
 
         mRebootSuggestion = new RebootSuggestion(mContext);
 
@@ -1204,7 +1207,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                 (requestTopUi, componentTag) -> mMainExecutor.execute(
                         () -> mTopUiController.setRequestTopUi(requestTopUi, componentTag)
                 )));
-        getNotifContainerParentView().addView(MediaViewController.get(mContext).getMediaArtScrim(), 0);
+        getNotifContainerParentView().addView(mMediaViewController.getMediaArtScrim(), 0);
     }
 
     private ViewGroup getNotifContainerParentView() {
