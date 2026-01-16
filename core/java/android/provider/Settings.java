@@ -7130,6 +7130,12 @@ public final class Settings {
         public static final String QS_TILE_SHAPE = "qs_tile_shape";
 
         /**
+         * Customize Brightness slider shape.
+         * @hide
+         */
+        public static final String QS_BRIGHTNESS_SLIDER_SHAPE = "qs_brightness_slider_shape";
+
+        /**
          * Whether to use tiny taskbar on phones
          * @hide
          */
