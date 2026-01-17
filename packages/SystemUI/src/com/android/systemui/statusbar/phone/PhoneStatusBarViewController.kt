@@ -322,7 +322,7 @@ private constructor(
             )
         }
 
-        centralSurfaces.onBrightnessChanged(upOrCancel)
+        centralSurfaces.onBrightnessChanged(upOrCancel        )
     }
 
     private fun addDarkReceivers() {

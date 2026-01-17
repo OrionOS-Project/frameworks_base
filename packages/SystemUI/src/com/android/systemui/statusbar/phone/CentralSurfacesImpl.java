@@ -1370,13 +1370,16 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                         checkBarModes();
                         mBurnInProtectionController.setPhoneStatusBarView(mPhoneStatusBarViewController.getPhoneStatusBarView());
                         mPhoneStatusBarViewController.setBrightnessControlEnabled(mBrightnessControl);
-                        mOnGoingActionProgressController =
-                             new OnGoingActionProgressController(
-                                     mContext,
-                                     statusBarViewController.getOngoingActionProgressGroup(),
-                                     mNotificationListener, mKeyguardStateController, mHeadsUpManager);
+                        if (!StatusBarRootModernization.isEnabled()) {
+                            mOnGoingActionProgressController =
+                                 new OnGoingActionProgressController(
+                                         mContext,
+                                         statusBarViewController.getOngoingActionProgressGroup(), mNotificationListener,
+                                         mKeyguardStateController, mHeadsUpManager);
+                        }
                     });
         }
+
         if (!StatusBarRootModernization.isEnabled() && !StatusBarConnectedDisplays.isEnabled()) {
             // When the flag is on, we register the fragment as a core startable and this is not
             // needed
