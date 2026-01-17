@@ -24,6 +24,7 @@ import android.content.res.ColorStateList;
 import android.database.ContentObserver;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.AdaptiveIconDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -685,32 +686,22 @@ public class OnGoingActionProgressController implements NotificationListener.Not
         }
         
         mBackgroundExecutor.execute(() -> {
-            try {
-                final IconFetcher.AdaptiveDrawableResult iconResult = 
-                        mIconFetcher.getMonotonicPackageIcon(packageName);
-                
-                if (iconResult != null && iconResult.drawable != null) {
-                    synchronized (mLock) {
-                        // Limit cache size
-                        if (mIconCache.size() >= MAX_ICON_CACHE_SIZE) {
-                            mIconCache.clear();
-                        }
-                        mIconCache.put(packageName, iconResult);
+            final IconFetcher.AdaptiveDrawableResult iconResult = 
+                    mIconFetcher.getMonotonicPackageIcon(packageName);
+
+            if (iconResult != null && iconResult.drawable != null) {
+                if (mIsComposeMode) {
+                    int sizePx = (int) (24 * mContext.getResources().getDisplayMetrics().density);
+                    iconResult.drawable.setBounds(0, 0, sizePx, sizePx);
+
+                    if (iconResult.isAdaptive && iconResult.drawable instanceof AdaptiveIconDrawable) {
                     }
-                    
-                    mHandler.post(() -> {
-                        callback.onIconLoaded(iconResult);
-                    });
-                } else {
-                    Log.w(TAG, "Failed to load icon for package: " + packageName);
-                    mHandler.post(() -> {
-                        callback.onIconLoaded(null);
-                    });
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "Error loading icon for package: " + packageName, e);
+
+                mIconCache.put(packageName, iconResult);
+
                 mHandler.post(() -> {
-                    callback.onIconLoaded(null);
+                    callback.onIconLoaded(iconResult);
                 });
             }
         });

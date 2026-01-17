@@ -449,11 +449,11 @@ private fun addStartSideComposable(
             layoutParams =
                 LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT,
                     )
                     .apply {
+                        gravity = android.view.Gravity.CENTER_VERTICAL
                         if (showDate) {
-                            gravity = android.view.Gravity.CENTER_VERTICAL
                         }
                     }
 
