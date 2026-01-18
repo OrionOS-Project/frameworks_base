@@ -374,7 +374,7 @@ public class InternetDetailsContentControllerTest extends SysuiTestCase {
     public void getDialogTitleText_withAirplaneModeOn_returnAirplaneMode() {
         fakeAirplaneModeEnabled(true);
 
-        assertTrue(TextUtils.equals(mInternetDetailsContentController.getDialogTitleText(),
+        assertTrue(TextUtils.equals(mInternetDetailsContentController.getDialogTitleText(true),
                 getResourcesString("airplane_mode")));
     }
 
@@ -382,7 +382,7 @@ public class InternetDetailsContentControllerTest extends SysuiTestCase {
     public void getDialogTitleText_withAirplaneModeOff_returnInternet() {
         fakeAirplaneModeEnabled(false);
 
-        assertTrue(TextUtils.equals(mInternetDetailsContentController.getDialogTitleText(),
+        assertTrue(TextUtils.equals(mInternetDetailsContentController.getDialogTitleText(true),
                 getResourcesString("quick_settings_internet_label")));
     }
 
