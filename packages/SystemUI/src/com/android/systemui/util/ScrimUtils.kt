@@ -15,6 +15,7 @@
  */
 package com.android.systemui.util
 
+import android.service.notification.StatusBarNotification
 import com.android.systemui.statusbar.StatusBarState.KEYGUARD
 import com.android.systemui.statusbar.StatusBarState.SHADE_LOCKED
 import java.util.concurrent.atomic.AtomicBoolean
@@ -34,6 +35,7 @@ class ScrimUtils private constructor() {
         fun onStartedWakingUp() {}
         fun onScreenTurnedOff() {}
         fun setPulsing(pulsing: Boolean) {}
+        fun onNotificationPosted(sbn: StatusBarNotification) {}
     }
 
     private val listeners = WeakListenerManager<ScrimEventListener>()
@@ -117,6 +119,10 @@ class ScrimUtils private constructor() {
 
     fun onScreenTurnedOff() =
         notifyListeners(Consumer { it.onScreenTurnedOff() })
+
+    fun onNotificationPosted(sbn: StatusBarNotification) {
+        listeners.notifyOnMain { it.onNotificationPosted(sbn) }
+    }
 
     fun isDozing(): Boolean = mIsDozing
 
