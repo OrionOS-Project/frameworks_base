@@ -298,6 +298,7 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
     private int mOneFingerQuickSettingsIntercept;
     private final ContentObserver mOneFingerQuickSettingsInterceptObserver;
     private final ContentObserver mNotificationRowTransparencyObserver;
+    private final ContentObserver mNotificationRowTransparencyLockscreenObserver;
 
     private final Region mInterceptRegion = new Region();
     /** The end bounds of a clipping animation. */
@@ -429,6 +430,13 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
         };
 
         mNotificationRowTransparencyObserver = new ContentObserver(null) {
+            @Override
+            public void onChange(boolean selfChange) {
+                updateTransparencyIfNeeded();
+            }
+        };
+
+        mNotificationRowTransparencyLockscreenObserver = new ContentObserver(null) {
             @Override
             public void onChange(boolean selfChange) {
                 updateTransparencyIfNeeded();
@@ -2344,6 +2352,11 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
                     Settings.Secure.getUriFor(Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY),
                     false, mNotificationRowTransparencyObserver,
                     UserHandle.USER_ALL);
+            mPanelView.getContext().getContentResolver().registerContentObserver(
+                    Settings.Secure.getUriFor(
+                            Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY_LOCKSCREEN),
+                    false, mNotificationRowTransparencyLockscreenObserver,
+                    UserHandle.USER_ALL);
             updateExpansion();
         }
 
@@ -2358,6 +2371,8 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
                     mOneFingerQuickSettingsInterceptObserver);
             mPanelView.getContext().getContentResolver().unregisterContentObserver(
                     mNotificationRowTransparencyObserver);
+            mPanelView.getContext().getContentResolver().unregisterContentObserver(
+                    mNotificationRowTransparencyLockscreenObserver);
             // Manual handling of fragment lifecycle is only required because this bridges
             // non-fragment and fragment code. Once we are using a fragment for the notification
             // panel, mQs will not need to be null cause it will be tied to the same lifecycle.

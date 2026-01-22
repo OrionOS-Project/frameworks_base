@@ -14119,6 +14119,13 @@ public final class Settings {
         public static final String NOTIFICATION_ROW_TRANSPARENCY = "notification_row_transparency";
 
         /**
+         * Translucent lockscreen notifications
+         * @hide
+         */
+        public static final String NOTIFICATION_ROW_TRANSPARENCY_LOCKSCREEN =
+                "notification_row_transparency_lockscreen";
+
+        /**
          * Pulse renderer implementation
          * @hide
          */
