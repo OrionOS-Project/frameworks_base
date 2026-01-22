@@ -1577,10 +1577,9 @@ fun QuickSettingsLayout(
             }
         } else {
             tiles()
-        }
-
-        if (showSlider != 0 && !sliderAtTop) {
-            brightness()
+            if (showSlider != 0 && !sliderAtTop) {
+                brightness()
+            }
         }
 
         if (!mediaInRow) {
