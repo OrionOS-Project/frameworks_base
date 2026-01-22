@@ -14113,6 +14113,12 @@ public final class Settings {
         public static final String PULSE_LAVALAMP_SPEED = "pulse_lavalamp_speed";
 
         /**
+         * Translucent notifications
+         * @hide
+         */
+        public static final String NOTIFICATION_ROW_TRANSPARENCY = "notification_row_transparency";
+
+        /**
          * Pulse renderer implementation
          * @hide
          */

@@ -42,11 +42,13 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.os.Handler;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.IndentingPrintWriter;
 import android.util.Log;
 import android.util.MathUtils;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -93,6 +95,7 @@ import com.android.systemui.statusbar.PulseExpansionHandler;
 import com.android.systemui.statusbar.QsFrameTranslateController;
 import com.android.systemui.statusbar.StatusBarState;
 import com.android.systemui.statusbar.notification.domain.interactor.ActiveNotificationsInteractor;
+import com.android.systemui.statusbar.notification.row.ExpandableNotificationRow;
 import com.android.systemui.statusbar.notification.stack.AmbientState;
 import com.android.systemui.statusbar.notification.stack.NotificationStackScrollLayout;
 import com.android.systemui.statusbar.notification.stack.NotificationStackScrollLayoutController;
@@ -294,6 +297,7 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
 
     private int mOneFingerQuickSettingsIntercept;
     private final ContentObserver mOneFingerQuickSettingsInterceptObserver;
+    private final ContentObserver mNotificationRowTransparencyObserver;
 
     private final Region mInterceptRegion = new Region();
     /** The end bounds of a clipping animation. */
@@ -421,6 +425,13 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
                         mPanelView.getContext().getContentResolver(),
                         LineageSettings.System.STATUS_BAR_QUICK_QS_PULLDOWN, 0,
                         selectedUserInteractor.getSelectedUserId());
+            }
+        };
+
+        mNotificationRowTransparencyObserver = new ContentObserver(null) {
+            @Override
+            public void onChange(boolean selfChange) {
+                onTransparencyUpdated();
             }
         };
 
@@ -2325,6 +2336,10 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
                     false, mOneFingerQuickSettingsInterceptObserver,
                     UserHandle.USER_ALL);
             mOneFingerQuickSettingsInterceptObserver.onChange(true);
+            mPanelView.getContext().getContentResolver().registerContentObserver(
+                    Settings.Secure.getUriFor(Settings.Secure.NOTIFICATION_ROW_TRANSPARENCY),
+                    false, mNotificationRowTransparencyObserver,
+                    UserHandle.USER_ALL);
             updateExpansion();
         }
 
@@ -2337,6 +2352,8 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
         public void onFragmentViewDestroyed(String tag, Fragment fragment) {
             mPanelView.getContext().getContentResolver().unregisterContentObserver(
                     mOneFingerQuickSettingsInterceptObserver);
+            mPanelView.getContext().getContentResolver().unregisterContentObserver(
+                    mNotificationRowTransparencyObserver);
             // Manual handling of fragment lifecycle is only required because this bridges
             // non-fragment and fragment code. Once we are using a fragment for the notification
             // panel, mQs will not need to be null cause it will be tied to the same lifecycle.
@@ -2348,6 +2365,22 @@ public class QuickSettingsControllerImpl implements QuickSettingsController, Dum
                     mNotificationStackScrollLayoutController.setQsHeader(null);
                 }
                 mQs = null;
+            }
+        }
+    }
+
+    private void onTransparencyUpdated() {
+        NotificationStackScrollLayoutController controller = mNotificationStackScrollLayoutController;
+        if (controller == null || controller.getView() == null) {
+            return;
+        }
+        NotificationStackScrollLayout view = controller.getView();
+        int childCount = view.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = view.getChildAt(i);
+            if (child instanceof ExpandableNotificationRow) {
+                ExpandableNotificationRow row = (ExpandableNotificationRow) child;
+                child.post(row::updateIfNeeded);
             }
         }
     }
