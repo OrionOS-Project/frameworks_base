@@ -63,13 +63,14 @@
             android:layout_height="@dimen/screenrecord_option_icon_size"
             android:src="@drawable/ic_screen_awake"
             android:tint="?android:attr/textColorSecondary"
-            android:layout_marginRight="@dimen/screenrecord_option_padding"
+            android:layout_marginEnd="@dimen/screenrecord_option_padding"
             android:importantForAccessibility="no"/>
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:layout_weight="1"
+            android:gravity="center_vertical"
             android:text="@string/screenrecord_keep_screen_awake_label"
             android:textAppearance="@style/TextAppearance.ScreenRecord.SwitchLabel"
             android:contentDescription="@string/screenrecord_keep_screen_awake_label"/>
