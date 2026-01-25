@@ -600,6 +600,17 @@ public class EdgeBackGestureHandler {
         // Update this before calling mButtonForcedVisibleCallback since NavigationBar will relayout
         // and query isHandlingGestures() as a part of the callback
         mIsBackGestureAllowed = !mIsButtonForcedVisible;
+        // Update plugin with new settings
+        if (DesktopExperienceFlags.ENABLE_MULTIDISPLAY_TRACKPAD_BACK_GESTURE.isTrue()) {
+            for (DisplayBackGestureHandler displayBackGestureHandler :
+                    mDisplayBackGestureHandlers.values()) {
+                displayBackGestureHandler.setBackArrowVisibility(mIsBackGestureArrowEnabled);
+                displayBackGestureHandler.setEdgeHapticEnabled(mIsEdgeHapticEnabled);
+            }
+        } else if (mEdgeBackPlugin != null) {
+            mEdgeBackPlugin.setBackArrowVisibility(mIsBackGestureArrowEnabled);
+            mEdgeBackPlugin.setEdgeHapticEnabled(mIsEdgeHapticEnabled);
+        }
         if (previousForcedVisible != mIsButtonForcedVisible
                 && mButtonForcedVisibleCallback != null) {
             mButtonForcedVisibleCallback.accept(mIsButtonForcedVisible);
@@ -783,11 +794,14 @@ public class EdgeBackGestureHandler {
                 displayWindowManager = mDefaultWindowManager;
             }
         }
-        return mDisplayBackGestureHandlerFactory.create(windowContext, displayWindowManager,
+        DisplayBackGestureHandler handler = mDisplayBackGestureHandlerFactory.create(windowContext, displayWindowManager,
                 mBackCallback, (ev) -> {
                     onInputEvent(ev);
                     return Unit.INSTANCE;
                 });
+        handler.setBackArrowVisibility(mIsBackGestureArrowEnabled);
+        handler.setEdgeHapticEnabled(mIsEdgeHapticEnabled);
+        return handler;
     }
 
     private void removeAndDisposeDisplayResource(int displayId) {
@@ -920,6 +934,8 @@ public class EdgeBackGestureHandler {
             mEdgeBackPlugin = edgeBackPlugin;
             mEdgeBackPlugin.setBackCallback(mBackCallback);
             mEdgeBackPlugin.setLayoutParams(createLayoutParams());
+            mEdgeBackPlugin.setBackArrowVisibility(mIsBackGestureArrowEnabled);
+            mEdgeBackPlugin.setEdgeHapticEnabled(mIsEdgeHapticEnabled);
             updateDisplaySize();
         } finally {
             Trace.endSection();
