@@ -497,10 +497,15 @@ public final class CardRecyclerViewAdapter extends RecyclerView.Adapter<CardRecy
                             mDiffer.submitList(new ArrayList<>(smartspaceTargets), runnable);
                         }
                         hasAodLockscreenTransition = targets != lockscreenTargets;
-                        if (!configProvider.isDefaultDateWeatherDisabled() || !BcSmartspaceDataPlugin.UI_SURFACE_HOME_SCREEN.equalsIgnoreCase(uiSurface)) {
-                            return;
+                        // Hide view when empty on lockscreen (either when default date/weather is disabled,
+                        // or when all cards have been filtered out due to date/weather decoupling)
+                        if (!BcSmartspaceDataPlugin.UI_SURFACE_HOME_SCREEN.equalsIgnoreCase(uiSurface)) {
+                            boolean shouldHide = smartspaceTargets.isEmpty() &&
+                                    (configProvider.isDefaultDateWeatherDisabled() || 
+                                     "lockscreen".equalsIgnoreCase(uiSurface));
+                            BcSmartspaceTemplateDataUtils.updateVisibility(
+                                    root, shouldHide ? View.GONE : View.VISIBLE);
                         }
-                        BcSmartspaceTemplateDataUtils.updateVisibility(root, smartspaceTargets.isEmpty() ? View.GONE : View.VISIBLE);
                         return;
                     }
                 }
