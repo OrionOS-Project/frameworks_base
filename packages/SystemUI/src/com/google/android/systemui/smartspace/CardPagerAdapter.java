@@ -608,9 +608,20 @@ public final class CardPagerAdapter extends PagerAdapter implements CardAdapter 
                 hasDifferentTargets = true;
             }
         }
+        // Filter out any date cards that might already be in the lists
+        // (date is already shown in date/weather view when decoupled)
+        if ("lockscreen".equals(uiSurface)) {
+            _lockscreenTargets.removeIf(target ->
+                    "date_card_794317_92634".equals(target.getSmartspaceTargetId()) ||
+                    target.getFeatureType() == 39); // FEATURE_STEP_DATE
+        }
         if (!configProvider.isDefaultDateWeatherDisabled()) {
             addDefaultDateCardIfEmpty(_aodTargets);
-            addDefaultDateCardIfEmpty(_lockscreenTargets);
+            // Don't add default date card for lockscreen when date/weather is decoupled,
+            // as date is already shown in date/weather view
+            if (!"lockscreen".equals(uiSurface)) {
+                addDefaultDateCardIfEmpty(_lockscreenTargets);
+            }
         }
         updateTargetVisibility();
         notifyDataSetChanged();

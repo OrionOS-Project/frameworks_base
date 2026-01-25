@@ -593,8 +593,17 @@ constructor(
     }
 
     private fun filterSmartspaceTarget(t: SmartspaceTarget): Boolean {
-        if (isDateWeatherDecoupled && t.featureType == SmartspaceTarget.FEATURE_WEATHER) {
-            return false
+        if (isDateWeatherDecoupled) {
+            // Filter out weather cards (already handled by date/weather views)
+            if (t.featureType == SmartspaceTarget.FEATURE_WEATHER) {
+                return false
+            }
+            // Filter out date cards (date is already shown in date/weather view)
+            // This includes both the default date card and actual date cards from Smartspace
+            if (t.featureType == SmartspaceTarget.FEATURE_STEP_DATE ||
+                t.smartspaceTargetId == "date_card_794317_92634") {
+                return false
+            }
         }
         if (!showNotifications) {
             return t.featureType == SmartspaceTarget.FEATURE_WEATHER

@@ -431,7 +431,15 @@ public final class CardRecyclerViewAdapter extends RecyclerView.Adapter<CardRecy
 
     @Override
     public final void setTargets(List<SmartspaceTarget> targets) {
-        setTargets(targets, null);
+        // Filter out any date cards that might already be in the list
+        // (date is already shown in date/weather view when decoupled)
+        List<SmartspaceTarget> filteredTargets = new ArrayList<>(targets);
+        if ("lockscreen".equals(uiSurface)) {
+            filteredTargets.removeIf(target ->
+                    "date_card_794317_92634".equals(target.getSmartspaceTargetId()) ||
+                    target.getFeatureType() == 39); // FEATURE_STEP_DATE
+        }
+        setTargets(filteredTargets, null);
     }
 
     @Override
@@ -555,10 +563,20 @@ public final class CardRecyclerViewAdapter extends RecyclerView.Adapter<CardRecy
                 }
             }
         }
-
+        // Filter out any date cards that might already be in the lists
+        // (date is already shown in date/weather view when decoupled)
+        if ("lockscreen".equals(uiSurface)) {
+            _lockscreenTargets.removeIf(target ->
+                    "date_card_794317_92634".equals(target.getSmartspaceTargetId()) ||
+                    target.getFeatureType() == 39); // FEATURE_STEP_DATE
+        }
+        // Don't add default date card for lockscreen when date/weather is decoupled,
+        // as date is already shown in date/weather view
         if (!configProvider.isDefaultDateWeatherDisabled()) {
             addDefaultDateCardIfEmpty(_aodTargets);
-            addDefaultDateCardIfEmpty(_lockscreenTargets);
+            if (!"lockscreen".equals(uiSurface)) {
+                addDefaultDateCardIfEmpty(_lockscreenTargets);
+            }
         }
 
         updateTargetVisibility(runnable, true);
