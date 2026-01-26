@@ -206,7 +206,23 @@ public class LocaleConfig implements Parcelable {
             return;
         }
         try (XmlResourceParser parser = res.getXml(resourceId)) {
-            XmlUtils.beginDocument(parser, TAG_LOCALE_CONFIG);
+            // Check if the root tag is actually "locale-config" before parsing
+            // This prevents errors when the resource ID incorrectly points to a different XML file
+            int eventType = parser.getEventType();
+            while (eventType != XmlResourceParser.START_TAG && eventType != XmlResourceParser.END_DOCUMENT) {
+                eventType = parser.next();
+            }
+            if (eventType == XmlResourceParser.END_DOCUMENT) {
+                mStatus = STATUS_NOT_SPECIFIED;
+                return;
+            }
+            String rootTag = parser.getName();
+            if (!TAG_LOCALE_CONFIG.equals(rootTag)) {
+                // The resource doesn't have a locale-config root tag, treat as not specified
+                // rather than parsing failed to avoid warning spam for incorrectly configured resources
+                mStatus = STATUS_NOT_SPECIFIED;
+                return;
+            }
             int outerDepth = parser.getDepth();
             AttributeSet attrs = Xml.asAttributeSet(parser);
 
