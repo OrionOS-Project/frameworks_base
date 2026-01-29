@@ -58,7 +58,8 @@ public class VPNTetheringTile extends QSTileImpl<BooleanState> {
 
     public static final String TILE_SPEC = "vpn_tethering";
 
-    private final Icon mIcon = ResourceIcon.get(R.drawable.ic_qs_vpn_tethering);
+    @Nullable
+    private Icon mIcon = null;
     private static final Intent TETHER_SETTINGS = new Intent().setComponent(new ComponentName(
             "com.android.settings", "com.android.settings.TetherSettings"));
 
@@ -129,6 +130,9 @@ public class VPNTetheringTile extends QSTileImpl<BooleanState> {
         final boolean enable = value != 0;
         state.value = enable;
         state.label = mContext.getString(R.string.vpn_tethering_label);
+        if (mIcon == null) {
+            mIcon = maybeLoadResourceIcon(R.drawable.ic_qs_vpn_tethering);
+        }
         state.icon = mIcon;
         if (enable) {
             state.contentDescription =  mContext.getString(
