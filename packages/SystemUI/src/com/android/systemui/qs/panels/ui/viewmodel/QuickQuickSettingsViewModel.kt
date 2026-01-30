@@ -16,6 +16,7 @@
 
 package com.android.systemui.qs.panels.ui.viewmodel
 
+import android.content.res.Resources
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -30,6 +31,8 @@ import com.android.systemui.qs.panels.shared.model.SizedTileImpl
 import com.android.systemui.qs.panels.shared.model.splitInRowsSequence
 import com.android.systemui.qs.pipeline.domain.interactor.CurrentTilesInteractor
 import com.android.systemui.qs.pipeline.shared.TileSpec
+import com.android.systemui.res.R
+import com.android.systemui.shade.ShadeDisplayAware
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.awaitCancellation
@@ -46,6 +49,7 @@ constructor(
     val squishinessViewModel: TileSquishinessViewModel,
     iconTilesViewModel: IconTilesViewModel,
     val tileHapticsViewModelFactoryProvider: TileHapticsViewModelFactoryProvider,
+    @ShadeDisplayAware private val resources: Resources,
 ) : ExclusiveActivatable() {
 
     private val hydrator = Hydrator("QuickQuickSettingsViewModel")
@@ -57,22 +61,32 @@ constructor(
     val columns: Int
         get() = qsColumnsViewModel.columns
 
+    // Use QS columns for smooth transition, but allow QQS-specific override if needed
+    val qqsColumns = quickQuickSettingsRowInteractor.quickColumns
+
+    private val qqsColumnsValue by
+        hydrator.hydratedStateOf(
+            traceName = "qqsColumns",
+            initialValue = resources.getInteger(R.integer.quick_settings_infinite_grid_num_columns),
+            source = quickQuickSettingsRowInteractor.quickColumns,
+        )
+
     private val largeTiles by
         hydrator.hydratedStateOf(traceName = "largeTiles", source = iconTilesViewModel.largeTiles)
 
-    private val rows: Int
-        get() =
-            if (mediaInRowViewModel.shouldMediaShowInRow) {
-                rowsWithoutMedia * 2
-            } else {
-                rowsWithoutMedia
-            }
+    val rows by derivedStateOf {
+        if (mediaInRowViewModel.shouldMediaShowInRow) {
+            rowsWithoutMedia * 2
+        } else {
+            rowsWithoutMedia
+        }
+    }
 
     private val rowsWithoutMedia by
         hydrator.hydratedStateOf(
             traceName = "rowsWithoutMedia",
-            initialValue = quickQuickSettingsRowInteractor.defaultRows,
-            source = quickQuickSettingsRowInteractor.rows,
+            initialValue = resources.getInteger(R.integer.quick_qs_paginated_grid_num_rows),
+            source = quickQuickSettingsRowInteractor.quickRows,
         )
 
     private val largeTilesSpan: Int
@@ -84,7 +98,7 @@ constructor(
     val tileViewModels by derivedStateOf {
         currentTiles
             .map { SizedTileImpl(TileViewModel(it.tile, it.spec), it.spec.width()) }
-            .let { splitInRowsSequence(it, columns).take(rows).toList().flatten() }
+            .let { splitInRowsSequence(it, qqsColumnsValue).take(rows).toList().flatten() }
     }
 
     override suspend fun onActivated(): Nothing {
@@ -101,7 +115,7 @@ constructor(
         fun create(): QuickQuickSettingsViewModel
     }
 
-    private fun TileSpec.width(): Int = if (largeTiles.contains(this)) largeTilesSpan else 1
+    private fun TileSpec.width(): Int = if (largeTiles.contains(this)) minOf(largeTilesSpan, qqsColumnsValue) else 1
 
     companion object {
         /** Behavior of the media carousel in quick quick settings */

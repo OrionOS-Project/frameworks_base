@@ -18,10 +18,16 @@ package com.android.systemui.qs.panels.data.repository
 
 import com.android.systemui.common.ui.data.repository.configurationRepository
 import com.android.systemui.kosmos.Kosmos
+import com.android.systemui.kosmos.applicationCoroutineScope
 import com.android.systemui.kosmos.testCase
+import com.android.systemui.shared.settings.data.repository.systemSettingsRepository
 
 val Kosmos.quickQuickSettingsRowRepository by
     Kosmos.Fixture {
-        testCase.context.orCreateTestableResources
-        QuickQuickSettingsRowRepository(testCase.context.resources, configurationRepository)
+        QuickQuickSettingsRowRepository(
+            applicationCoroutineScope,
+            testCase.context.resources,
+            configurationRepository,
+            systemSettingsRepository,
+        )
     }

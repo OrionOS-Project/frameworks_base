@@ -25,6 +25,7 @@ import com.android.systemui.common.ui.data.repository.configurationRepository
 import com.android.systemui.common.ui.data.repository.fakeConfigurationRepository
 import com.android.systemui.flags.EnableSceneContainer
 import com.android.systemui.kosmos.Kosmos
+import com.android.systemui.kosmos.applicationCoroutineScope
 import com.android.systemui.kosmos.runTest
 import com.android.systemui.kosmos.testCase
 import com.android.systemui.kosmos.testScope
@@ -40,6 +41,7 @@ import com.android.systemui.qs.composefragment.dagger.usingMediaInComposeFragmen
 import com.android.systemui.qs.panels.data.repository.QSColumnsRepository
 import com.android.systemui.qs.panels.data.repository.qsColumnsRepository
 import com.android.systemui.qs.ui.viewmodel.QuickSettingsContainerViewModel
+import com.android.systemui.shared.settings.data.repository.systemSettingsRepository
 import com.android.systemui.res.R
 import com.android.systemui.shade.domain.interactor.disableDualShade
 import com.android.systemui.shade.domain.interactor.enableDualShade
@@ -71,7 +73,13 @@ class QSColumnsViewModelTest : SysuiTestCase() {
                 R.integer.quick_settings_infinite_grid_tile_max_width,
                 4,
             )
-            qsColumnsRepository = QSColumnsRepository(mainResources, configurationRepository)
+            qsColumnsRepository =
+                QSColumnsRepository(
+                    applicationCoroutineScope,
+                    mainResources,
+                    configurationRepository,
+                    systemSettingsRepository,
+                )
         }
 
     @Test

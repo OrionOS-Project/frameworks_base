@@ -58,17 +58,18 @@ constructor(
             )
 
     override fun splitIntoPages(tiles: List<TileViewModel>, rows: Int): List<List<TileViewModel>> {
+        val columns = columnsWithMediaViewModel.columns
         return splitInRows(
-                tiles.map { SizedTileImpl(it, widthOf(it.spec)) },
-                columnsWithMediaViewModel.columns,
+                tiles.map { SizedTileImpl(it, widthOf(it.spec, columns)) },
+                columns,
             )
             .chunked(rows)
             .map { it.flatten().map { it.tile } }
     }
 
-    private fun widthOf(spec: TileSpec): Int {
+    private fun widthOf(spec: TileSpec, columns: Int): Int {
         return if (iconTilesViewModel.largeTilesState.value.contains(spec))
-            columnsWithMediaViewModel.largeSpan
+            minOf(columnsWithMediaViewModel.largeSpan, columns)
         else 1
     }
 

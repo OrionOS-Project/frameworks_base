@@ -22,12 +22,14 @@ import androidx.test.filters.SmallTest
 import com.android.systemui.SysuiTestCase
 import com.android.systemui.common.ui.data.repository.configurationRepository
 import com.android.systemui.flags.EnableSceneContainer
+import com.android.systemui.kosmos.applicationCoroutineScope
 import com.android.systemui.kosmos.collectLastValue
 import com.android.systemui.kosmos.runTest
 import com.android.systemui.kosmos.testCase
 import com.android.systemui.kosmos.useUnconfinedTestDispatcher
 import com.android.systemui.qs.panels.data.repository.QSColumnsRepository
 import com.android.systemui.qs.panels.data.repository.qsColumnsRepository
+import com.android.systemui.shared.settings.data.repository.systemSettingsRepository
 import com.android.systemui.res.R
 import com.android.systemui.shade.domain.interactor.enableDualShade
 import com.android.systemui.shade.domain.interactor.enableSingleShade
@@ -56,7 +58,13 @@ class QSColumnsInteractorTest : SysuiTestCase() {
                 R.integer.quick_settings_split_shade_num_columns,
                 3,
             )
-            qsColumnsRepository = QSColumnsRepository(mainResources, configurationRepository)
+            qsColumnsRepository =
+                QSColumnsRepository(
+                    applicationCoroutineScope,
+                    mainResources,
+                    configurationRepository,
+                    systemSettingsRepository,
+                )
         }
     private lateinit var underTest: QSColumnsInteractor
 

@@ -7136,6 +7136,42 @@ public final class Settings {
         public static final String QS_BRIGHTNESS_SLIDER_SHAPE = "qs_brightness_slider_shape";
 
         /**
+         * Number of columns in quick settings panel layout.
+         * @hide
+         */
+        public static final String QS_LAYOUT_COLUMNS = "qs_layout_columns";
+
+        /**
+         * Number of rows in quick settings panel layout.
+         * @hide
+         */
+        public static final String QS_LAYOUT_ROWS = "qs_layout_rows";
+
+        /**
+         * Number of rows in quick quick settings panel layout.
+         * @hide
+         */
+        public static final String QQS_LAYOUT_ROWS = "qqs_layout_rows";
+
+        /**
+         * Number of columns in quick settings panel layout for landscape orientation.
+         * @hide
+         */
+        public static final String QS_LAYOUT_COLUMNS_LANDSCAPE = "qs_layout_columns_landscape";
+
+        /**
+         * Number of rows in quick settings panel layout for landscape orientation.
+         * @hide
+         */
+        public static final String QS_LAYOUT_ROWS_LANDSCAPE = "qs_layout_rows_landscape";
+
+        /**
+         * Number of rows in quick quick settings panel layout for landscape orientation.
+         * @hide
+         */
+        public static final String QQS_LAYOUT_ROWS_LANDSCAPE = "qqs_layout_rows_landscape";
+
+        /**
          * Whether to use tiny taskbar on phones
          * @hide
          */

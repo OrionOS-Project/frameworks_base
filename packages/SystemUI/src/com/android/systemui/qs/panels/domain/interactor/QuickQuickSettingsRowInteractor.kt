@@ -27,6 +27,6 @@ constructor(
     quickQuickSettingsRowRepository: QuickQuickSettingsRowRepository,
 ) {
     val rows = quickQuickSettingsRowRepository.rows
-
-    val defaultRows = 2
+    val quickRows = quickQuickSettingsRowRepository.quickRows
+    val quickColumns = quickQuickSettingsRowRepository.quickColumns
 }
