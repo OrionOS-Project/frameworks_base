@@ -7172,6 +7172,12 @@ public final class Settings {
         public static final String QQS_LAYOUT_ROWS_LANDSCAPE = "qqs_layout_rows_landscape";
 
         /**
+         * Whether media-in-row should halve QS columns.
+         * @hide
+         */
+        public static final String QS_MEDIA_RESPECT_HALVING = "qs_media_respect_halving";
+
+        /**
          * Whether to use tiny taskbar on phones
          * @hide
          */

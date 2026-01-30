@@ -24,6 +24,7 @@ import com.android.systemui.media.controls.ui.controller.MediaLocation
 import com.android.systemui.media.remedia.ui.compose.MediaUiBehavior
 import com.android.systemui.qs.panels.domain.interactor.LargeTileSpanInteractor
 import com.android.systemui.qs.panels.domain.interactor.QSColumnsInteractor
+import com.android.systemui.shared.settings.data.repository.SystemSettingsRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -43,6 +44,7 @@ constructor(
     interactor: QSColumnsInteractor,
     mediaInRowInLandscapeViewModelFactory: MediaInRowInLandscapeViewModel.Factory,
     private val largeTileSpanInteractor: LargeTileSpanInteractor,
+    private val systemSettingsRepository: SystemSettingsRepository,
     @Assisted @MediaLocation mediaLocation: Int?,
     @Assisted mediaUiBehavior: MediaUiBehavior?,
 ) : ExclusiveActivatable() {
@@ -50,8 +52,9 @@ constructor(
     private val hydrator = Hydrator("QSColumnsViewModelWithMedia")
 
     val columns by derivedStateOf {
-        if (mediaInRowInLandscapeViewModel?.shouldMediaShowInRow == true) {
-            columnsWithoutMedia / 2
+        val shouldRespectHalving = respectHalving
+        if (shouldRespectHalving && mediaInRowInLandscapeViewModel?.shouldMediaShowInRow == true) {
+            (columnsWithoutMedia / 2).coerceAtLeast(1)
         } else {
             columnsWithoutMedia
         }
@@ -88,6 +91,13 @@ constructor(
 
     private val columnsWithoutMedia by
         hydrator.hydratedStateOf(traceName = "columnsWithoutMedia", source = interactor.columns)
+
+    private val respectHalving: Boolean by
+        hydrator.hydratedStateOf(
+            traceName = "respectHalving",
+            initialValue = true,
+            source = systemSettingsRepository.boolSetting("qs_media_respect_halving", true),
+        )
 
     override suspend fun onActivated(): Nothing {
         coroutineScope {
